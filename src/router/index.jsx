@@ -1,45 +1,53 @@
+import { lazy, Suspense } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import MainLayout from '../components/layout/MainLayout'
 import PublicLayout from '../components/layout/PublicLayout'
 import AuthLayout from '../components/layout/AuthLayout'
 import DashboardLayout from '../components/layout/DashboardLayout'
 import ProtectedRoute from '../components/layout/ProtectedRoute'
+import { Spinner } from '../components/ui'
 
-// Pages
-import Landing from '../pages/Public/Landing'
-import Login from '../pages/Public/Login'
-import Register from '../pages/Public/Register'
-import About from '../pages/Public/About'
+// Lazy load pages for better performance
+const Landing = lazy(() => import('../pages/Public/Landing'))
+const Login = lazy(() => import('../pages/Public/Login'))
+const Register = lazy(() => import('../pages/Public/Register'))
+const About = lazy(() => import('../pages/Public/About'))
+const StudentDashboard = lazy(() => import('../pages/Student/StudentDashboard'))
+const MyCourses = lazy(() => import('../pages/Student/MyCourses'))
+const BrowseCourses = lazy(() => import('../pages/Student/BrowseCourses'))
+const CourseView = lazy(() => import('../pages/Student/CourseView'))
+const StudentProfile = lazy(() => import('../pages/Student/Profile'))
+const Wishlist = lazy(() => import('../pages/Student/Wishlist'))
+const TeacherDashboard = lazy(() => import('../pages/Teacher/TeacherDashboard'))
+const TeacherProfile = lazy(() => import('../pages/Teacher/Profile'))
+const CreateCourse = lazy(() => import('../pages/Teacher/CreateCourse'))
+const LessonManager = lazy(() => import('../pages/Teacher/LessonManager'))
+const TeacherMyCourses = lazy(() => import('../pages/Teacher/MyCourses'))
+const StudentsList = lazy(() => import('../pages/Teacher/StudentsList'))
+const TeacherAnalytics = lazy(() => import('../pages/Teacher/Analytics'))
+const TeacherCertificates = lazy(() => import('../pages/Teacher/Certificates'))
+const AdminDashboard = lazy(() => import('../pages/Admin/AdminDashboard'))
+const UserManagement = lazy(() => import('../pages/Admin/UserManagement'))
+const CourseApproval = lazy(() => import('../pages/Admin/CourseApproval'))
+const Reports = lazy(() => import('../pages/Admin/Reports'))
+const SystemSettings = lazy(() => import('../pages/Admin/SystemSettings'))
+const CertificateManagement = lazy(() => import('../pages/Admin/CertificateManagement'))
+const CertificateView = lazy(() => import('../pages/CertificateView'))
+const VerifyCertificate = lazy(() => import('../pages/VerifyCertificate'))
 
-// Student pages
-import StudentDashboard from '../pages/Student/StudentDashboard'
-import MyCourses from '../pages/Student/MyCourses'
-import BrowseCourses from '../pages/Student/BrowseCourses'
-import CourseView from '../pages/Student/CourseView'
-import StudentProfile from '../pages/Student/Profile'
-import Wishlist from '../pages/Student/Wishlist'
+// Loading component
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <Spinner size="lg" />
+  </div>
+)
 
-// Teacher pages
-import TeacherDashboard from '../pages/Teacher/TeacherDashboard'
-import TeacherProfile from '../pages/Teacher/Profile'
-import CreateCourse from '../pages/Teacher/CreateCourse'
-import LessonManager from '../pages/Teacher/LessonManager'
-import TeacherMyCourses from '../pages/Teacher/MyCourses'
-import StudentsList from '../pages/Teacher/StudentsList'
-import TeacherAnalytics from '../pages/Teacher/Analytics'
-import TeacherCertificates from '../pages/Teacher/Certificates'
-
-// Admin pages
-import AdminDashboard from '../pages/Admin/AdminDashboard'
-import UserManagement from '../pages/Admin/UserManagement'
-import CourseApproval from '../pages/Admin/CourseApproval'
-import Reports from '../pages/Admin/Reports'
-import SystemSettings from '../pages/Admin/SystemSettings'
-import CertificateManagement from '../pages/Admin/CertificateManagement'
-
-// Certificate pages
-import CertificateView from '../pages/CertificateView'
-import VerifyCertificate from '../pages/VerifyCertificate'
+// Wrap component with Suspense
+const withSuspense = (Component) => (
+  <Suspense fallback={<PageLoader />}>
+    <Component />
+  </Suspense>
+)
 
 export const router = createBrowserRouter([
   // Public routes
@@ -47,8 +55,8 @@ export const router = createBrowserRouter([
     path: '/',
     element: <PublicLayout />,
     children: [
-      { index: true, element: <Landing /> },
-      { path: 'about', element: <About /> }
+      { index: true, element: withSuspense(Landing) },
+      { path: 'about', element: withSuspense(About) }
     ]
   },
   
@@ -57,34 +65,34 @@ export const router = createBrowserRouter([
     path: '/login',
     element: <AuthLayout />,
     children: [
-      { index: true, element: <Login /> }
+      { index: true, element: withSuspense(Login) }
     ]
   },
   {
     path: '/register',
     element: <AuthLayout />,
     children: [
-      { index: true, element: <Register /> }
+      { index: true, element: withSuspense(Register) }
     ]
   },
   
-  // Certificate routes (public for verification)
+  // Certificate routes
   {
     path: '/certificate/:id',
     element: <PublicLayout />,
     children: [
-      { index: true, element: <CertificateView /> }
+      { index: true, element: withSuspense(CertificateView) }
     ]
   },
   {
     path: '/verify/:token',
     element: <PublicLayout />,
     children: [
-      { index: true, element: <VerifyCertificate /> }
+      { index: true, element: withSuspense(VerifyCertificate) }
     ]
   },
   
-  // Protected Student routes
+  // Student routes
   {
     path: '/student',
     element: <ProtectedRoute role="student" />,
@@ -92,18 +100,18 @@ export const router = createBrowserRouter([
       {
         element: <DashboardLayout />,
         children: [
-          { index: true, element: <StudentDashboard /> },
-          { path: 'my-courses', element: <MyCourses /> },
-          { path: 'browse', element: <BrowseCourses /> },
-          { path: 'course/:courseId', element: <CourseView /> },
-          { path: 'profile', element: <StudentProfile /> },
-          { path: 'wishlist', element: <Wishlist /> }
+          { index: true, element: withSuspense(StudentDashboard) },
+          { path: 'my-courses', element: withSuspense(MyCourses) },
+          { path: 'browse', element: withSuspense(BrowseCourses) },
+          { path: 'course/:courseId', element: withSuspense(CourseView) },
+          { path: 'profile', element: withSuspense(StudentProfile) },
+          { path: 'wishlist', element: withSuspense(Wishlist) }
         ]
       }
     ]
   },
   
-  // Protected Teacher routes
+  // Teacher routes
   {
     path: '/teacher',
     element: <ProtectedRoute role="teacher" />,
@@ -111,20 +119,20 @@ export const router = createBrowserRouter([
       {
         element: <DashboardLayout />,
         children: [
-          { index: true, element: <TeacherDashboard /> },
-          { path: 'profile', element: <TeacherProfile /> },
-          { path: 'courses', element: <TeacherMyCourses /> },
-          { path: 'courses/new', element: <CreateCourse /> },
-          { path: 'courses/:courseId/lessons', element: <LessonManager /> },
-          { path: 'students', element: <StudentsList /> },
-          { path: 'analytics', element: <TeacherAnalytics /> },
-          { path: 'certificates', element: <TeacherCertificates /> }
+          { index: true, element: withSuspense(TeacherDashboard) },
+          { path: 'profile', element: withSuspense(TeacherProfile) },
+          { path: 'courses', element: withSuspense(TeacherMyCourses) },
+          { path: 'courses/new', element: withSuspense(CreateCourse) },
+          { path: 'courses/:courseId/lessons', element: withSuspense(LessonManager) },
+          { path: 'students', element: withSuspense(StudentsList) },
+          { path: 'analytics', element: withSuspense(TeacherAnalytics) },
+          { path: 'certificates', element: withSuspense(TeacherCertificates) }
         ]
       }
     ]
   },
 
-  // Protected Admin routes
+  // Admin routes
   {
     path: '/admin',
     element: <ProtectedRoute role="admin" />,
@@ -132,12 +140,12 @@ export const router = createBrowserRouter([
       {
         element: <DashboardLayout />,
         children: [
-          { index: true, element: <AdminDashboard /> },
-          { path: 'users', element: <UserManagement /> },
-          { path: 'courses', element: <CourseApproval /> },
-          { path: 'certificates', element: <CertificateManagement /> },
-          { path: 'reports', element: <Reports /> },
-          { path: 'settings', element: <SystemSettings /> }
+          { index: true, element: withSuspense(AdminDashboard) },
+          { path: 'users', element: withSuspense(UserManagement) },
+          { path: 'courses', element: withSuspense(CourseApproval) },
+          { path: 'certificates', element: withSuspense(CertificateManagement) },
+          { path: 'reports', element: withSuspense(Reports) },
+          { path: 'settings', element: withSuspense(SystemSettings) }
         ]
       }
     ]
