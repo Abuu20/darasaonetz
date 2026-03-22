@@ -1,0 +1,145 @@
+/* Mobile-first responsive styles */
+@media (max-width: 640px) {
+  /* Increase touch targets */
+  button, 
+  a,
+  [role="button"],
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+  }
+  
+  /* Better scrolling for mobile */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Larger tap targets for navigation */
+  .nav-link {
+    padding: 12px 16px;
+  }
+  
+  /* Improve readability */
+  body {
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  h1 {
+    font-size: 28px;
+  }
+  
+  h2 {
+    font-size: 24px;
+  }
+  
+  h3 {
+    font-size: 20px;
+  }
+  
+  /* Form input improvements for mobile */
+  input, select, textarea {
+    font-size: 16px;
+  }
+  
+  /* Better form spacing */
+  form {
+    margin-bottom: 1rem;
+  }
+  
+  /* Touch-friendly radio/checkbox */
+  input[type="radio"],
+  input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+  
+  /* Larger tap targets for links in forms */
+  form a {
+    padding: 8px 0;
+    display: inline-block;
+  }
+  
+  /* Better card borders for mobile */
+  .bg-white {
+    border-radius: 1rem;
+  }
+}
+
+/* Tablet styles */
+@media (min-width: 641px) and (max-width: 1024px) {
+  h1 {
+    font-size: 32px;
+  }
+  
+  h2 {
+    font-size: 28px;
+  }
+  
+  h3 {
+    font-size: 24px;
+  }
+}
+
+/* Desktop styles */
+@media (min-width: 1025px) {
+  h1 {
+    font-size: 36px;
+  }
+  
+  h2 {
+    font-size: 32px;
+  }
+  
+  h3 {
+    font-size: 28px;
+  }
+}
+
+/* Smooth scrolling for mobile */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Better focus states for accessibility */
+*:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Disable outline on touch devices when using touch */
+@media (hover: none) {
+  *:focus {
+    outline: none;
+  }
+}
+
+/* Improve touch scrolling */
+.scroll-container {
+  -webkit-overflow-scrolling: touch;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+/* Hide scrollbar on mobile but keep functionality */
+@media (max-width: 640px) {
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Animation for active states */
+.active\:scale-98:active {
+  transform: scale(0.98);
+}
+
+/* Prevent text zoom on focus in iOS */
+input, select, textarea {
+  font-size: 16px;
+}

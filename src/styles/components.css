@@ -1,0 +1,169 @@
+/* Custom component classes - never override Tailwind utilities directly */
+
+.card {
+  @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4;
+  border-radius: 1rem;
+}
+
+.card-header {
+  @apply border-b border-gray-200 dark:border-gray-700 pb-4 mb-4;
+}
+
+.card-body {
+  @apply space-y-4;
+}
+
+.card-footer {
+  @apply border-t border-gray-200 dark:border-gray-700 pt-4 mt-4;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center font-medium transition-colors rounded-lg;
+}
+
+.btn-primary {
+  @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+}
+
+.btn-secondary {
+  @apply bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500;
+}
+
+.btn-danger {
+  @apply bg-red-600 text-white hover:bg-red-700 focus:ring-2 focus:ring-red-500;
+}
+
+.btn-outline {
+  @apply border-2 border-blue-600 text-blue-600 hover:bg-blue-50 dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-900/20;
+}
+
+.btn-sm {
+  @apply px-3 py-1.5 text-sm;
+}
+
+.btn-md {
+  @apply px-4 py-2 text-base;
+}
+
+.btn-lg {
+  @apply px-6 py-3 text-lg;
+}
+
+/* Form components */
+.form-input {
+  @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg 
+         bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+}
+
+.form-label {
+  @apply block text-gray-700 dark:text-gray-300 mb-2 font-medium;
+}
+
+.form-error {
+  @apply mt-1 text-sm text-red-500;
+}
+
+/* Layout components */
+.container-main {
+  @apply w-full px-4 sm:px-6 lg:px-8 mx-auto;
+}
+
+.sidebar {
+  @apply fixed top-0 left-0 h-full bg-white dark:bg-gray-800 shadow-lg z-50;
+  width: 16rem;
+}
+
+.main-content {
+  @apply transition-all duration-300;
+}
+
+/* Dashboard cards */
+.dashboard-stat {
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-md p-6;
+}
+
+.dashboard-stat-title {
+  @apply text-gray-500 dark:text-gray-400 text-sm mb-1;
+}
+
+.dashboard-stat-value {
+  @apply text-3xl font-bold;
+}
+
+/* Course cards */
+.course-card {
+  @apply bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition;
+}
+
+.course-card-thumbnail {
+  @apply h-40 bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-4xl;
+}
+
+.course-card-content {
+  @apply p-4;
+}
+
+.course-card-title {
+  @apply font-semibold text-lg mb-1 line-clamp-1;
+}
+
+.course-card-description {
+  @apply text-gray-600 dark:text-gray-400 text-sm mb-4 line-clamp-2;
+}
+
+/* Rating stars */
+.rating-stars {
+  @apply flex items-center gap-0.5;
+}
+
+.rating-star {
+  @apply w-5 h-5 text-gray-300 dark:text-gray-600;
+}
+
+.rating-star-filled {
+  @apply text-yellow-400 fill-current;
+}
+
+/* Mobile menu */
+.mobile-menu-overlay {
+  @apply fixed inset-0 bg-black bg-opacity-50 z-40;
+}
+
+.mobile-menu-panel {
+  @apply absolute right-0 top-0 h-full w-64 bg-white dark:bg-gray-800 shadow-xl overflow-y-auto;
+}
+
+/* Responsive utilities */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Animations */
+.fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Touch targets for mobile */
+@media (max-width: 640px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

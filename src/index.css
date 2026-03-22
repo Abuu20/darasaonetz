@@ -1,0 +1,82 @@
+/* Import styles */
+@import './styles/responsive.css';
+@import './styles/components.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global styles */
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+  
+  body {
+    background-color: #f9fafb;
+    color: #111827;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+  
+  .dark body {
+    background-color: #111827;
+    color: #f9fafb;
+  }
+  
+  /* Force root element to fill screen */
+  #root {
+    min-height: 100vh;
+    background-color: #f9fafb;
+    transition: background-color 0.2s ease;
+  }
+  
+  .dark #root {
+    background-color: #111827;
+  }
+}
+
+/* Ensure all backgrounds change in dark mode */
+.bg-gray-50 {
+  background-color: #f9fafb;
+}
+
+.dark .bg-gray-50 {
+  background-color: #111827;
+}
+
+.bg-gray-100 {
+  background-color: #f3f4f6;
+}
+
+.dark .bg-gray-100 {
+  background-color: #1f2937;
+}
+
+.bg-white {
+  background-color: #ffffff;
+}
+
+.dark .bg-white {
+  background-color: #1f2937;
+}
+
+/* Ensure all layout backgrounds change */
+.min-h-screen {
+  background-color: inherit;
+}
+
+/* Force body background to update with dark mode */
+body {
+  background-color: #f9fafb;
+  transition: background-color 0.2s ease;
+}
+
+.dark body {
+  background-color: #111827;
+}
+
+/* Ensure root div fills the screen */
+#root {
+  min-height: 100vh;
+  background-color: inherit;
+}
