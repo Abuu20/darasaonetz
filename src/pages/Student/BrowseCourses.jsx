@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../supabase/client'
 import { Card, Input, Select, Spinner, Button } from '../../components/ui'
-import CourseCard from '../../components/courses/CourseCard'
+import BeautifulCard from '../../components/ui/BeautifulCard'
 import RatingStars from '../../components/ui/RatingStars'
 import { useCart } from '../../context/CartContext'
 
@@ -130,7 +130,7 @@ export default function BrowseCourses() {
       if (error) throw error
 
       setEnrolledCourses([...enrolledCourses, courseId])
-      alert('Successfully enrolled in course!')
+      alert('🎉 Successfully enrolled in course!')
 
     } catch (error) {
       console.error('Error enrolling:', error)
@@ -140,7 +140,7 @@ export default function BrowseCourses() {
 
   function handleAddToCart(course) {
     addToCart(course)
-    alert(`${course.title} added to cart!`)
+    alert(`🛒 ${course.title} added to cart!`)
   }
 
   function applyFilters() {
@@ -170,9 +170,9 @@ export default function BrowseCourses() {
     }
 
     if (filters.price === 'free') {
-      filtered = filtered.filter(course => course.price === 0 || !course.price)
+      filtered = filtered.filter(course => parseFloat(course.price) === 0 || !course.price)
     } else if (filters.price === 'paid') {
-      filtered = filtered.filter(course => course.price > 0)
+      filtered = filtered.filter(course => parseFloat(course.price) > 0)
     }
 
     filtered.sort((a, b) => {
@@ -182,9 +182,9 @@ export default function BrowseCourses() {
         case 'oldest':
           return new Date(a.created_at) - new Date(b.created_at)
         case 'price-low':
-          return (a.price || 0) - (b.price || 0)
+          return (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0)
         case 'price-high':
-          return (b.price || 0) - (a.price || 0)
+          return (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0)
         case 'rating':
           return (b.average_rating || 0) - (a.average_rating || 0)
         case 'popular':
@@ -228,11 +228,13 @@ export default function BrowseCourses() {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg p-4 md:p-6 text-white">
-        <h1 className="text-xl md:text-2xl font-bold mb-1">Browse Courses</h1>
-        <p className="text-sm text-blue-100">Discover Islamic courses from expert teachers</p>
+    <div className="space-y-6">
+      {/* Header with Gradient */}
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl p-8 text-white">
+        <h1 className="text-2xl md:text-3xl font-bold mb-2">Discover Amazing Courses</h1>
+        <p className="text-sm md:text-base text-blue-100">
+          Learn from expert teachers around the world
+        </p>
       </div>
 
       {/* Mobile Filter Toggle */}
@@ -250,16 +252,17 @@ export default function BrowseCourses() {
 
       {/* Filters Section */}
       <div className={`${showFilters ? 'block' : 'hidden md:block'}`}>
-        <Card>
-          <div className="space-y-3">
+        <Card className="p-6">
+          <div className="space-y-4">
             <Input
               label="Search Courses"
               value={filters.search}
               onChange={(e) => updateFilter('search', e.target.value)}
               placeholder="Search by title or description..."
+              className="w-full"
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <Select
                 label="Category"
                 value={filters.category}
@@ -306,7 +309,7 @@ export default function BrowseCourses() {
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Select
                 label="Price"
                 value={filters.price}
@@ -353,106 +356,22 @@ export default function BrowseCourses() {
 
       {/* Courses Grid */}
       {filteredCourses.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredCourses.map(course => {
-            const isEnrolled = enrolledCourses.includes(course.id)
-            
-            return (
-              <div key={course.id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
-                {/* Course Thumbnail */}
-                <div className="h-36 sm:h-40 md:h-48 bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white text-3xl relative">
-                  {course.thumbnail_url ? (
-                    <img src={course.thumbnail_url} alt={course.title} className="w-full h-full object-cover" />
-                  ) : (
-                    '📚'
-                  )}
-                  {course.average_rating > 0 && (
-                    <div className="absolute top-2 right-2 bg-black/70 rounded-full px-2 py-1 flex items-center gap-1">
-                      <RatingStars rating={course.average_rating} readonly size="sm" />
-                      <span className="text-xs text-white ml-1">
-                        ({course.review_count})
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Course Content */}
-                <div className="p-3 sm:p-4">
-                  <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded capitalize">
-                      {course.level}
-                    </span>
-                    {course.categories && (
-                      <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">
-                        {course.categories.name}
-                      </span>
-                    )}
-                  </div>
-
-                  <h3 className="font-semibold text-sm sm:text-base mb-1 line-clamp-1">{course.title}</h3>
-                  
-                  <div className="flex items-center gap-2 mb-2">
-                    <RatingStars rating={course.average_rating} readonly size="sm" />
-                    {course.review_count > 0 && (
-                      <span className="text-xs text-gray-500">({course.review_count})</span>
-                    )}
-                  </div>
-
-                  <p className="text-gray-600 text-xs sm:text-sm mb-3 line-clamp-2">
-                    {course.description}
-                  </p>
-
-                  <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
-                    <span>👤 {course.profiles?.full_name?.split(' ')[0] || 'Instructor'}</span>
-                    <span>📚 {course.lessons?.count || 0} lessons</span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      {course.price > 0 ? (
-                        <span className="text-lg sm:text-xl font-bold text-blue-600">
-                          TZS {course.price.toLocaleString()}
-                        </span>
-                      ) : (
-                        <span className="text-lg sm:text-xl font-bold text-green-600">
-                          Free
-                        </span>
-                      )}
-                    </div>
-                    
-                    {isEnrolled ? (
-                      <Link
-                        to={`/student/course/${course.id}`}
-                        className="bg-green-600 text-white px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-green-700"
-                      >
-                        Continue
-                      </Link>
-                    ) : course.price > 0 ? (
-                      <button
-                        onClick={() => handleAddToCart(course)}
-                        className="bg-yellow-600 text-white px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-yellow-700"
-                      >
-                        Add to Cart
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleEnroll(course.id)}
-                        className="bg-blue-600 text-white px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-blue-700"
-                      >
-                        Enroll Free
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )
-          })}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredCourses.map(course => (
+            <BeautifulCard
+              key={course.id}
+              course={course}
+              isEnrolled={enrolledCourses.includes(course.id)}
+              onEnroll={handleEnroll}
+              onAddToCart={handleAddToCart}
+            />
+          ))}
         </div>
       ) : (
         <Card>
-          <div className="text-center py-8">
+          <div className="text-center py-12">
             <p className="text-4xl mb-4">🔍</p>
-            <p className="text-gray-500">No courses found</p>
+            <p className="text-gray-500 text-lg">No courses found</p>
             <p className="text-gray-400 text-sm mt-2">Try adjusting your search or filters</p>
             <button
               onClick={resetFilters}
