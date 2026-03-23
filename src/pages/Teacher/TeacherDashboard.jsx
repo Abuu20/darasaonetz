@@ -10,6 +10,8 @@ import TeacherMyCourses from './MyCourses'
 import StudentsList from './StudentsList'
 import TeacherAnalytics from './Analytics'
 import TeacherCertificates from './Certificates'
+import TeacherForum from './TeacherForum'
+import TeacherTopicDetail from './TeacherTopicDetail'
 
 export default function TeacherDashboard() {
   const navigate = useNavigate()
@@ -222,18 +224,15 @@ export default function TeacherDashboard() {
 
   return (
     <div className="min-h-screen">
-      {/* Main Content - No duplicate navigation here */}
       <div className="container mx-auto px-4 py-8">
         <Routes>
           <Route path="/" element={
             <div className="space-y-6">
-              {/* Welcome Header */}
               <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg p-8 text-white">
                 <h1 className="text-3xl font-bold mb-2">Teacher Dashboard</h1>
                 <p className="text-purple-100">Manage your courses and track your performance</p>
               </div>
 
-              {/* Stats Cards */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card>
                   <h3 className="text-gray-500 text-sm mb-1">Total Courses</h3>
@@ -255,7 +254,6 @@ export default function TeacherDashboard() {
                 </Card>
               </div>
 
-              {/* Quick Action Button */}
               <div className="flex justify-end">
                 <Link to="/teacher/courses/new">
                   <Button variant="primary" size="lg">
@@ -264,10 +262,8 @@ export default function TeacherDashboard() {
                 </Link>
               </div>
 
-              {/* Tabs Section */}
               <Card>
                 <Tabs tabs={tabs} defaultTab="overview" onChange={setActiveTab}>
-                  {/* Overview Tab */}
                   <div id="overview" className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <Card>
@@ -296,7 +292,6 @@ export default function TeacherDashboard() {
                     </div>
                   </div>
 
-                  {/* My Courses Tab */}
                   <div id="courses" className="space-y-4">
                     {courses.length > 0 ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -336,6 +331,11 @@ export default function TeacherDashboard() {
                                     Manage Lessons
                                   </Button>
                                 </Link>
+                                <Link to={`/teacher/forum/${course.id}`} className="flex-1">
+                                  <Button variant="outline" size="sm" fullWidth>
+                                    💬 Forum
+                                  </Button>
+                                </Link>
                               </div>
                             </Card>
                           )
@@ -351,7 +351,6 @@ export default function TeacherDashboard() {
                     )}
                   </div>
 
-                  {/* Reviews Tab */}
                   <div id="reviews" className="space-y-4">
                     {reviews.length > 0 ? (
                       <div className="space-y-4">
@@ -427,6 +426,8 @@ export default function TeacherDashboard() {
           <Route path="/students" element={<StudentsList />} />
           <Route path="/analytics" element={<TeacherAnalytics />} />
           <Route path="/certificates" element={<TeacherCertificates />} />
+          <Route path="/forum/:courseId" element={<TeacherForum />} />
+          <Route path="/forum/:courseId/topic/:topicId" element={<TeacherTopicDetail />} />
         </Routes>
       </div>
     </div>

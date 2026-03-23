@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../../supabase/client'
 import { useAuth } from '../../context/AuthContext'
@@ -10,6 +10,10 @@ import ReviewForm from '../../components/courses/ReviewForm'
 import ReviewsList from '../../components/courses/ReviewsList'
 import QuizTaker from '../../components/quiz/QuizTaker'
 import CertificateGenerator from '../../components/certificates/CertificateGenerator'
+import ForumTopics from '../../components/forum/ForumTopics'
+import TopicDetail from '../../components/forum/TopicDetail'
+import NotesPanel from '../../components/notes/NotesPanel'
+import BookmarksPanel from '../../components/notes/BookmarksPanel'
 import { Tabs, Card, Button, Spinner } from '../../components/ui'
 
 export default function CourseView() {
@@ -17,6 +21,10 @@ export default function CourseView() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const { showSuccess, showError } = useTheme()
+  const videoRef = useRef(null)
+  const [videoCurrentTime, setVideoCurrentTime] = useState(0)
+  const [refreshBookmarks, setRefreshBookmarks] = useState(0)
+  
   const [loading, setLoading] = useState(true)
   const [course, setCourse] = useState(null)
   const [lessons, setLessons] = useState([])
@@ -29,6 +37,7 @@ export default function CourseView() {
   const [quizScore, setQuizScore] = useState(null)
   const [activeTab, setActiveTab] = useState('content')
   const [certificateIssued, setCertificateIssued] = useState(false)
+  const [selectedTopic, setSelectedTopic] = useState(null)
 
   useEffect(() => {
     fetchCourseData()
@@ -151,7 +160,6 @@ export default function CourseView() {
 
   async function markLessonComplete(lessonId) {
     try {
-      // Mark lesson as completed
       await supabase
         .from('lesson_completions')
         .insert({
@@ -182,9 +190,7 @@ export default function CourseView() {
 
       showSuccess('Lesson completed!')
 
-      // Check if course is now 100% complete and certificate not issued yet
       if (progress === 100 && !certificateIssued) {
-        // Refresh course data to show certificate button
         await fetchCourseData()
       }
 
@@ -197,7 +203,6 @@ export default function CourseView() {
   async function handleQuizComplete(passed) {
     if (passed) {
       showSuccess('Congratulations! You passed the quiz!')
-      // Update course progress if quiz is required
       const newProgress = Math.min(100, enrollment.progress + 20)
       await supabase
         .from('enrollments')
@@ -206,7 +211,6 @@ export default function CourseView() {
       
       setEnrollment({ ...enrollment, progress: newProgress })
       
-      // Check if course is now 100% complete and certificate not issued yet
       if (newProgress === 100 && !certificateIssued) {
         await fetchCourseData()
       }
@@ -216,8 +220,60 @@ export default function CourseView() {
     await fetchCourseData()
   }
 
+  const handleVideoTimeUpdate = (time) => {
+    setVideoCurrentTime(time)
+  }
+
+  const handleSeek = (time) => {
+    if (videoRef.current) {
+      videoRef.current.seekTo(time)
+      setTimeout(() => {
+        if (videoRef.current) {
+          videoRef.current.play()
+        }
+      }, 100)
+    }
+  }
+
+  const handleBookmark = async (time, note) => {
+    try {
+      const { error } = await supabase
+        .from('student_bookmarks')
+        .insert({
+          student_id: user.id,
+          course_id: courseId,
+          lesson_id: currentLesson?.id,
+          timestamp: Math.floor(time),
+          note: note || ''
+        })
+
+      if (error) throw error
+      
+      const formatTime = (seconds) => {
+        const mins = Math.floor(seconds / 60)
+        const secs = Math.floor(seconds % 60)
+        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+      }
+      
+      showSuccess(`Bookmark added at ${formatTime(time)}`)
+      setRefreshBookmarks(prev => prev + 1)
+      
+    } catch (error) {
+      console.error('Error adding bookmark:', error)
+      showError('Failed to add bookmark')
+    }
+  }
+
+  const formatTimeDisplay = (seconds) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`
+  }
+
   const tabs = [
     { id: 'content', label: 'Course Content' },
+    { id: 'notes', label: 'Notes & Bookmarks' },
+    { id: 'forum', label: 'Discussion Forum' },
     { id: 'reviews', label: `Reviews (${course?.review_count || 0})` },
     ...(quiz ? [{ id: 'quiz', label: hasTakenQuiz ? `Quiz (${quizScore}%)` : 'Quiz' }] : [])
   ]
@@ -257,12 +313,20 @@ export default function CourseView() {
           <div id="content">
             {currentLesson ? (
               <div className="p-4 md:p-6">
-                {/* Video Player */}
+                {/* Video Player with integrated bookmark button */}
                 {currentLesson.video_url && (
                   <div className="mb-6">
                     <VideoPlayer 
+                      ref={videoRef}
                       videoUrl={currentLesson.video_url}
                       title={currentLesson.title}
+                      onTimeUpdate={handleVideoTimeUpdate}
+                      onLoaded={() => {
+                        console.log('Video loaded')
+                      }}
+                      onBookmark={handleBookmark}
+                      lessonId={currentLesson.id}
+                      courseId={courseId}
                     />
                   </div>
                 )}
@@ -308,6 +372,39 @@ export default function CourseView() {
                   <p>Select a lesson to start learning</p>
                 </div>
               </div>
+            )}
+          </div>
+
+          {/* Notes & Bookmarks Tab */}
+          <div id="notes" className="p-4 md:p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <NotesPanel 
+                courseId={courseId} 
+                lessonId={currentLesson?.id} 
+              />
+              <BookmarksPanel 
+                key={refreshBookmarks}
+                courseId={courseId} 
+                lessonId={currentLesson?.id}
+                currentTime={videoCurrentTime}
+                onSeek={handleSeek}
+              />
+            </div>
+          </div>
+
+          {/* Forum Tab */}
+          <div id="forum" className="p-4 md:p-6">
+            {selectedTopic ? (
+              <TopicDetail
+                topicId={selectedTopic}
+                courseId={courseId}
+                onBack={() => setSelectedTopic(null)}
+              />
+            ) : (
+              <ForumTopics 
+                courseId={courseId} 
+                onSelectTopic={setSelectedTopic}
+              />
             )}
           </div>
 

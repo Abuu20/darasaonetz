@@ -15,19 +15,31 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-      setUser(session?.user ?? null)
-      if (session?.user) {
-        fetchProfile(session.user.id)
-      } else {
+    const initAuth = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession()
+        if (error) throw error
+        
+        setSession(session)
+        setUser(session?.user ?? null)
+        
+        if (session?.user) {
+          await fetchProfile(session.user.id)
+        } else {
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error('Error getting session:', error)
         setLoading(false)
       }
-    })
+    }
+    
+    initAuth()
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth event:', event, session?.user?.email)
         setSession(session)
         setUser(session?.user ?? null)
         
@@ -40,7 +52,9 @@ export const AuthProvider = ({ children }) => {
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      subscription.unsubscribe()
+    }
   }, [])
 
   const fetchProfile = async (userId) => {
@@ -67,8 +81,15 @@ export const AuthProvider = ({ children }) => {
         password
       })
       if (error) throw error
+      
+      // Store session in localStorage
+      if (data?.session) {
+        localStorage.setItem('darasaone-auth-token', JSON.stringify(data.session))
+      }
+      
       return { success: true, data }
     } catch (error) {
+      console.error('Login error:', error)
       return { success: false, error: error.message }
     }
   }
@@ -79,12 +100,14 @@ export const AuthProvider = ({ children }) => {
         email,
         password,
         options: {
-          data: userData
+          data: userData,
+          emailRedirectTo: `${window.location.origin}/login`
         }
       })
       if (error) throw error
       return { success: true, data }
     } catch (error) {
+      console.error('Register error:', error)
       return { success: false, error: error.message }
     }
   }
@@ -93,10 +116,16 @@ export const AuthProvider = ({ children }) => {
     try {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
+      
+      // Clear stored session
+      localStorage.removeItem('darasaone-auth-token')
+      
       setUser(null)
       setProfile(null)
+      setSession(null)
       return { success: true }
     } catch (error) {
+      console.error('Logout error:', error)
       return { success: false, error: error.message }
     }
   }
@@ -112,10 +141,10 @@ export const AuthProvider = ({ children }) => {
 
       if (error) throw error
 
-      // Update local profile
       setProfile(prev => ({ ...prev, ...updates }))
       return { success: true }
     } catch (error) {
+      console.error('Update profile error:', error)
       return { success: false, error: error.message }
     }
   }
@@ -128,6 +157,7 @@ export const AuthProvider = ({ children }) => {
       if (error) throw error
       return { success: true }
     } catch (error) {
+      console.error('Reset password error:', error)
       return { success: false, error: error.message }
     }
   }

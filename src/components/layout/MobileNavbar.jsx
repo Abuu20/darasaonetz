@@ -1,19 +1,18 @@
 import { useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
+import { useCart } from '../../context/CartContext'
 import { Avatar, Button } from '../ui'
 import MobileMenu from '../ui/MobileMenu'
 import NotificationBell from '../ui/NotificationBell'
 
 export default function MobileNavbar() {
   const navigate = useNavigate()
-  const location = useLocation()
   const { user, profile, logout } = useAuth()
   const { theme, toggleTheme, isMobile } = useTheme()
+  const { cartCount } = useCart()
   const [menuOpen, setMenuOpen] = useState(false)
-  
-  const isLandingPage = location.pathname === '/'
 
   const handleLogout = async () => {
     await logout()
@@ -30,17 +29,12 @@ export default function MobileNavbar() {
     }
   }
 
-  // Only render on mobile
   if (!isMobile) return null
-
-  // If not logged in on landing page, don't show this navbar (SimpleNavbar handles it)
-  if (isLandingPage && !user) return null
 
   return (
     <>
       <nav className="bg-white dark:bg-gray-800 shadow-lg fixed w-full top-0 z-40">
         <div className="px-3 py-2 flex justify-between items-center">
-          {/* Menu Button */}
           <button
             onClick={() => setMenuOpen(true)}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -51,13 +45,25 @@ export default function MobileNavbar() {
             </svg>
           </button>
           
-          {/* Logo */}
           <Link to="/" className="text-lg font-bold text-blue-600 dark:text-blue-400">
             Darasaone
           </Link>
           
-          {/* Right Icons */}
           <div className="flex items-center gap-1">
+            {/* Cart Icon - Fixed link to /student/cart */}
+            {user && profile?.role === 'student' && (
+              <Link to="/student/cart" className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+            )}
+
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -66,10 +72,9 @@ export default function MobileNavbar() {
               {theme === 'dark' ? '☀️' : '🌙'}
             </button>
             
-            {/* Only show notification bell when user is logged in */}
             {user && <NotificationBell />}
             
-            {user ? (
+            {user && (
               <div className="ml-1">
                 <Avatar
                   src={profile?.avatar_url}
@@ -77,21 +82,11 @@ export default function MobileNavbar() {
                   size="sm"
                 />
               </div>
-            ) : (
-              <div className="flex items-center gap-1">
-                <Link to="/login">
-                  <Button variant="outline" size="sm">Login</Button>
-                </Link>
-                <Link to="/register">
-                  <Button variant="primary" size="sm">Sign Up</Button>
-                </Link>
-              </div>
             )}
           </div>
         </div>
       </nav>
 
-      {/* Mobile Menu */}
       <MobileMenu isOpen={menuOpen} onClose={() => setMenuOpen(false)}>
         <div className="space-y-4">
           {user ? (
@@ -142,6 +137,13 @@ export default function MobileNavbar() {
                       onClick={() => setMenuOpen(false)}
                     >
                       ❤️ Wishlist
+                    </Link>
+                    <Link
+                      to="/student/cart"
+                      className="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      🛒 Cart ({cartCount})
                     </Link>
                   </>
                 )}

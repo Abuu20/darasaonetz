@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../supabase/client'
 import { Card, Button, Spinner, Input, Select, Tabs } from '../../components/ui'
+import RatingStars from '../../components/ui/RatingStars'
 
 export default function CourseApproval() {
   const navigate = useNavigate()
@@ -76,7 +77,9 @@ export default function CourseApproval() {
           ),
           categories (
             name
-          )
+          ),
+          lessons (count),
+          enrollments (count)
         `)
         .order('created_at', { ascending: false })
 
@@ -208,9 +211,10 @@ export default function CourseApproval() {
   }
 
   async function handleDelete(courseId) {
-    if (!confirm('Are you sure you want to permanently delete this course? This action cannot be undone.')) return
+    if (!confirm('⚠️ WARNING: This will permanently delete the course and ALL related data including:\n- All lessons\n- All enrollments\n- All reviews\n- All quiz attempts\n\nThis action CANNOT be undone. Are you sure?')) return
 
     try {
+      // With CASCADE DELETE, this will automatically delete all related records
       const { error } = await supabase
         .from('courses')
         .delete()
@@ -242,18 +246,19 @@ export default function CourseApproval() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Navigation */}
-      <nav className="bg-white shadow">
+      <nav className="bg-white dark:bg-gray-800 shadow">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-8">
-            <h1 className="text-2xl font-bold text-red-600">Darasaone Admin</h1>
+            <h1 className="text-2xl font-bold text-red-600 dark:text-red-400">Darasaone Admin</h1>
             <div className="flex gap-4">
-              <Link to="/admin" className="text-gray-600 hover:text-red-600">Dashboard</Link>
-              <Link to="/admin/users" className="text-gray-600 hover:text-red-600">Users</Link>
+              <Link to="/admin" className="text-gray-600 dark:text-gray-300 hover:text-red-600">Dashboard</Link>
+              <Link to="/admin/users" className="text-gray-600 dark:text-gray-300 hover:text-red-600">Users</Link>
               <Link to="/admin/courses" className="text-red-600 font-medium">Courses</Link>
-              <Link to="/admin/reports" className="text-gray-600 hover:text-red-600">Reports</Link>
-              <Link to="/admin/settings" className="text-gray-600 hover:text-red-600">Settings</Link>
+              <Link to="/admin/certificates" className="text-gray-600 dark:text-gray-300 hover:text-red-600">Certificates</Link>
+              <Link to="/admin/reports" className="text-gray-600 dark:text-gray-300 hover:text-red-600">Reports</Link>
+              <Link to="/admin/settings" className="text-gray-600 dark:text-gray-300 hover:text-red-600">Settings</Link>
             </div>
           </div>
         </div>
@@ -271,20 +276,20 @@ export default function CourseApproval() {
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
             <Card>
-              <h3 className="text-gray-500 text-sm mb-1">Total Courses</h3>
-              <p className="text-3xl font-bold text-blue-600">{stats.total}</p>
+              <h3 className="text-gray-500 dark:text-gray-400 text-sm mb-1">Total Courses</h3>
+              <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{stats.total}</p>
             </Card>
             <Card>
-              <h3 className="text-gray-500 text-sm mb-1">Pending Review</h3>
-              <p className="text-3xl font-bold text-orange-600">{stats.pending}</p>
+              <h3 className="text-gray-500 dark:text-gray-400 text-sm mb-1">Pending Review</h3>
+              <p className="text-3xl font-bold text-orange-600 dark:text-orange-400">{stats.pending}</p>
             </Card>
             <Card>
-              <h3 className="text-gray-500 text-sm mb-1">Published</h3>
-              <p className="text-3xl font-bold text-green-600">{stats.published}</p>
+              <h3 className="text-gray-500 dark:text-gray-400 text-sm mb-1">Published</h3>
+              <p className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.published}</p>
             </Card>
             <Card>
-              <h3 className="text-gray-500 text-sm mb-1">Drafts</h3>
-              <p className="text-3xl font-bold text-gray-600">{stats.draft}</p>
+              <h3 className="text-gray-500 dark:text-gray-400 text-sm mb-1">Drafts</h3>
+              <p className="text-3xl font-bold text-gray-600 dark:text-gray-400">{stats.draft}</p>
             </Card>
           </div>
 
@@ -309,7 +314,7 @@ export default function CourseApproval() {
                 ]}
               />
             </div>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
               Showing {filteredCourses.length} of {courses.length} courses
             </p>
           </Card>
@@ -317,113 +322,131 @@ export default function CourseApproval() {
           {/* Courses List */}
           <div className="space-y-4">
             {filteredCourses.length > 0 ? (
-              filteredCourses.map(course => (
-                <Card key={course.id} hover>
-                  <div className="flex flex-col md:flex-row gap-4">
-                    {/* Course Thumbnail */}
-                    <div className="w-full md:w-48 h-32 bg-gradient-to-r from-red-500 to-purple-500 rounded-lg flex items-center justify-center text-white text-2xl">
-                      {course.thumbnail_url ? (
-                        <img src={course.thumbnail_url} alt={course.title} className="w-full h-full object-cover rounded-lg" />
-                      ) : (
-                        '📚'
-                      )}
-                    </div>
-                    
-                    {/* Course Details */}
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="text-xl font-semibold">{course.title}</h3>
-                          <p className="text-sm text-gray-500">
-                            By {course.profiles?.full_name || 'Unknown Teacher'} • {course.categories?.name || 'Uncategorized'} • {course.level}
-                          </p>
+              filteredCourses.map(course => {
+                // Calculate average rating if reviews exist
+                const courseReviews = course.course_reviews || []
+                const avgRating = courseReviews.length > 0 
+                  ? courseReviews.reduce((sum, r) => sum + r.rating, 0) / courseReviews.length 
+                  : 0
+                
+                return (
+                  <Card key={course.id} hover>
+                    <div className="flex flex-col md:flex-row gap-4">
+                      {/* Course Thumbnail */}
+                      <div className="w-full md:w-48 h-32 bg-gradient-to-r from-red-500 to-purple-500 rounded-lg flex items-center justify-center text-white text-2xl">
+                        {course.thumbnail_url ? (
+                          <img src={course.thumbnail_url} alt={course.title} className="w-full h-full object-cover rounded-lg" />
+                        ) : (
+                          '📚'
+                        )}
+                      </div>
+                      
+                      {/* Course Details */}
+                      <div className="flex-1">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="text-xl font-semibold">{course.title}</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              By {course.profiles?.full_name || 'Unknown Teacher'} • {course.categories?.name || 'Uncategorized'} • {course.level}
+                            </p>
+                            {avgRating > 0 && (
+                              <div className="flex items-center gap-2 mt-1">
+                                <RatingStars rating={avgRating} readonly size="sm" />
+                                <span className="text-xs text-gray-500">
+                                  ({courseReviews.length} reviews)
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            course.status === 'published' ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400' :
+                            course.status === 'pending' ? 'bg-orange-100 dark:bg-orange-900/20 text-orange-700 dark:text-orange-400' :
+                            'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-400'
+                          }`}>
+                            {course.status}
+                          </span>
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          course.status === 'published' ? 'bg-green-100 text-green-700' :
-                          course.status === 'pending' ? 'bg-orange-100 text-orange-700' :
-                          'bg-gray-100 text-gray-700'
-                        }`}>
-                          {course.status}
-                        </span>
-                      </div>
-                      
-                      <p className="text-sm text-gray-600 mt-2 line-clamp-2">
-                        {course.description || 'No description provided'}
-                      </p>
-                      
-                      <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-500">
-                        <span>💰 Price: ${course.price || 'Free'}</span>
-                        <span>📅 Created: {new Date(course.created_at).toLocaleDateString()}</span>
-                        <span>📧 Teacher: {course.profiles?.email || 'No email'}</span>
-                      </div>
-                      
-                      {/* Action Buttons - Show for all courses */}
-                      <div className="flex flex-wrap gap-2 mt-4">
-                        {course.status === 'pending' && (
-                          <>
+                        
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 line-clamp-2">
+                          {course.description || 'No description provided'}
+                        </p>
+                        
+                        <div className="flex flex-wrap gap-4 mt-4 text-sm text-gray-500 dark:text-gray-400">
+                          <span>💰 Price: {course.price > 0 ? `TZS ${parseFloat(course.price).toLocaleString()}` : 'Free'}</span>
+                          <span>📅 Created: {new Date(course.created_at).toLocaleDateString()}</span>
+                          <span>📧 Teacher: {course.profiles?.email || 'No email'}</span>
+                          <span>📚 Lessons: {course.lessons?.count || 0}</span>
+                          <span>👥 Students: {course.enrollments?.count || 0}</span>
+                        </div>
+                        
+                        {/* Action Buttons */}
+                        <div className="flex flex-wrap gap-2 mt-4">
+                          {course.status === 'pending' && (
+                            <>
+                              <Button 
+                                variant="success" 
+                                size="sm"
+                                onClick={() => handleApprove(course.id)}
+                              >
+                                ✓ Approve
+                              </Button>
+                              <Button 
+                                variant="danger" 
+                                size="sm"
+                                onClick={() => handleReject(course.id)}
+                              >
+                                ✗ Reject
+                              </Button>
+                            </>
+                          )}
+                          
+                          {course.status === 'published' && (
                             <Button 
-                              variant="success" 
+                              variant="warning" 
+                              size="sm"
+                              onClick={() => handleUnpublish(course.id)}
+                            >
+                              📥 Unpublish
+                            </Button>
+                          )}
+                          
+                          {course.status === 'draft' && (
+                            <Button 
+                              variant="primary" 
                               size="sm"
                               onClick={() => handleApprove(course.id)}
                             >
-                              ✓ Approve
+                              ✓ Publish
                             </Button>
-                            <Button 
-                              variant="danger" 
-                              size="sm"
-                              onClick={() => handleReject(course.id)}
-                            >
-                              ✗ Reject
-                            </Button>
-                          </>
-                        )}
-                        
-                        {course.status === 'published' && (
+                          )}
+                          
                           <Button 
-                            variant="warning" 
+                            variant="outline" 
                             size="sm"
-                            onClick={() => handleUnpublish(course.id)}
+                            onClick={() => window.open(`/teacher/courses/${course.id}/lessons`, '_blank')}
                           >
-                            📥 Unpublish
+                            📚 View Lessons
                           </Button>
-                        )}
-                        
-                        {course.status === 'draft' && (
+                          
                           <Button 
-                            variant="primary" 
+                            variant="danger" 
                             size="sm"
-                            onClick={() => handleApprove(course.id)}
+                            onClick={() => handleDelete(course.id)}
                           >
-                            ✓ Publish
+                            🗑️ Delete
                           </Button>
-                        )}
-                        
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => window.open(`/teacher/courses/${course.id}/lessons`, '_blank')}
-                        >
-                          📚 View Lessons
-                        </Button>
-                        
-                        <Button 
-                          variant="danger" 
-                          size="sm"
-                          onClick={() => handleDelete(course.id)}
-                        >
-                          🗑️ Delete
-                        </Button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Card>
-              ))
+                  </Card>
+                )
+              })
             ) : (
               <Card>
                 <div className="text-center py-12">
                   <p className="text-4xl mb-4">📚</p>
-                  <p className="text-gray-500 text-lg">No courses found</p>
-                  <p className="text-gray-400 text-sm mt-2">
+                  <p className="text-gray-500 dark:text-gray-400 text-lg">No courses found</p>
+                  <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
                     {searchTerm || statusFilter !== 'all' 
                       ? 'Try adjusting your filters' 
                       : 'Courses will appear here once teachers create them'}

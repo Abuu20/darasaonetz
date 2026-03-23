@@ -46,7 +46,9 @@ export default function Sidebar() {
           { path: '/student/my-courses', icon: '📚', label: 'My Courses' },
           { path: '/student/browse', icon: '🔍', label: 'Browse Courses' },
           { path: '/student/wishlist', icon: '❤️', label: 'Wishlist' },
-          { path: '/student/profile', icon: '👤', label: 'Profile' }
+          { path: '/student/profile', icon: '👤', label: 'Profile' },
+          { path: '/student/notes', icon: '📝', label: 'My Notes' }
+
         ]
       
       default:

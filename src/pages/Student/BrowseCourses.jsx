@@ -4,6 +4,7 @@ import { supabase } from '../../supabase/client'
 import { Card, Input, Select, Spinner, Button } from '../../components/ui'
 import CourseCard from '../../components/courses/CourseCard'
 import RatingStars from '../../components/ui/RatingStars'
+import { useCart } from '../../context/CartContext'
 
 export default function BrowseCourses() {
   const [courses, setCourses] = useState([])
@@ -11,6 +12,7 @@ export default function BrowseCourses() {
   const [loading, setLoading] = useState(true)
   const [enrolledCourses, setEnrolledCourses] = useState([])
   const [showFilters, setShowFilters] = useState(false)
+  const { addToCart } = useCart()
   const [filters, setFilters] = useState({
     search: '',
     category: '',
@@ -136,6 +138,11 @@ export default function BrowseCourses() {
     }
   }
 
+  function handleAddToCart(course) {
+    addToCart(course)
+    alert(`${course.title} added to cart!`)
+  }
+
   function applyFilters() {
     let filtered = [...courses]
 
@@ -245,7 +252,6 @@ export default function BrowseCourses() {
       <div className={`${showFilters ? 'block' : 'hidden md:block'}`}>
         <Card>
           <div className="space-y-3">
-            {/* Search Bar */}
             <Input
               label="Search Courses"
               value={filters.search}
@@ -253,7 +259,6 @@ export default function BrowseCourses() {
               placeholder="Search by title or description..."
             />
 
-            {/* Filter Grid - Responsive */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <Select
                 label="Category"
@@ -346,7 +351,7 @@ export default function BrowseCourses() {
         </Card>
       </div>
 
-      {/* Courses Grid - Mobile Optimized */}
+      {/* Courses Grid */}
       {filteredCourses.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredCourses.map(course => {
@@ -405,8 +410,8 @@ export default function BrowseCourses() {
                   <div className="flex items-center justify-between">
                     <div>
                       {course.price > 0 ? (
-                        <span className="text-lg sm:text-xl font-bold text-gray-800">
-                          ${course.price}
+                        <span className="text-lg sm:text-xl font-bold text-blue-600">
+                          TZS {course.price.toLocaleString()}
                         </span>
                       ) : (
                         <span className="text-lg sm:text-xl font-bold text-green-600">
@@ -422,12 +427,19 @@ export default function BrowseCourses() {
                       >
                         Continue
                       </Link>
+                    ) : course.price > 0 ? (
+                      <button
+                        onClick={() => handleAddToCart(course)}
+                        className="bg-yellow-600 text-white px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-yellow-700"
+                      >
+                        Add to Cart
+                      </button>
                     ) : (
                       <button
                         onClick={() => handleEnroll(course.id)}
                         className="bg-blue-600 text-white px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm hover:bg-blue-700"
                       >
-                        Enroll
+                        Enroll Free
                       </button>
                     )}
                   </div>

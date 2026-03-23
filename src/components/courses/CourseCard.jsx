@@ -1,9 +1,19 @@
 import { Link } from 'react-router-dom'
 import { Card, Button } from '../ui'
 import RatingStars from '../ui/RatingStars'
+import { useCart } from '../../context/CartContext'
 
 export default function CourseCard({ course, progress, enrollmentId, isTeacher = false }) {
+  const { addToCart } = useCart()
   const courseData = course.courses || course
+  const priceValue = parseFloat(courseData.price) || 0
+  const isPaid = priceValue > 0
+
+  const handleAddToCart = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    addToCart(courseData)
+  }
 
   return (
     <Card hover className="overflow-hidden">
@@ -28,14 +38,23 @@ export default function CourseCard({ course, progress, enrollmentId, isTeacher =
             />
           </div>
         )}
+        {/* Rating Badge */}
+        {(courseData.average_rating > 0 || courseData.review_count > 0) && (
+          <div className="absolute top-2 right-2 bg-black/70 rounded-full px-2 py-1 flex items-center gap-1">
+            <RatingStars rating={courseData.average_rating} readonly size="sm" />
+            <span className="text-xs text-white ml-1">
+              ({courseData.review_count})
+            </span>
+          </div>
+        )}
       </div>
       
       {/* Content */}
       <div className="p-4">
         <h3 className="font-semibold text-lg mb-1 line-clamp-1">{courseData.title}</h3>
         
-        {/* Rating */}
-        {(courseData.average_rating > 0 || courseData.review_count > 0) && (
+        {/* Rating Display */}
+        {!isTeacher && (courseData.average_rating > 0 || courseData.review_count > 0) && (
           <div className="flex items-center gap-2 mb-2">
             <RatingStars rating={courseData.average_rating} readonly size="sm" />
             <span className="text-xs text-gray-500">
@@ -46,7 +65,7 @@ export default function CourseCard({ course, progress, enrollmentId, isTeacher =
         
         {!isTeacher && (
           <p className="text-sm text-gray-500 mb-2">
-            {courseData.level} • {courseData.profiles?.full_name || 'Instructor'}
+            {courseData.level} • {courseData.profiles?.full_name?.split(' ')[0] || 'Instructor'}
           </p>
         )}
 
@@ -75,9 +94,17 @@ export default function CourseCard({ course, progress, enrollmentId, isTeacher =
               {progress}% Complete
             </span>
           ) : !isTeacher && (
-            <span className="text-lg font-bold text-blue-600">
-              ${courseData.price || 'Free'}
-            </span>
+            <div>
+              {isPaid ? (
+                <span className="text-lg font-bold text-blue-600">
+                  TZS {priceValue.toLocaleString()}
+                </span>
+              ) : (
+                <span className="text-lg font-bold text-green-600">
+                  Free
+                </span>
+              )}
+            </div>
           )}
 
           {isTeacher && (
@@ -86,21 +113,33 @@ export default function CourseCard({ course, progress, enrollmentId, isTeacher =
             </span>
           )}
           
-          {!isTeacher ? (
-            <Link 
-              to={`/student/course/${courseData.id}`}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-            >
-              {progress ? 'Continue →' : 'View Course →'}
-            </Link>
-          ) : (
-            <Link 
-              to={`/teacher/courses/${courseData.id}/lessons`}
-              className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-            >
-              Manage Lessons →
-            </Link>
-          )}
+          <div className="flex gap-2">
+            {!isTeacher ? (
+              <>
+                <Link 
+                  to={`/student/course/${courseData.id}`}
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                >
+                  {progress ? 'Continue →' : 'View Course →'}
+                </Link>
+                {!progress && isPaid && (
+                  <button
+                    onClick={handleAddToCart}
+                    className="bg-green-600 text-white px-3 py-1 rounded-lg text-xs hover:bg-green-700"
+                  >
+                    Add to Cart
+                  </button>
+                )}
+              </>
+            ) : (
+              <Link 
+                to={`/teacher/courses/${courseData.id}/lessons`}
+                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+              >
+                Manage Lessons →
+              </Link>
+            )}
+          </div>
         </div>
       </div>
     </Card>
