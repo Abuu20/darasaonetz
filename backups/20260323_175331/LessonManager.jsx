@@ -1,5 +1,3 @@
-
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../../supabase/client'
@@ -8,7 +6,6 @@ import VideoUpload from '../../components/ui/VideoUpload'
 import QuizBuilder from '../../components/quiz/QuizBuilder'
 
 export default function LessonManager() {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const { courseId } = useParams()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
@@ -157,7 +154,7 @@ export default function LessonManager() {
 
     } catch (error) {
       console.error('Error saving lesson:', error)
-      showInfo('Failed to save lesson')
+      alert('Failed to save lesson')
     } finally {
       setSaving(false)
     }
@@ -177,7 +174,7 @@ export default function LessonManager() {
       await fetchCourseAndLessons()
     } catch (error) {
       console.error('Error deleting lesson:', error)
-      showInfo('Failed to delete lesson')
+      alert('Failed to delete lesson')
     }
   }
 

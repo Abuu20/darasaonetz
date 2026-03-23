@@ -1,9 +1,7 @@
-import { useTheme } from '../../context/ThemeContext'
 import { useState } from 'react'
 import { Modal, Button, Input } from '../ui'
 
 export default function PaymentModal({ isOpen, onClose, items, total, onSuccess }) {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const [loading, setLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -11,7 +9,7 @@ export default function PaymentModal({ isOpen, onClose, items, total, onSuccess 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!paymentMethod) {
-      showWarning('Please select a payment method')
+      alert('Please select a payment method')
       return
     }
 
@@ -21,12 +19,12 @@ export default function PaymentModal({ isOpen, onClose, items, total, onSuccess 
       // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 2000))
       
-      showSuccess(`Payment of TZS ${total.toLocaleString()} processed successfully!`)
+      alert(`Payment of TZS ${total.toLocaleString()} processed successfully!`)
       onSuccess && onSuccess()
       onClose()
     } catch (error) {
       console.error('Payment error:', error)
-      showError('Payment failed. Please try again.')
+      alert('Payment failed. Please try again.')
     } finally {
       setLoading(false)
     }

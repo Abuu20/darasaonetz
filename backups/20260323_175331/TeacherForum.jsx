@@ -1,5 +1,3 @@
-
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { supabase } from '../../supabase/client'
@@ -7,7 +5,6 @@ import { useAuth } from '../../context/AuthContext'
 import { Card, Button, Avatar, Spinner, Input } from '../../components/ui'
 
 export default function TeacherForum() {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const { courseId } = useParams()
   const { user, profile } = useAuth()
   const [topics, setTopics] = useState([])
@@ -35,7 +32,7 @@ export default function TeacherForum() {
 
       // Check if user is the teacher of this course
       if (courseData.teacher_id !== user.id && profile?.role !== 'admin') {
-        showInfo('You do not have permission to view this forum')
+        alert('You do not have permission to view this forum')
         return
       }
 
@@ -87,7 +84,7 @@ export default function TeacherForum() {
       fetchData()
     } catch (error) {
       console.error('Error creating topic:', error)
-      showInfo('Failed to create topic')
+      alert('Failed to create topic')
     } finally {
       setSubmitting(false)
     }
@@ -104,7 +101,7 @@ export default function TeacherForum() {
       fetchData()
     } catch (error) {
       console.error('Error pinning topic:', error)
-      showInfo('Failed to pin topic')
+      alert('Failed to pin topic')
     }
   }
 
@@ -121,7 +118,7 @@ export default function TeacherForum() {
       fetchData()
     } catch (error) {
       console.error('Error deleting topic:', error)
-      showInfo('Failed to delete topic')
+      alert('Failed to delete topic')
     }
   }
 

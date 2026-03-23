@@ -1,13 +1,9 @@
-import { useTheme } from './context/ThemeContext'
-import { useTheme } from '../context/ThemeContext'
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../supabase/client'
 import { Card, Button, Spinner, Input, Select, Table, Avatar } from '../../components/ui'
 
 export default function ForumManagement() {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const [topics, setTopics] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -81,10 +77,10 @@ export default function ForumManagement() {
 
       if (error) throw error
       fetchTopics()
-      showSuccess('Topic deleted successfully')
+      alert('Topic deleted successfully')
     } catch (error) {
       console.error('Error deleting topic:', error)
-      showInfo('Failed to delete topic')
+      alert('Failed to delete topic')
     }
   }
 
@@ -99,7 +95,7 @@ export default function ForumManagement() {
       fetchTopics()
     } catch (error) {
       console.error('Error pinning topic:', error)
-      showInfo('Failed to pin topic')
+      alert('Failed to pin topic')
     }
   }
 

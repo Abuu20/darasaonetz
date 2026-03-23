@@ -1,13 +1,9 @@
-import { useTheme } from './context/ThemeContext'
-import { useTheme } from '../context/ThemeContext'
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { certificateQueries } from '../supabase/queries/certificates'
 import { Card, Button, Spinner } from '../components/ui'
 
 export default function CertificateView() {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const { id } = useParams()
   const navigate = useNavigate()
   const [certificate, setCertificate] = useState(null)
@@ -35,7 +31,7 @@ export default function CertificateView() {
 
   async function downloadAsPDF() {
     if (!certificateRef.current) {
-      showInfo('Certificate element not found')
+      alert('Certificate element not found')
       return
     }
 
@@ -77,7 +73,7 @@ export default function CertificateView() {
       
     } catch (error) {
       console.error('Error downloading certificate:', error)
-      showWarning('Failed to download certificate. Please try again.')
+      alert('Failed to download certificate. Please try again.')
     } finally {
       setDownloading(false)
     }
@@ -101,7 +97,7 @@ export default function CertificateView() {
         await navigator.share(shareData)
       } else {
         await navigator.clipboard.writeText(window.location.href)
-        showInfo('Link copied to clipboard!')
+        alert('Link copied to clipboard!')
       }
     } catch (error) {
       console.error('Error sharing certificate:', error)

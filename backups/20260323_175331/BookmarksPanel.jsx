@@ -1,11 +1,9 @@
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../supabase/client'
 import { useAuth } from '../../context/AuthContext'
 import { Card, Button, Spinner, Input } from '../ui'
 
 export default function BookmarksPanel({ courseId, lessonId, currentTime, onSeek }) {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const { user } = useAuth()
   const [bookmarks, setBookmarks] = useState([])
   const [loading, setLoading] = useState(true)
@@ -60,10 +58,10 @@ export default function BookmarksPanel({ courseId, lessonId, currentTime, onSeek
 
       setNewBookmarkNote('')
       fetchBookmarks()
-      showInfo(`Bookmark added at ${formatTime(timeToSave)}`)
+      alert(`Bookmark added at ${formatTime(timeToSave)}`)
     } catch (error) {
       console.error('Error adding bookmark:', error)
-      showInfo('Failed to add bookmark')
+      alert('Failed to add bookmark')
     } finally {
       setAdding(false)
     }
@@ -82,7 +80,7 @@ export default function BookmarksPanel({ courseId, lessonId, currentTime, onSeek
       fetchBookmarks()
     } catch (error) {
       console.error('Error deleting bookmark:', error)
-      showInfo('Failed to delete bookmark')
+      alert('Failed to delete bookmark')
     }
   }
 

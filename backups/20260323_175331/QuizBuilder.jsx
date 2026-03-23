@@ -1,11 +1,8 @@
-
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../supabase/client'
 import { Card, Button, Input, Modal } from '../ui'
 
 export default function QuizBuilder({ courseId, lessonId, onSaved }) {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const [quiz, setQuiz] = useState(null)
   const [questions, setQuestions] = useState([])
   const [loading, setLoading] = useState(true)
@@ -110,7 +107,7 @@ export default function QuizBuilder({ courseId, lessonId, onSaved }) {
       fetchQuiz()
     } catch (error) {
       console.error('Error saving quiz:', error)
-      showInfo('Failed to save quiz')
+      alert('Failed to save quiz')
     }
   }
 
@@ -171,7 +168,7 @@ export default function QuizBuilder({ courseId, lessonId, onSaved }) {
       fetchQuiz()
     } catch (error) {
       console.error('Error saving question:', error)
-      showInfo('Failed to save question')
+      alert('Failed to save question')
     }
   }
 

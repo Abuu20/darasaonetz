@@ -86,16 +86,16 @@ export default function StudentDashboard() {
   return (
     <div className="space-y-4 md:space-y-6">
       {/* Welcome Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-lg p-4 sm:p-6 md:p-8 text-white">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-1 sm:mb-2">
-          Welcome back, {profile?.full_name?.split(' ')[0] || 'Student'}!
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 rounded-2xl p-6 md:p-8 text-white">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">
+          Welcome back, {profile?.full_name?.split(' ')[0] || 'Student'}! 👋
         </h1>
         <p className="text-sm sm:text-base text-blue-100">
           Continue your learning journey
         </p>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Grid - Now with dark mode support */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         <StatsCard 
           title="Enrolled" 
@@ -136,12 +136,14 @@ export default function StudentDashboard() {
       {/* Recommended Courses */}
       <Card>
         <Card.Header>
-          <h2 className="text-lg sm:text-xl font-semibold">Recommended for You</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
+            Recommended for You
+          </h2>
         </Card.Header>
         <Card.Body>
-          <div className="text-center py-6 sm:py-8 text-gray-500">
-            <p className="text-3xl sm:text-4xl mb-2">🔍</p>
-            <p className="text-sm sm:text-base">More courses coming soon!</p>
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+            <p className="text-4xl mb-2">🔍</p>
+            <p className="text-sm">More courses coming soon!</p>
           </div>
         </Card.Body>
       </Card>

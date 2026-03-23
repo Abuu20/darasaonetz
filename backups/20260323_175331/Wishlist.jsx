@@ -1,4 +1,3 @@
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../supabase/client'
@@ -8,7 +7,6 @@ import RatingStars from '../../components/ui/RatingStars'
 import WishlistButton from '../../components/ui/WishlistButton'
 
 export default function Wishlist() {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const { user } = useAuth()
   const [wishlist, setWishlist] = useState([])
   const [loading, setLoading] = useState(true)
@@ -91,10 +89,10 @@ export default function Wishlist() {
       await fetchWishlist()
       await fetchEnrolledCourses()
       
-      showInfo('Successfully enrolled in course!')
+      alert('Successfully enrolled in course!')
     } catch (error) {
       console.error('Error enrolling:', error)
-      showWarning('Failed to enroll. Please try again.')
+      alert('Failed to enroll. Please try again.')
     }
   }
 

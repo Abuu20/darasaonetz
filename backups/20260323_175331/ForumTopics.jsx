@@ -1,4 +1,3 @@
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../supabase/client'
@@ -6,7 +5,6 @@ import { useAuth } from '../../context/AuthContext'
 import { Card, Button, Avatar, Spinner, Input } from '../ui'
 
 export default function ForumTopics({ courseId, onSelectTopic }) {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const { user, profile } = useAuth()
   const [topics, setTopics] = useState([])
   const [loading, setLoading] = useState(true)
@@ -67,7 +65,7 @@ export default function ForumTopics({ courseId, onSelectTopic }) {
       fetchTopics()
     } catch (error) {
       console.error('Error creating topic:', error)
-      showInfo('Failed to create topic')
+      alert('Failed to create topic')
     } finally {
       setSubmitting(false)
     }

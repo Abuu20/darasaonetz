@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { supabase } from '../../supabase/client'
 import { useCourses } from '../../context/CourseContext'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
@@ -20,7 +21,7 @@ export default function CourseForm({ initialData = null, courseId = null, onSucc
     level: initialData?.level || COURSE_LEVELS.BEGINNER,
     price: initialData?.price || '0',
     type: initialData?.type || COURSE_TYPES.ISLAMIC,
-    category_id: initialData?.category_id || '',
+    category_id: initialData?.category_id || null, // Change from '' to null
     status: initialData?.status || COURSE_STATUS.DRAFT,
     thumbnail_url: initialData?.thumbnail_url || ''
   })
@@ -38,8 +39,9 @@ export default function CourseForm({ initialData = null, courseId = null, onSucc
 
   const handleChange = (e) => {
     const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-    // Clear error for this field
+    // Handle category_id specially - if empty string, set to null
+    const newValue = name === 'category_id' && value === '' ? null : value
+    setFormData(prev => ({ ...prev, [name]: newValue }))
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }))
     }
@@ -52,7 +54,6 @@ export default function CourseForm({ initialData = null, courseId = null, onSucc
   const handleSubmit = async (e) => {
     e.preventDefault()
     
-    // Validate form
     const validation = validateCourse(formData)
     if (!validation.isValid) {
       setErrors(validation.errors)
@@ -62,12 +63,34 @@ export default function CourseForm({ initialData = null, courseId = null, onSucc
     setLoading(true)
     
     try {
+      const slug = formData.title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+
+      const courseData = {
+        title: formData.title,
+        description: formData.description,
+        level: formData.level,
+        price: parseFloat(formData.price) || 0,
+        type: formData.type,
+        status: formData.status,
+        slug: slug,
+        thumbnail_url: formData.thumbnail_url || null,
+        enrolled_students: 0, // Explicitly set to 0
+        rating: 0
+      }
+
+      // Only add category_id if it's a valid UUID (not null)
+      if (formData.category_id && formData.category_id !== '') {
+        courseData.category_id = formData.category_id
+      }
+
       let result
-      
       if (isEditing && courseId) {
-        result = await updateCourse(courseId, formData)
+        result = await updateCourse(courseId, courseData)
       } else {
-        result = await createCourse(formData)
+        result = await createCourse(courseData)
       }
       
       if (result.success) {
@@ -85,6 +108,7 @@ export default function CourseForm({ initialData = null, courseId = null, onSucc
         setErrors({ general: result.error })
       }
     } catch (error) {
+      console.error('Error saving course:', error)
       showError('An unexpected error occurred')
       setErrors({ general: error.message })
     } finally {
@@ -150,7 +174,7 @@ export default function CourseForm({ initialData = null, courseId = null, onSucc
             <Select
               label="Category"
               name="category_id"
-              value={formData.category_id}
+              value={formData.category_id || ''}
               onChange={handleChange}
               options={[
                 { value: '', label: 'Select a category (optional)' },

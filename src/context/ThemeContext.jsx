@@ -14,6 +14,7 @@ export const ThemeProvider = ({ children }) => {
 
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [notifications, setNotifications] = useState([])
+  const [toasts, setToasts] = useState([])
   
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 0,
@@ -54,7 +55,6 @@ export const ThemeProvider = ({ children }) => {
     }
   }, [isMobile])
 
-  // Apply dark mode class to html element
   useEffect(() => {
     if (theme === 'dark') {
       document.documentElement.classList.add('dark')
@@ -72,6 +72,22 @@ export const ThemeProvider = ({ children }) => {
   const toggleSidebar = () => {
     setSidebarOpen(prev => !prev)
   }
+
+  // Toast methods
+  const showToast = (message, type = 'info') => {
+    const id = Date.now()
+    setToasts(prev => [...prev, { id, message, type }])
+    return id
+  }
+
+  const removeToast = (id) => {
+    setToasts(prev => prev.filter(t => t.id !== id))
+  }
+
+  const showSuccess = (message) => showToast(message, 'success')
+  const showError = (message) => showToast(message, 'error')
+  const showWarning = (message) => showToast(message, 'warning')
+  const showInfo = (message) => showToast(message, 'info')
 
   const value = {
     theme,
@@ -99,19 +115,13 @@ export const ThemeProvider = ({ children }) => {
       setNotifications(prev => prev.filter(n => n.id !== id))
     },
     
-    showToast: (message, type = 'info') => {
-      const id = Date.now()
-      const notification = { message, type, isToast: true, id }
-      setNotifications(prev => [notification, ...prev])
-      setTimeout(() => {
-        setNotifications(prev => prev.filter(n => n.id !== id))
-      }, 3000)
-      return id
-    },
-    showSuccess: (message) => value.showToast(message, 'success'),
-    showError: (message) => value.showToast(message, 'error'),
-    showInfo: (message) => value.showToast(message, 'info'),
-    showWarning: (message) => value.showToast(message, 'warning'),
+    toasts,
+    showToast,
+    removeToast,
+    showSuccess,
+    showError,
+    showWarning,
+    showInfo,
   }
 
   return (

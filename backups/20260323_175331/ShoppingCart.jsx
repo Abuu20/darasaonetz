@@ -1,4 +1,3 @@
-import { useTheme } from '../context/ThemeContext'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
@@ -6,7 +5,6 @@ import { Card, Button, Spinner } from '../components/ui'
 import PaymentModal from '../components/payments/PaymentModal'
 
 export default function ShoppingCart() {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const { cart, removeFromCart, clearCart, cartTotal, cartCount } = useCart()
   const [showPayment, setShowPayment] = useState(false)
 
@@ -18,7 +16,7 @@ export default function ShoppingCart() {
   const handlePaymentSuccess = () => {
     clearCart()
     setShowPayment(false)
-    showInfo('Payment successful! You are now enrolled in your courses.')
+    alert('Payment successful! You are now enrolled in your courses.')
   }
 
   if (cart.length === 0) {

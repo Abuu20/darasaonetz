@@ -4,6 +4,7 @@ import { CourseProvider } from './context/CourseContext'
 import { ThemeProvider } from './context/ThemeContext'
 import { CartProvider } from './context/CartContext'
 import { router } from './router'
+import ToastContainer from './components/ui/ToastContainer'
 
 function App() {
   return (
@@ -12,6 +13,7 @@ function App() {
         <AuthProvider>
           <CourseProvider>
             <RouterProvider router={router} />
+            <ToastContainer />
           </CourseProvider>
         </AuthProvider>
       </ThemeProvider>

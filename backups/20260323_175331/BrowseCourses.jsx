@@ -1,4 +1,3 @@
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../supabase/client'
@@ -8,7 +7,6 @@ import RatingStars from '../../components/ui/RatingStars'
 import { useCart } from '../../context/CartContext'
 
 export default function BrowseCourses() {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const [courses, setCourses] = useState([])
   const [categories, setCategories] = useState([])
   const [loading, setLoading] = useState(true)
@@ -132,17 +130,17 @@ export default function BrowseCourses() {
       if (error) throw error
 
       setEnrolledCourses([...enrolledCourses, courseId])
-      showSuccess('🎉 Successfully enrolled in course!')
+      alert('🎉 Successfully enrolled in course!')
 
     } catch (error) {
       console.error('Error enrolling:', error)
-      showWarning('Failed to enroll. Please try again.')
+      alert('Failed to enroll. Please try again.')
     }
   }
 
   function handleAddToCart(course) {
     addToCart(course)
-    showInfo(`🛒 ${course.title} added to cart!`)
+    alert(`🛒 ${course.title} added to cart!`)
   }
 
   function applyFilters() {

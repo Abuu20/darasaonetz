@@ -1,12 +1,9 @@
-
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../supabase/client'
 import { Card, Button, Spinner, Input, Tabs } from '../../components/ui'
 
 export default function SystemSettings() {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -56,7 +53,7 @@ export default function SystemSettings() {
     setSaving(true)
     // Simulate saving
     await new Promise(resolve => setTimeout(resolve, 1000))
-    showSuccess('Settings saved successfully')
+    alert('Settings saved successfully')
     setSaving(false)
   }
 

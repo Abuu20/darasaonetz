@@ -1,11 +1,9 @@
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../supabase/client'
 import { useAuth } from '../../context/AuthContext'
 import { Card, Button, Input, Modal, Spinner } from '../ui'
 
 export default function NotesPanel({ courseId, lessonId }) {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const { user } = useAuth()
   const [notes, setNotes] = useState([])
   const [loading, setLoading] = useState(true)
@@ -87,7 +85,7 @@ export default function NotesPanel({ courseId, lessonId }) {
       fetchNotes()
     } catch (error) {
       console.error('Error saving note:', error)
-      showInfo('Failed to save note')
+      alert('Failed to save note')
     } finally {
       setSubmitting(false)
     }
@@ -106,7 +104,7 @@ export default function NotesPanel({ courseId, lessonId }) {
       fetchNotes()
     } catch (error) {
       console.error('Error deleting note:', error)
-      showInfo('Failed to delete note')
+      alert('Failed to delete note')
     }
   }
 

@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom'
 import { Card, Button } from '../ui'
 import RatingStars from '../ui/RatingStars'
 import { useCart } from '../../context/CartContext'
+import { useTheme } from '../../context/ThemeContext'
 
 export default function CourseCard({ course, progress, enrollmentId, isTeacher = false }) {
   const { addToCart } = useCart()
+  const { showSuccess } = useTheme()
   const courseData = course.courses || course
   const priceValue = parseFloat(courseData.price) || 0
   const isPaid = priceValue > 0
@@ -13,10 +15,11 @@ export default function CourseCard({ course, progress, enrollmentId, isTeacher =
     e.preventDefault()
     e.stopPropagation()
     addToCart(courseData)
+    showSuccess(`${courseData.title} added to cart!`)
   }
 
   return (
-    <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100">
+    <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-gray-700">
       {/* Thumbnail */}
       <div className="h-40 bg-gradient-to-r from-blue-500 to-purple-500 relative">
         {courseData.thumbnail_url ? (
@@ -50,19 +53,19 @@ export default function CourseCard({ course, progress, enrollmentId, isTeacher =
       
       {/* Content */}
       <div className="p-4">
-        <h3 className="font-semibold text-lg mb-1 line-clamp-1">{courseData.title}</h3>
+        <h3 className="font-semibold text-lg mb-1 line-clamp-1 text-gray-900 dark:text-white">{courseData.title}</h3>
         
         {!isTeacher && (courseData.average_rating > 0 || courseData.review_count > 0) && (
           <div className="flex items-center gap-2 mb-2">
             <RatingStars rating={courseData.average_rating} readonly size="sm" />
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-gray-500 dark:text-gray-400">
               ({courseData.review_count})
             </span>
           </div>
         )}
         
         {!isTeacher && (
-          <p className="text-sm text-gray-500 mb-2">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
             {courseData.level} • {courseData.profiles?.full_name?.split(' ')[0] || 'Instructor'}
           </p>
         )}
@@ -70,35 +73,35 @@ export default function CourseCard({ course, progress, enrollmentId, isTeacher =
         {isTeacher && (
           <div className="flex gap-2 mb-2">
             <span className={`text-xs px-2 py-1 rounded ${
-              courseData.status === 'published' ? 'bg-green-100 text-green-700' :
-              courseData.status === 'pending' ? 'bg-orange-100 text-orange-700' :
-              'bg-gray-100 text-gray-700'
+              courseData.status === 'published' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+              courseData.status === 'pending' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400' :
+              'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
             }`}>
               {courseData.status}
             </span>
-            <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded">
+            <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 px-2 py-1 rounded">
               {courseData.lessons?.count || 0} lessons
             </span>
           </div>
         )}
 
-        <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 line-clamp-2">
           {courseData.description}
         </p>
         
         <div className="flex items-center justify-between">
           {!isTeacher && progress !== undefined ? (
-            <span className="text-sm font-medium text-green-600">
+            <span className="text-sm font-medium text-green-600 dark:text-green-400">
               {progress}% Complete
             </span>
           ) : !isTeacher && (
             <div>
               {isPaid ? (
-                <span className="text-lg font-bold text-blue-600">
+                <span className="text-lg font-bold text-blue-600 dark:text-blue-400">
                   TZS {priceValue.toLocaleString()}
                 </span>
               ) : (
-                <span className="text-lg font-bold text-green-600">
+                <span className="text-lg font-bold text-green-600 dark:text-green-400">
                   Free
                 </span>
               )}
@@ -106,8 +109,8 @@ export default function CourseCard({ course, progress, enrollmentId, isTeacher =
           )}
 
           {isTeacher && (
-            <span className="text-sm font-medium text-gray-600">
-              👥 {courseData.enrollments?.length || 0} students
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+              👥 {courseData.enrolled_students || 0} students
             </span>
           )}
           
@@ -116,14 +119,14 @@ export default function CourseCard({ course, progress, enrollmentId, isTeacher =
               <>
                 <Link 
                   to={`/student/course/${courseData.id}`}
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                  className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
                 >
                   {progress ? 'Continue →' : 'View Course →'}
                 </Link>
                 {!progress && isPaid && (
                   <button
                     onClick={handleAddToCart}
-                    className="bg-green-600 text-white px-3 py-1 rounded-lg text-xs hover:bg-green-700"
+                    className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg text-xs transition-colors"
                   >
                     Add to Cart
                   </button>
@@ -132,7 +135,7 @@ export default function CourseCard({ course, progress, enrollmentId, isTeacher =
             ) : (
               <Link 
                 to={`/teacher/courses/${courseData.id}/lessons`}
-                className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm font-medium"
               >
                 Manage Lessons →
               </Link>

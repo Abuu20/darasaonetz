@@ -1,4 +1,3 @@
-import { useTheme } from '../../context/ThemeContext'
 import { useEffect, useState } from 'react'
 import { supabase } from '../../supabase/client'
 import { useNavigate, Routes, Route, Link, useLocation } from 'react-router-dom'
@@ -15,7 +14,6 @@ import TeacherForum from './TeacherForum'
 import TeacherTopicDetail from './TeacherTopicDetail'
 
 export default function TeacherDashboard() {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const navigate = useNavigate()
   const location = useLocation()
   const [user, setUser] = useState(null)
@@ -143,7 +141,7 @@ export default function TeacherDashboard() {
 
   async function handleRespondToReview(reviewId, courseId, response) {
     if (!response.trim()) {
-      showWarning('Please enter a response')
+      alert('Please enter a response')
       return
     }
 
@@ -164,11 +162,11 @@ export default function TeacherDashboard() {
       await fetchReviews()
       setRespondingTo(null)
       setResponseText('')
-      showSuccess('Response sent successfully!')
+      alert('Response sent successfully!')
       
     } catch (error) {
       console.error('Error responding to review:', error)
-      showInfo('Failed to submit response')
+      alert('Failed to submit response')
     } finally {
       setSubmitting(false)
     }
@@ -183,10 +181,10 @@ export default function TeacherDashboard() {
 
       if (error) throw error
       fetchCourses()
-      showSuccess('Course published successfully!')
+      alert('Course published successfully!')
     } catch (error) {
       console.error('Error publishing course:', error)
-      showInfo('Failed to publish course')
+      alert('Failed to publish course')
     }
   }
 
@@ -199,10 +197,10 @@ export default function TeacherDashboard() {
 
       if (error) throw error
       fetchCourses()
-      showSuccess('Course unpublished successfully')
+      alert('Course unpublished successfully')
     } catch (error) {
       console.error('Error unpublishing course:', error)
-      showInfo('Failed to unpublish course')
+      alert('Failed to unpublish course')
     }
   }
 

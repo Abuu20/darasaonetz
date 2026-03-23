@@ -1,4 +1,3 @@
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../supabase/client'
@@ -6,7 +5,6 @@ import { useAuth } from '../../context/AuthContext'
 import { Card, Button, Avatar, Spinner } from '../../components/ui'
 
 export default function TeacherTopicDetail() {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const { courseId, topicId } = useParams()
   const navigate = useNavigate()
   const { user, profile } = useAuth()
@@ -30,7 +28,7 @@ export default function TeacherTopicDetail() {
         .single()
 
       if (course.teacher_id !== user.id && profile?.role !== 'admin') {
-        showInfo('You do not have permission')
+        alert('You do not have permission')
         navigate('/teacher')
         return
       }
@@ -99,7 +97,7 @@ export default function TeacherTopicDetail() {
       fetchTopic()
     } catch (error) {
       console.error('Error creating reply:', error)
-      showInfo('Failed to post reply')
+      alert('Failed to post reply')
     } finally {
       setSubmitting(false)
     }

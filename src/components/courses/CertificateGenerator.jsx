@@ -1,8 +1,12 @@
+import { useTheme } from './context/ThemeContext'
+import { useTheme } from '../context/ThemeContext'
+import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../supabase/client'
 import { Button, Spinner } from '../ui'
 
 export default function CertificateGenerator({ 
+  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   studentId, 
   courseId, 
   studentName, 
@@ -121,7 +125,7 @@ export default function CertificateGenerator({
 
     } catch (error) {
       console.error('Error generating certificate:', error)
-      alert('Failed to generate certificate. Please try again.')
+      showWarning('Failed to generate certificate. Please try again.')
     } finally {
       setGenerating(false)
     }

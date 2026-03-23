@@ -1,11 +1,7 @@
-import { useTheme } from './context/ThemeContext'
-import { useTheme } from '../context/ThemeContext'
-import { useTheme } from '../../context/ThemeContext'
 import { useState } from 'react'
 import { Button } from '../ui'
 
 export default function TeacherReviewResponse({ review, onResponded }) {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const [showForm, setShowForm] = useState(false)
   const [response, setResponse] = useState(review.teacher_response || '')
   const [submitting, setSubmitting] = useState(false)
@@ -31,7 +27,7 @@ export default function TeacherReviewResponse({ review, onResponded }) {
       
     } catch (error) {
       console.error('Error responding to review:', error)
-      showInfo('Failed to submit response')
+      alert('Failed to submit response')
     } finally {
       setSubmitting(false)
     }

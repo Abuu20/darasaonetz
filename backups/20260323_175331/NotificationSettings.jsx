@@ -1,13 +1,9 @@
-import { useTheme } from './context/ThemeContext'
-import { useTheme } from '../context/ThemeContext'
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../supabase/client'
 import { useAuth } from '../../context/AuthContext'
 import { Card, Button, Spinner } from '../../components/ui'
 
 export default function NotificationSettings() {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const { user } = useAuth()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -57,10 +53,10 @@ export default function NotificationSettings() {
         .eq('id', user.id)
 
       if (error) throw error
-      showSuccess('Settings saved successfully!')
+      alert('Settings saved successfully!')
     } catch (error) {
       console.error('Error saving settings:', error)
-      showInfo('Failed to save settings')
+      alert('Failed to save settings')
     } finally {
       setSaving(false)
     }

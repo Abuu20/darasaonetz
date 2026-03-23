@@ -1,12 +1,9 @@
-
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../supabase/client'
 import { Card, Button, Spinner, Input, Select, Table, Modal } from '../../components/ui'
 
 export default function UserManagement() {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [users, setUsers] = useState([])
@@ -48,7 +45,7 @@ export default function UserManagement() {
       if (error) throw error
 
       if (profile?.role !== 'admin') {
-        showInfo('Access denied. Admin only.')
+        alert('Access denied. Admin only.')
         navigate('/')
         return
       }
@@ -80,7 +77,7 @@ export default function UserManagement() {
       setFilteredUsers(data || [])
     } catch (error) {
       console.error('Error fetching users:', error)
-      showError('Failed to fetch users: ' + error.message)
+      alert('Failed to fetch users: ' + error.message)
     } finally {
       setLoading(false)
     }
@@ -116,10 +113,10 @@ export default function UserManagement() {
         user.id === userId ? { ...user, role: newRole } : user
       ))
       
-      showSuccess('User role updated successfully')
+      alert('User role updated successfully')
     } catch (error) {
       console.error('Error updating user role:', error)
-      showError('Failed to update user role: ' + error.message)
+      alert('Failed to update user role: ' + error.message)
     }
   }
 
@@ -142,10 +139,10 @@ export default function UserManagement() {
 
       setUsers(users.filter(user => user.id !== userId))
       setShowDeleteModal(false)
-      showSuccess('User deleted successfully')
+      alert('User deleted successfully')
     } catch (error) {
       console.error('Error deleting user:', error)
-      showError('Failed to delete user: ' + error.message)
+      alert('Failed to delete user: ' + error.message)
     }
   }
 

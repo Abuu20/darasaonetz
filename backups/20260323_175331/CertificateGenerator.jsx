@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '../../supabase/client'
 import { Button, Spinner } from '../ui'
-import { useTheme } from '../../context/ThemeContext'
 
 export default function CertificateGenerator({ 
   studentId, 
@@ -11,7 +10,6 @@ export default function CertificateGenerator({
   teacherName,
   onCertificateGenerated 
 }) {
-  const { showSuccess, showError } = useTheme()
   const [generating, setGenerating] = useState(false)
   const [hasCertificate, setHasCertificate] = useState(false)
   const [certificateUrl, setCertificateUrl] = useState(null)
@@ -76,6 +74,8 @@ export default function CertificateGenerator({
         certificateNumber: certData.certificate_number
       })
 
+      // Convert HTML to PDF (using html2pdf or similar)
+      // For now, we'll create a downloadable HTML version
       const blob = new Blob([htmlContent], { type: 'text/html' })
       const url = URL.createObjectURL(blob)
       
@@ -103,7 +103,6 @@ export default function CertificateGenerator({
 
       setCertificateUrl(publicUrl)
       setHasCertificate(true)
-      showSuccess('🎓 Certificate generated successfully!')
       
       if (onCertificateGenerated) {
         onCertificateGenerated(certData)
@@ -122,7 +121,7 @@ export default function CertificateGenerator({
 
     } catch (error) {
       console.error('Error generating certificate:', error)
-      showError('Failed to generate certificate. Please try again.')
+      alert('Failed to generate certificate. Please try again.')
     } finally {
       setGenerating(false)
     }
@@ -143,28 +142,181 @@ export default function CertificateGenerator({
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Certificate of Completion - ${studentName}</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Georgia', serif; background: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-    .certificate { width: 800px; background: white; padding: 40px; border: 20px solid #fbbf24; box-shadow: 0 10px 30px rgba(0,0,0,0.1); position: relative; background: linear-gradient(to bottom, #fff, #fef9e8); }
-    .certificate::before { content: ''; position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 2px solid #fbbf24; pointer-events: none; }
-    .header { text-align: center; margin-bottom: 30px; }
-    .title { font-size: 48px; color: #d97706; font-weight: bold; margin-bottom: 10px; font-family: 'Times New Roman', serif; }
-    .subtitle { font-size: 18px; color: #666; border-top: 1px solid #ddd; border-bottom: 1px solid #ddd; display: inline-block; padding: 5px 20px; }
-    .content { text-align: center; margin: 40px 0; }
-    .awarded-to { font-size: 16px; color: #666; margin-bottom: 20px; }
-    .student-name { font-size: 42px; color: #2c3e50; font-weight: bold; margin: 20px 0; font-family: 'Times New Roman', serif; border-bottom: 2px dotted #fbbf24; display: inline-block; padding: 0 20px; }
-    .course-name { font-size: 28px; color: #d97706; margin: 20px 0; font-weight: bold; }
-    .description { font-size: 14px; color: #666; margin: 20px 0; line-height: 1.6; max-width: 500px; margin-left: auto; margin-right: auto; }
-    .footer { margin-top: 40px; display: flex; justify-content: space-between; align-items: flex-end; }
-    .signature { text-align: center; }
-    .signature-line { width: 200px; border-top: 2px solid #333; margin: 10px 0; }
-    .signature-name { font-size: 14px; font-weight: bold; }
-    .signature-title { font-size: 12px; color: #666; }
-    .date { text-align: center; }
-    .date-text { font-size: 14px; color: #666; }
-    .certificate-number { font-size: 10px; color: #999; text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
-    .seal { position: absolute; bottom: 80px; right: 60px; width: 80px; height: 80px; border: 3px solid #d97706; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #d97706; font-weight: bold; text-align: center; transform: rotate(-15deg); background: rgba(249, 115, 22, 0.1); }
-    @media print { body { background: white; padding: 0; } .certificate { box-shadow: none; border: 20px solid #fbbf24; } .no-print { display: none; } }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Georgia', serif;
+      background: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .certificate {
+      width: 800px;
+      background: white;
+      padding: 40px;
+      border: 20px solid #fbbf24;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      position: relative;
+      background: linear-gradient(to bottom, #fff, #fef9e8);
+    }
+    
+    .certificate::before {
+      content: '';
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      border: 2px solid #fbbf24;
+      pointer-events: none;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .title {
+      font-size: 48px;
+      color: #d97706;
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-family: 'Times New Roman', serif;
+    }
+    
+    .subtitle {
+      font-size: 18px;
+      color: #666;
+      border-top: 1px solid #ddd;
+      border-bottom: 1px solid #ddd;
+      display: inline-block;
+      padding: 5px 20px;
+    }
+    
+    .content {
+      text-align: center;
+      margin: 40px 0;
+    }
+    
+    .awarded-to {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 20px;
+    }
+    
+    .student-name {
+      font-size: 42px;
+      color: #2c3e50;
+      font-weight: bold;
+      margin: 20px 0;
+      font-family: 'Times New Roman', serif;
+      border-bottom: 2px dotted #fbbf24;
+      display: inline-block;
+      padding: 0 20px;
+    }
+    
+    .course-name {
+      font-size: 28px;
+      color: #d97706;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+    
+    .description {
+      font-size: 14px;
+      color: #666;
+      margin: 20px 0;
+      line-height: 1.6;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .footer {
+      margin-top: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    
+    .signature {
+      text-align: center;
+    }
+    
+    .signature-line {
+      width: 200px;
+      border-top: 2px solid #333;
+      margin: 10px 0;
+    }
+    
+    .signature-name {
+      font-size: 14px;
+      font-weight: bold;
+    }
+    
+    .signature-title {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .date {
+      text-align: center;
+    }
+    
+    .date-text {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .certificate-number {
+      font-size: 10px;
+      color: #999;
+      text-align: center;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+    }
+    
+    .seal {
+      position: absolute;
+      bottom: 80px;
+      right: 60px;
+      width: 80px;
+      height: 80px;
+      border: 3px solid #d97706;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: #d97706;
+      font-weight: bold;
+      text-align: center;
+      transform: rotate(-15deg);
+      background: rgba(249, 115, 22, 0.1);
+    }
+    
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .certificate {
+        box-shadow: none;
+        border: 20px solid #fbbf24;
+      }
+      .no-print {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -173,12 +325,16 @@ export default function CertificateGenerator({
       <div class="title">Certificate of Completion</div>
       <div class="subtitle">This certificate is proudly presented to</div>
     </div>
+    
     <div class="content">
       <div class="awarded-to">Awarded to</div>
       <div class="student-name">${studentName}</div>
       <div class="course-name">${courseTitle}</div>
-      <div class="description">for successfully completing the course requirements with dedication and excellence.</div>
+      <div class="description">
+        for successfully completing the course requirements with dedication and excellence.
+      </div>
     </div>
+    
     <div class="footer">
       <div class="signature">
         <div class="signature-line"></div>
@@ -189,12 +345,23 @@ export default function CertificateGenerator({
         <div class="date-text">Issued on ${issuedDate}</div>
       </div>
     </div>
-    <div class="certificate-number">Certificate ID: ${certificateNumber}</div>
-    <div class="seal">DARASAONE</div>
+    
+    <div class="certificate-number">
+      Certificate ID: ${certificateNumber}
+    </div>
+    
+    <div class="seal">
+      DARASAONE
+    </div>
   </div>
+  
   <div class="no-print" style="position: fixed; bottom: 20px; right: 20px; display: flex; gap: 10px;">
-    <button onclick="window.print()" style="padding: 10px 20px; background: #d97706; color: white; border: none; border-radius: 5px; cursor: pointer;">🖨️ Print Certificate</button>
-    <button onclick="window.close()" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">✖ Close</button>
+    <button onclick="window.print()" style="padding: 10px 20px; background: #d97706; color: white; border: none; border-radius: 5px; cursor: pointer;">
+      🖨️ Print Certificate
+    </button>
+    <button onclick="window.close()" style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer;">
+      ✖ Close
+    </button>
   </div>
 </body>
 </html>`
@@ -202,6 +369,7 @@ export default function CertificateGenerator({
 
   async function downloadCertificate() {
     if (!certificateUrl) return
+    
     window.open(certificateUrl, '_blank')
   }
 

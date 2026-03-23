@@ -1,5 +1,3 @@
-
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { supabase } from '../../supabase/client'
@@ -7,7 +5,6 @@ import { Card, Button, Spinner, Input, Select, Tabs } from '../../components/ui'
 import RatingStars from '../../components/ui/RatingStars'
 
 export default function CourseApproval() {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [courses, setCourses] = useState([])
@@ -54,7 +51,7 @@ export default function CourseApproval() {
       if (error) throw error
 
       if (profile?.role !== 'admin') {
-        showInfo('Access denied. Admin only.')
+        alert('Access denied. Admin only.')
         navigate('/')
         return
       }
@@ -109,7 +106,7 @@ export default function CourseApproval() {
       
     } catch (error) {
       console.error('Error fetching courses:', error)
-      showError('Failed to fetch courses: ' + error.message)
+      alert('Failed to fetch courses: ' + error.message)
     } finally {
       setLoading(false)
     }
@@ -158,10 +155,10 @@ export default function CourseApproval() {
         course.id === courseId ? { ...course, status: 'published' } : course
       ))
       
-      showSuccess('Course approved and published successfully')
+      alert('Course approved and published successfully')
     } catch (error) {
       console.error('Error approving course:', error)
-      showError('Failed to approve course: ' + error.message)
+      alert('Failed to approve course: ' + error.message)
     }
   }
 
@@ -184,10 +181,10 @@ export default function CourseApproval() {
         course.id === courseId ? { ...course, status: 'draft' } : course
       ))
       
-      showInfo('Course rejected and returned to draft')
+      alert('Course rejected and returned to draft')
     } catch (error) {
       console.error('Error rejecting course:', error)
-      showError('Failed to reject course: ' + error.message)
+      alert('Failed to reject course: ' + error.message)
     }
   }
 
@@ -206,10 +203,10 @@ export default function CourseApproval() {
         course.id === courseId ? { ...course, status: 'draft' } : course
       ))
       
-      showSuccess('Course unpublished successfully')
+      alert('Course unpublished successfully')
     } catch (error) {
       console.error('Error unpublishing course:', error)
-      showError('Failed to unpublish course: ' + error.message)
+      alert('Failed to unpublish course: ' + error.message)
     }
   }
 
@@ -226,10 +223,10 @@ export default function CourseApproval() {
       if (error) throw error
 
       setCourses(courses.filter(course => course.id !== courseId))
-      showSuccess('Course deleted successfully')
+      alert('Course deleted successfully')
     } catch (error) {
       console.error('Error deleting course:', error)
-      showError('Failed to delete course: ' + error.message)
+      alert('Failed to delete course: ' + error.message)
     }
   }
 

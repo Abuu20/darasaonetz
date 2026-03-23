@@ -1,11 +1,9 @@
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../supabase/client'
 import { useAuth } from '../../context/AuthContext'
 import { Card, Button, Avatar, Spinner, Input } from '../ui'
 
 export default function TopicDetail({ topicId, courseId, onBack }) {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const { user, profile } = useAuth()
   const [topic, setTopic] = useState(null)
   const [replies, setReplies] = useState([])
@@ -104,7 +102,7 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
       fetchTopic()
     } catch (error) {
       console.error('Error creating reply:', error)
-      showInfo('Failed to post reply')
+      alert('Failed to post reply')
     } finally {
       setSubmitting(false)
     }
@@ -129,7 +127,7 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
       fetchTopic()
     } catch (error) {
       console.error('Error marking best answer:', error)
-      showInfo('Failed to mark best answer')
+      alert('Failed to mark best answer')
     }
   }
 
@@ -179,7 +177,7 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
       fetchTopic()
     } catch (error) {
       console.error('Error deleting reply:', error)
-      showInfo('Failed to delete reply')
+      alert('Failed to delete reply')
     }
   }
 
@@ -196,7 +194,7 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
       onBack()
     } catch (error) {
       console.error('Error deleting topic:', error)
-      showInfo('Failed to delete topic')
+      alert('Failed to delete topic')
     }
   }
 
