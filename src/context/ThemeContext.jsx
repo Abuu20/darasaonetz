@@ -15,7 +15,6 @@ export const ThemeProvider = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [notifications, setNotifications] = useState([])
   
-  // Responsive breakpoints
   const [windowSize, setWindowSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 0,
     height: typeof window !== 'undefined' ? window.innerHeight : 0
@@ -64,9 +63,6 @@ export const ThemeProvider = ({ children }) => {
       document.documentElement.classList.remove('dark')
       localStorage.setItem('darasaone-theme', 'light')
     }
-    
-    // Force body background update
-    document.body.style.backgroundColor = theme === 'dark' ? '#111827' : '#f9fafb'
   }, [theme])
 
   const toggleTheme = () => {
@@ -83,19 +79,16 @@ export const ThemeProvider = ({ children }) => {
     isDark: theme === 'dark',
     isLight: theme === 'light',
     
-    // Responsive
     windowSize,
     isMobile,
     isTablet,
     isDesktop,
     isTouch,
     
-    // Sidebar
     sidebarOpen,
     toggleSidebar,
     setSidebarOpen,
     
-    // Notifications
     notifications,
     addNotification: (notification) => {
       const id = Date.now()
@@ -106,7 +99,6 @@ export const ThemeProvider = ({ children }) => {
       setNotifications(prev => prev.filter(n => n.id !== id))
     },
     
-    // Toast helpers
     showToast: (message, type = 'info') => {
       const id = Date.now()
       const notification = { message, type, isToast: true, id }

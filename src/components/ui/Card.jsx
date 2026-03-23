@@ -4,9 +4,10 @@ const Card = ({ children, className = '', padding = true, hover = false }) => {
   return (
     <div 
       className={`
-        bg-white dark:bg-gray-800 rounded-lg shadow-md
+        bg-white dark:bg-gray-800 rounded-xl shadow-md 
         ${padding ? 'p-4 md:p-6' : ''}
-        ${hover ? 'hover:shadow-lg transition-shadow' : ''}
+        ${hover ? 'hover:shadow-lg transition-all duration-300 hover:-translate-y-1' : ''}
+        border border-gray-100 dark:border-gray-700
         ${className}
       `}
     >
@@ -22,7 +23,7 @@ const CardHeader = ({ children, className = '' }) => (
 )
 
 const CardBody = ({ children, className = '' }) => (
-  <div className={`space-y-4 ${className}`}>
+  <div className={`${className}`}>
     {children}
   </div>
 )

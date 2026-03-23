@@ -60,27 +60,27 @@ export default function Register() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center py-8 px-4 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-gradient-to-br from-blue-50 to-purple-50">
       <div className="w-full max-w-md mx-auto">
         <Card>
           <Card.Header>
-            <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900 dark:text-white">
-              Create <span className="text-blue-600 dark:text-blue-400">Account</span>
+            <h2 className="text-2xl md:text-3xl font-bold text-center text-gray-900">
+              Create <span className="text-blue-600">Account</span>
             </h2>
-            <p className="text-center text-gray-600 dark:text-gray-400 mt-2 text-sm md:text-base">
+            <p className="text-center text-gray-600 mt-2 text-sm md:text-base">
               Join our learning community
             </p>
           </Card.Header>
 
           <Card.Body>
             {error && (
-              <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 rounded-lg text-sm">
+              <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
                 {error}
               </div>
             )}
             
             {success && (
-              <div className="mb-4 p-3 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-400 rounded-lg text-sm">
+              <div className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm">
                 {success}
               </div>
             )}
@@ -119,7 +119,7 @@ export default function Register() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-9 text-gray-500 dark:text-gray-400 hover:text-gray-700"
+                  className="absolute right-3 top-9 text-gray-500 hover:text-gray-700"
                 >
                   {showPassword ? (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -147,7 +147,7 @@ export default function Register() {
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-9 text-gray-500 dark:text-gray-400 hover:text-gray-700"
+                  className="absolute right-3 top-9 text-gray-500 hover:text-gray-700"
                 >
                   {showConfirmPassword ? (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -179,9 +179,9 @@ export default function Register() {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
+              <p className="text-gray-600 text-sm md:text-base">
                 Already have an account?{' '}
-                <Link to="/login" className="text-blue-600 dark:text-blue-400 font-semibold hover:underline">
+                <Link to="/login" className="text-blue-600 font-semibold hover:underline">
                   Sign in
                 </Link>
               </p>

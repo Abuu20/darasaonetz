@@ -8,6 +8,7 @@ export default function ProtectedRoute({ role }) {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
   const [userRole, setUserRole] = useState(null)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     checkUser()
@@ -15,33 +16,41 @@ export default function ProtectedRoute({ role }) {
 
   async function checkUser() {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
+      // Check current session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession()
       
-      if (user) {
-        // Try to get from metadata first
-        let role = user.user_metadata?.role || 'student'
+      if (sessionError) throw sessionError
+      
+      if (!session) {
+        // No session, redirect to login
+        setLoading(false)
+        return
+      }
+      
+      setUser(session.user)
+      
+      // Get user role from profile
+      try {
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', session.user.id)
+          .maybeSingle()
         
-        // Then try to get from profiles
-        try {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .maybeSingle()
-          
-          if (profile?.role) {
-            role = profile.role
-          }
-        } catch (profileError) {
-          console.warn('Could not fetch profile')
-        }
+        if (profileError) throw profileError
         
+        const role = profile?.role || session.user.user_metadata?.role || 'student'
+        setUserRole(role)
+        
+      } catch (profileError) {
+        console.warn('Could not fetch profile, using metadata role')
+        const role = session.user.user_metadata?.role || 'student'
         setUserRole(role)
       }
       
     } catch (error) {
       console.error('Auth error:', error)
+      setError(error.message)
     } finally {
       setLoading(false)
     }
@@ -55,25 +64,17 @@ export default function ProtectedRoute({ role }) {
     )
   }
 
-  // If no role specified, this is a public route
-  if (!role) {
-    return <Outlet />
-  }
-
-  // If not logged in, redirect to login
-  if (!user) {
+  // If error or no user, redirect to login
+  if (error || !user) {
     return <Navigate to="/login" state={{ from: location }} replace />
   }
 
   // Check if user has required role
   if (role && userRole !== role) {
-    console.log(`Access denied: required ${role}, but user is ${userRole}`)
-    
     // Redirect to appropriate dashboard based on actual role
     if (userRole === 'admin') return <Navigate to="/admin" replace />
     if (userRole === 'teacher') return <Navigate to="/teacher" replace />
     if (userRole === 'student') return <Navigate to="/student" replace />
-    
     return <Navigate to="/" replace />
   }
 

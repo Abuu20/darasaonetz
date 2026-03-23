@@ -38,6 +38,7 @@ export default function DesktopNavbar() {
     <nav className="bg-white dark:bg-gray-800 shadow-lg fixed w-full top-0 z-50 border-b border-gray-200 dark:border-gray-700">
       <div className="w-full px-4 sm:px-6">
         <div className="flex justify-between items-center h-16">
+          {/* Left section */}
           <div className="flex items-center gap-2 sm:gap-4">
             {user && isDashboardPage && (
               <button
@@ -54,6 +55,7 @@ export default function DesktopNavbar() {
             </Link>
           </div>
 
+          {/* Navigation links */}
           <div className="hidden md:flex items-center gap-4 lg:gap-6">
             {user && isDashboardPage ? (
               <>
@@ -71,11 +73,19 @@ export default function DesktopNavbar() {
                     <Link to="/student/wishlist" className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400">
                       Wishlist
                     </Link>
+                    <Link to="/student/notes" className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400">
+                      Notes
+                    </Link>
                   </>
                 )}
                 {profile?.role === 'teacher' && (
                   <Link to="/teacher/courses" className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400">
                     My Courses
+                  </Link>
+                )}
+                {profile?.role === 'admin' && (
+                  <Link to="/admin/users" className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400">
+                    Users
                   </Link>
                 )}
               </>
@@ -91,11 +101,12 @@ export default function DesktopNavbar() {
             )}
           </div>
 
+          {/* Right section */}
           <div className="flex items-center gap-2 sm:gap-4">
-            {/* Cart Icon - Fixed link to /student/cart */}
+            {/* Cart Icon */}
             {user && profile?.role === 'student' && (
               <Link to="/student/cart" className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 text-gray-700 dark:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
                 {cartCount > 0 && (
@@ -106,15 +117,19 @@ export default function DesktopNavbar() {
               </Link>
             )}
 
+            {/* Dark Mode Toggle */}
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-gray-700 dark:text-gray-200"
+              aria-label="Toggle theme"
             >
               {theme === 'dark' ? '☀️' : '🌙'}
             </button>
 
+            {/* Notifications */}
             {user && <NotificationBell />}
 
+            {/* User Menu */}
             {user ? (
               <div className="relative">
                 <button
@@ -147,6 +162,15 @@ export default function DesktopNavbar() {
                     >
                       Dashboard
                     </Link>
+                    {profile?.role === 'student' && (
+                      <Link
+                        to="/student/notes"
+                        className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        My Notes
+                      </Link>
+                    )}
                     <hr className="my-2 border-gray-200 dark:border-gray-700" />
                     <button
                       onClick={handleLogout}

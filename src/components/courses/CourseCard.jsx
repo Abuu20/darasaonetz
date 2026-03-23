@@ -16,7 +16,7 @@ export default function CourseCard({ course, progress, enrollmentId, isTeacher =
   }
 
   return (
-    <Card hover className="overflow-hidden">
+    <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100">
       {/* Thumbnail */}
       <div className="h-40 bg-gradient-to-r from-blue-500 to-purple-500 relative">
         {courseData.thumbnail_url ? (
@@ -38,7 +38,6 @@ export default function CourseCard({ course, progress, enrollmentId, isTeacher =
             />
           </div>
         )}
-        {/* Rating Badge */}
         {(courseData.average_rating > 0 || courseData.review_count > 0) && (
           <div className="absolute top-2 right-2 bg-black/70 rounded-full px-2 py-1 flex items-center gap-1">
             <RatingStars rating={courseData.average_rating} readonly size="sm" />
@@ -53,7 +52,6 @@ export default function CourseCard({ course, progress, enrollmentId, isTeacher =
       <div className="p-4">
         <h3 className="font-semibold text-lg mb-1 line-clamp-1">{courseData.title}</h3>
         
-        {/* Rating Display */}
         {!isTeacher && (courseData.average_rating > 0 || courseData.review_count > 0) && (
           <div className="flex items-center gap-2 mb-2">
             <RatingStars rating={courseData.average_rating} readonly size="sm" />
@@ -142,6 +140,6 @@ export default function CourseCard({ course, progress, enrollmentId, isTeacher =
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   )
 }

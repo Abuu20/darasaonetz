@@ -6,10 +6,7 @@ import AuthLayout from '../components/layout/AuthLayout'
 import DashboardLayout from '../components/layout/DashboardLayout'
 import ProtectedRoute from '../components/layout/ProtectedRoute'
 import { Spinner } from '../components/ui'
-import TeacherForum from '../pages/Teacher/TeacherForum'
-import ForumManagement from '../pages/Admin/ForumManagement'
-import TeacherTopicDetail from '../pages/Teacher/TeacherTopicDetail'
-import AllNotes from '../pages/Student/AllNotes'
+import NotFound from '../pages/NotFound'
 
 // Lazy load pages
 const Landing = lazy(() => import('../pages/Public/Landing'))
@@ -24,6 +21,7 @@ const StudentProfile = lazy(() => import('../pages/Student/Profile'))
 const Wishlist = lazy(() => import('../pages/Student/Wishlist'))
 const ShoppingCart = lazy(() => import('../pages/ShoppingCart'))
 const ForumPage = lazy(() => import('../pages/ForumPage'))
+const AllNotes = lazy(() => import('../pages/Student/AllNotes'))
 
 const TeacherDashboard = lazy(() => import('../pages/Teacher/TeacherDashboard'))
 const TeacherProfile = lazy(() => import('../pages/Teacher/Profile'))
@@ -33,6 +31,8 @@ const TeacherMyCourses = lazy(() => import('../pages/Teacher/MyCourses'))
 const StudentsList = lazy(() => import('../pages/Teacher/StudentsList'))
 const TeacherAnalytics = lazy(() => import('../pages/Teacher/Analytics'))
 const TeacherCertificates = lazy(() => import('../pages/Teacher/Certificates'))
+const TeacherForum = lazy(() => import('../pages/Teacher/TeacherForum'))
+const TeacherTopicDetail = lazy(() => import('../pages/Teacher/TeacherTopicDetail'))
 
 const AdminDashboard = lazy(() => import('../pages/Admin/AdminDashboard'))
 const UserManagement = lazy(() => import('../pages/Admin/UserManagement'))
@@ -40,6 +40,7 @@ const CourseApproval = lazy(() => import('../pages/Admin/CourseApproval'))
 const Reports = lazy(() => import('../pages/Admin/Reports'))
 const SystemSettings = lazy(() => import('../pages/Admin/SystemSettings'))
 const CertificateManagement = lazy(() => import('../pages/Admin/CertificateManagement'))
+const ForumManagement = lazy(() => import('../pages/Admin/ForumManagement'))
 
 const CertificateView = lazy(() => import('../pages/CertificateView'))
 const VerifyCertificate = lazy(() => import('../pages/VerifyCertificate'))
@@ -83,7 +84,7 @@ export const router = createBrowserRouter([
     ]
   },
   
-  // Certificate routes
+  // Certificate routes (public for verification)
   {
     path: '/certificate/:id',
     element: <PublicLayout />,
@@ -116,7 +117,6 @@ export const router = createBrowserRouter([
           { path: 'wishlist', element: withSuspense(Wishlist) },
           { path: 'cart', element: withSuspense(ShoppingCart) },
           { path: 'notes', element: withSuspense(AllNotes) }
-
         ]
       }
     ]
@@ -139,8 +139,7 @@ export const router = createBrowserRouter([
           { path: 'analytics', element: withSuspense(TeacherAnalytics) },
           { path: 'certificates', element: withSuspense(TeacherCertificates) },
           { path: 'forum/:courseId', element: withSuspense(TeacherForum) },
-          { path: 'forum/:courseId/topic/:topicId', element: withSuspense(TeacherTopicDetail) },
-
+          { path: 'forum/:courseId/topic/:topicId', element: withSuspense(TeacherTopicDetail) }
         ]
       }
     ]
@@ -158,12 +157,20 @@ export const router = createBrowserRouter([
           { path: 'users', element: withSuspense(UserManagement) },
           { path: 'courses', element: withSuspense(CourseApproval) },
           { path: 'certificates', element: withSuspense(CertificateManagement) },
+          { path: 'forum', element: withSuspense(ForumManagement) },
           { path: 'reports', element: withSuspense(Reports) },
-          { path: 'settings', element: withSuspense(SystemSettings) },
-          { path: 'forum', element: withSuspense(ForumManagement) }
-
+          { path: 'settings', element: withSuspense(SystemSettings) }
         ]
       }
+    ]
+  },
+  
+  // 404 - Catch all unmatched routes
+  {
+    path: '*',
+    element: <PublicLayout />,
+    children: [
+      { index: true, element: <NotFound /> }
     ]
   }
 ])

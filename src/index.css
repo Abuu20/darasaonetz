@@ -1,4 +1,3 @@
-/* Import styles */
 @import './styles/responsive.css';
 @import './styles/components.css';
 
@@ -6,92 +5,193 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Global styles */
 @layer base {
-  html {
-    -webkit-tap-highlight-color: transparent;
+  /* Light theme (default) */
+  :root {
+    --bg-primary: #f9fafb;
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #6b7280;
+    --border-color: #e5e7eb;
+    --border-light: #f3f4f6;
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --primary: #3b82f6;
+    --primary-dark: #2563eb;
+    --secondary: #8b5cf6;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
   }
-  
-  body {
-    background-color: #f9fafb;
-    color: #111827;
-    transition: background-color 0.2s ease, color 0.2s ease;
-  }
-  
-  .dark body {
-    background-color: #111827;
-    color: #f9fafb;
-  }
-  
-  /* Force root element to fill screen */
-  #root {
-    min-height: 100vh;
-    background-color: #f9fafb;
-    transition: background-color 0.2s ease;
-  }
-  
-  .dark #root {
-    background-color: #111827;
+
+  /* Dark theme */
+  .dark {
+    --bg-primary: #111827;
+    --bg-secondary: #1f2937;
+    --bg-card: #1f2937;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+    --border-color: #374151;
+    --border-light: #1f2937;
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    --primary: #60a5fa;
+    --primary-dark: #3b82f6;
+    --secondary: #c084fc;
   }
 }
 
-/* Ensure all backgrounds change in dark mode */
-.bg-gray-50 {
-  background-color: #f9fafb;
-}
-
-.dark .bg-gray-50 {
-  background-color: #111827;
-}
-
-.bg-gray-100 {
-  background-color: #f3f4f6;
-}
-
-.dark .bg-gray-100 {
-  background-color: #1f2937;
-}
-
-.bg-white {
-  background-color: #ffffff;
-}
-
-.dark .bg-white {
-  background-color: #1f2937;
-}
-
-/* Ensure all layout backgrounds change */
-.min-h-screen {
-  background-color: inherit;
-}
-
-/* Force body background to update with dark mode */
+/* Apply CSS variables to all elements */
 body {
-  background-color: #f9fafb;
-  transition: background-color 0.2s ease;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
 }
 
-.dark body {
-  background-color: #111827;
-}
-
-/* Ensure root div fills the screen */
 #root {
+  background-color: var(--bg-primary);
   min-height: 100vh;
-  background-color: inherit;
-}
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.3s ease-out;
+/* Card styles */
+.bg-white {
+  background-color: var(--bg-card) !important;
+}
+
+.bg-gray-50 {
+  background-color: var(--bg-primary) !important;
+}
+
+/* Text colors with !important to ensure visibility */
+.text-gray-900,
+.text-gray-800 {
+  color: var(--text-primary) !important;
+}
+
+.text-gray-700,
+.text-gray-600 {
+  color: var(--text-secondary) !important;
+}
+
+.text-gray-500,
+.text-gray-400 {
+  color: var(--text-muted) !important;
+}
+
+/* Ensure all text has proper contrast */
+p, span, li, a, button, label, h1, h2, h3, h4, h5, h6 {
+  color: inherit;
+}
+
+/* Input styles - FORCE visibility */
+input, 
+textarea, 
+select,
+[type="text"],
+[type="email"],
+[type="password"],
+[type="number"],
+[type="search"],
+[type="tel"],
+[type="url"] {
+  background-color: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 0.5rem !important;
+  padding: 0.5rem 1rem !important;
+}
+
+input::placeholder, 
+textarea::placeholder {
+  color: var(--text-muted) !important;
+  opacity: 1 !important;
+}
+
+input:focus, 
+textarea:focus, 
+select:focus {
+  outline: none !important;
+  ring: 2px solid var(--primary) !important;
+  border-color: transparent !important;
+}
+
+/* Card styling */
+.card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+/* Button styling */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: white;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Border colors */
+.border-gray-200 {
+  border-color: var(--border-color) !important;
+}
+
+.border-gray-100 {
+  border-color: var(--border-light) !important;
+}
+
+/* Shadow utilities */
+.shadow-md {
+  box-shadow: var(--shadow) !important;
+}
+
+.shadow-lg {
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Link styles */
+a {
+  color: var(--primary);
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--primary-dark);
+}
+
+/* Custom scrollbar for better UX */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--border-light);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-muted);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
 }
