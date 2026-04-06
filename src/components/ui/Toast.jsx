@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react'
 import { useTheme } from '../../context/ThemeContext'
 
 export default function Toast({ message, type = 'info', onClose, duration = 3000 }) {
-  const { isDark } = useTheme()
+  const { isDark, isMobile } = useTheme()
   const [scale, setScale] = useState(0.3)
-  const [phase, setPhase] = useState('opening')
 
   useEffect(() => {
     // PHASE 1: Opening animation (grow from 0.3 to 1)
@@ -14,7 +13,6 @@ export default function Toast({ message, type = 'info', onClose, duration = 3000
           clearInterval(openInterval)
           // PHASE 2: Stay open for reading (duration time)
           setTimeout(() => {
-            setPhase('closing')
             // PHASE 3: Closing animation (shrink from 1 to 0)
             const closeInterval = setInterval(() => {
               setScale(prev => {
@@ -59,23 +57,59 @@ export default function Toast({ message, type = 'info', onClose, duration = 3000
     info: 'shadow-purple-500/30'
   }
 
-  // Text color based on theme
+  // Responsive sizing based on device
   const textColor = isDark ? 'text-white' : 'text-gray-900'
   const textShadow = isDark ? 'drop-shadow-lg' : 'drop-shadow-sm'
+  
+  // Mobile vs Desktop styles - REDUCED MORE FOR MOBILE
+  const mobileStyles = isMobile ? {
+    padding: 'px-3 py-2',
+    gap: 'gap-1.5',
+    minWidth: 'min-w-[200px]',
+    maxWidth: 'max-w-[280px]',
+    iconSize: 'text-lg',
+    textSize: 'text-xs',
+    ringOffset: {
+      outer: 'inset-[-8px]',
+      middle: 'inset-[-5px]',
+      inner: 'inset-[-2px]'
+    },
+    borderWidth: 'border',
+    ringBorderWidth: 'border',
+    particleCount: 3
+  } : {
+    padding: 'px-8 py-5',
+    gap: 'gap-4',
+    minWidth: 'min-w-[320px]',
+    maxWidth: 'max-w-md',
+    iconSize: 'text-3xl',
+    textSize: 'text-base',
+    ringOffset: {
+      outer: 'inset-[-25px]',
+      middle: 'inset-[-15px]',
+      inner: 'inset-[-8px]'
+    },
+    borderWidth: 'border-2',
+    ringBorderWidth: 'border-2',
+    particleCount: 12
+  }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+    <div className={`fixed ${isMobile ? 'top-2 left-2 right-2' : 'inset-0 flex items-center justify-center'} z-50 pointer-events-none`}>
       <div 
         className={`
           ${gradients[type]} 
-          px-8 py-5 rounded-2xl 
-          shadow-2xl ${shadows[type]} 
-          flex items-center gap-4 
-          min-w-[320px] max-w-md 
+          ${mobileStyles.padding}
+          rounded-xl 
+          shadow-xl ${shadows[type]} 
+          flex items-center ${mobileStyles.gap}
+          ${mobileStyles.minWidth} 
+          ${mobileStyles.maxWidth}
           pointer-events-auto 
           border border-white/30 
           backdrop-blur-md
           relative
+          ${isMobile ? 'w-auto' : ''}
         `}
         style={{
           transform: `scale(${scale})`,
@@ -83,27 +117,33 @@ export default function Toast({ message, type = 'info', onClose, duration = 3000
           animation: 'slideUp 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55)'
         }}
       >
-        {/* Portal Rings around toast */}
-        <div className="absolute inset-[-25px] rounded-2xl border-2 border-cyan-500/40 animate-spin-slow" />
-        <div className="absolute inset-[-15px] rounded-2xl border-2 border-purple-500/40 animate-spin-reverse" />
-        <div className="absolute inset-[-8px] rounded-2xl border-2 border-pink-500/40 animate-spin-slow" style={{ animationDuration: '2s' }} />
+        {/* Portal Rings around toast - Responsive sizes */}
+        <div className={`absolute ${mobileStyles.ringOffset.outer} rounded-xl ${mobileStyles.ringBorderWidth} border-cyan-500/40 animate-spin-slow`} />
+        <div className={`absolute ${mobileStyles.ringOffset.middle} rounded-xl ${mobileStyles.ringBorderWidth} border-purple-500/40 animate-spin-reverse`} />
+        
+        {/* Only show inner ring on desktop */}
+        {!isMobile && (
+          <div className={`absolute ${mobileStyles.ringOffset.inner} rounded-xl ${mobileStyles.ringBorderWidth} border-pink-500/40 animate-spin-slow`} style={{ animationDuration: '2s' }} />
+        )}
 
         {/* Icon with portal effect */}
         <div className="relative">
-          <span className="text-3xl animate-bounce-subtle">{icons[type]}</span>
-          <div className="absolute inset-0 animate-ping-slow opacity-30">
-            <span className="text-3xl">{icons[type]}</span>
-          </div>
+          <span className={`${mobileStyles.iconSize} animate-bounce-subtle`}>{icons[type]}</span>
+          {!isMobile && (
+            <div className="absolute inset-0 animate-ping-slow opacity-30">
+              <span className={mobileStyles.iconSize}>{icons[type]}</span>
+            </div>
+          )}
         </div>
         
-        {/* Message - DYNAMIC TEXT COLOR FOR LIGHT/DARK MODE */}
+        {/* Message - Responsive text size */}
         <div className="flex-1">
-          <p className={`text-base font-bold tracking-wide ${textColor} ${textShadow}`}>
+          <p className={`${mobileStyles.textSize} font-semibold tracking-wide ${textColor} ${textShadow} leading-tight`}>
             {message}
           </p>
         </div>
         
-        {/* Quantum close button - DYNAMIC COLOR */}
+        {/* Quantum close button - Smaller on mobile */}
         <button 
           onClick={() => {
             const interval = setInterval(() => {
@@ -117,21 +157,21 @@ export default function Toast({ message, type = 'info', onClose, duration = 3000
               })
             }, 20)
           }} 
-          className={`ml-2 hover:rotate-90 transition-all duration-300 hover:scale-110 ${
-            isDark ? 'text-white/80 hover:text-white' : 'text-gray-700/80 hover:text-gray-900'
+          className={`ml-1 hover:rotate-90 transition-all duration-300 hover:scale-110 ${
+            isDark ? 'text-white/70 hover:text-white' : 'text-gray-700/70 hover:text-gray-900'
           }`}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className={`${isMobile ? 'w-3 h-3' : 'w-5 h-5'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
 
-        {/* Energy particles */}
+        {/* Energy particles - Fewer on mobile */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(12)].map((_, i) => (
+          {[...Array(mobileStyles.particleCount)].map((_, i) => (
             <div
               key={i}
-              className="absolute w-1.5 h-1.5 bg-cyan-400 rounded-full animate-particle"
+              className={`absolute ${isMobile ? 'w-0.5 h-0.5' : 'w-1.5 h-1.5'} bg-cyan-400 rounded-full animate-particle`}
               style={{
                 left: `${Math.random() * 100}%`,
                 top: `${Math.random() * 100}%`,
@@ -160,7 +200,7 @@ export default function Toast({ message, type = 'info', onClose, duration = 3000
             transform: translateY(0);
           }
           50% {
-            transform: translateY(-4px);
+            transform: translateY(-2px);
           }
         }
         
@@ -191,8 +231,8 @@ export default function Toast({ message, type = 'info', onClose, duration = 3000
             opacity: 0;
           }
           50% {
-            transform: translateY(-20px) scale(2);
-            opacity: 1;
+            transform: translateY(-15px) scale(1.5);
+            opacity: 0.6;
           }
         }
         
