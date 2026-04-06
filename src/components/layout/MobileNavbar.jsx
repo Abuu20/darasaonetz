@@ -1,17 +1,20 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
 import { useCart } from '../../context/CartContext'
 import { Avatar, Button } from '../ui'
 import MobileMenu from '../ui/MobileMenu'
 import NotificationBell from '../ui/NotificationBell'
+import LanguageSwitcher from '../../i18n/LanguageSwitcher'
 
 export default function MobileNavbar() {
   const navigate = useNavigate()
   const { user, profile, logout } = useAuth()
   const { theme, toggleTheme, isMobile } = useTheme()
   const { cartCount } = useCart()
+  const { t } = useTranslation()
   const [menuOpen, setMenuOpen] = useState(false)
 
   const handleLogout = async () => {
@@ -50,7 +53,15 @@ export default function MobileNavbar() {
           </Link>
           
           <div className="flex items-center gap-1">
-            {/* Cart Icon - Fixed link to /student/cart */}
+            {/* Language Switcher - Only show on mobile when user is NOT logged in */}
+            {!user && (
+              <LanguageSwitcher 
+                variant="icon"
+                hideOnMobile={false} // We handle visibility manually here
+              />
+            )}
+            
+            {/* Cart Icon */}
             {user && profile?.role === 'student' && (
               <Link to="/student/cart" className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,7 +123,7 @@ export default function MobileNavbar() {
                   className="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 font-medium"
                   onClick={() => setMenuOpen(false)}
                 >
-                  📊 Dashboard
+                  📊 {t('navigation.dashboard')}
                 </Link>
                 
                 {profile?.role === 'student' && (
@@ -122,14 +133,14 @@ export default function MobileNavbar() {
                       className="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                       onClick={() => setMenuOpen(false)}
                     >
-                      📚 My Courses
+                      📚 {t('navigation.myCourses')}
                     </Link>
                     <Link
                       to="/student/browse"
                       className="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                       onClick={() => setMenuOpen(false)}
                     >
-                      🔍 Browse Courses
+                      🔍 {t('courses.browseCourses')}
                     </Link>
                     <Link
                       to="/student/wishlist"
@@ -143,7 +154,7 @@ export default function MobileNavbar() {
                       className="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                       onClick={() => setMenuOpen(false)}
                     >
-                      🛒 Cart ({cartCount})
+                      🛒 {t('cart.myCart')} ({cartCount})
                     </Link>
                   </>
                 )}
@@ -155,7 +166,7 @@ export default function MobileNavbar() {
                       className="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                       onClick={() => setMenuOpen(false)}
                     >
-                      📚 My Courses
+                      📚 {t('navigation.myCourses')}
                     </Link>
                     <Link
                       to="/teacher/courses/new"
@@ -179,7 +190,7 @@ export default function MobileNavbar() {
                   className="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
                   onClick={() => setMenuOpen(false)}
                 >
-                  👤 Profile
+                  👤 {t('navigation.profile')}
                 </Link>
                 
                 <hr className="my-3 border-gray-200 dark:border-gray-700" />
@@ -188,42 +199,56 @@ export default function MobileNavbar() {
                   onClick={handleLogout}
                   className="block w-full text-left px-4 py-3 rounded-lg text-red-600 hover:bg-gray-100 dark:hover:bg-gray-700 font-medium"
                 >
-                  🚪 Logout
+                  🚪 {t('auth.signOut')}
                 </button>
               </div>
             </>
           ) : (
-            <div className="space-y-2">
-              <Link
-                to="/"
-                className="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                onClick={() => setMenuOpen(false)}
-              >
-                🏠 Home
-              </Link>
-              <Link
-                to="/about"
-                className="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
-                onClick={() => setMenuOpen(false)}
-              >
-                ℹ️ About
-              </Link>
+            <>
+              <div className="space-y-2">
+                <Link
+                  to="/"
+                  className="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  🏠 {t('navigation.home')}
+                </Link>
+                <Link
+                  to="/about"
+                  className="block px-4 py-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  ℹ️ {t('navigation.about')}
+                </Link>
+              </div>
+              
+              {/* Language Switcher in Mobile Menu for non-logged in users */}
+              <div className="pt-4 border-t dark:border-gray-700">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 px-4">
+                  {t('common.language')}
+                </p>
+                <LanguageSwitcher variant="buttons" />
+              </div>
+              
               <hr className="my-4 border-gray-200 dark:border-gray-700" />
-              <Link
-                to="/login"
-                className="block px-4 py-3 rounded-lg text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-700"
-                onClick={() => setMenuOpen(false)}
-              >
-                🔑 Login
-              </Link>
-              <Link
-                to="/register"
-                className="block px-4 py-3 rounded-lg bg-blue-600 text-white text-center"
-                onClick={() => setMenuOpen(false)}
-              >
-                📝 Sign Up
-              </Link>
-            </div>
+              
+              <div className="space-y-2">
+                <Link
+                  to="/login"
+                  className="block px-4 py-3 rounded-lg text-blue-600 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  🔑 {t('auth.signIn')}
+                </Link>
+                <Link
+                  to="/register"
+                  className="block px-4 py-3 rounded-lg bg-blue-600 text-white text-center"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  📝 {t('auth.signUp')}
+                </Link>
+              </div>
+            </>
           )}
         </div>
       </MobileMenu>

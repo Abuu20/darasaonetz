@@ -1,15 +1,13 @@
-import { useTheme } from './context/ThemeContext'
-import { useTheme } from '../context/ThemeContext'
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { certificateQueries } from '../supabase/queries/certificates'
 import { Card, Button, Spinner } from '../components/ui'
+import { useTheme } from '../context/ThemeContext'
 
 export default function CertificateView() {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const { id } = useParams()
   const navigate = useNavigate()
+  const { showError, showSuccess, showInfo } = useTheme()
   const [certificate, setCertificate] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -23,7 +21,6 @@ export default function CertificateView() {
   async function fetchCertificate() {
     try {
       const data = await certificateQueries.getCertificateById(id)
-      console.log('Certificate data:', data) // Debug log
       setCertificate(data)
     } catch (error) {
       console.error('Error fetching certificate:', error)
@@ -35,7 +32,7 @@ export default function CertificateView() {
 
   async function downloadAsPDF() {
     if (!certificateRef.current) {
-      showInfo('Certificate element not found')
+      showError('Certificate element not found')
       return
     }
 
@@ -77,7 +74,7 @@ export default function CertificateView() {
       
     } catch (error) {
       console.error('Error downloading certificate:', error)
-      showWarning('Failed to download certificate. Please try again.')
+      showError('Failed to download certificate. Please try again.')
     } finally {
       setDownloading(false)
     }
@@ -129,7 +126,6 @@ export default function CertificateView() {
     )
   }
 
-  // Get instructor name from the course data
   const instructorName = certificate.courses?.profiles?.full_name || 'Darasaone Instructor'
   const courseTitle = certificate.courses?.title || 'Course'
   const studentName = certificate.profiles?.full_name || 'Student'

@@ -1,5 +1,6 @@
+// src/components/forum/TopicDetail.jsx
 import { useTheme } from '../../context/ThemeContext'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { supabase } from '../../supabase/client'
 import { useAuth } from '../../context/AuthContext'
 import { Card, Button, Avatar, Spinner, Input } from '../ui'
@@ -13,15 +14,47 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
   const [newReply, setNewReply] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [likes, setLikes] = useState({})
+  
+  // Use a ref to track if view has been incremented
+  const viewIncremented = useRef(false)
 
   useEffect(() => {
+    // Reset when topicId changes
+    viewIncremented.current = false
     fetchTopic()
   }, [topicId])
 
+  async function incrementViewCount() {
+    // Only increment once per topic
+    if (viewIncremented.current) {
+      console.log('View already incremented, skipping...')
+      return
+    }
+    
+    console.log('Incrementing view for topic:', topicId)
+    
+    try {
+      const { error } = await supabase.rpc('increment_topic_views', {
+        topic_id: topicId
+      })
+      
+      if (error) {
+        console.error('RPC error:', error)
+      } else {
+        console.log('View incremented successfully')
+        viewIncremented.current = true
+      }
+    } catch (err) {
+      console.error('View increment failed:', err)
+    }
+  }
+
   async function fetchTopic() {
     try {
-      // Increment views
-      await supabase.rpc('increment_topic_views', { topic_id: topicId })
+      setLoading(true)
+      
+      // Increment view count
+      await incrementViewCount()
       
       // Fetch topic with profile
       const { data: topicData, error: topicError } = await supabase
@@ -61,12 +94,13 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
       setReplies(repliesData || [])
 
       // Check user likes
-      if (user) {
+      if (user && repliesData?.length > 0) {
+        const replyIds = repliesData.map(r => r.id)
         const { data: userLikes } = await supabase
           .from('forum_likes')
           .select('reply_id')
           .eq('user_id', user.id)
-          .in('reply_id', repliesData?.map(r => r.id) || [])
+          .in('reply_id', replyIds)
 
         const likesMap = {}
         userLikes?.forEach(like => {
@@ -77,6 +111,7 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
 
     } catch (error) {
       console.error('Error fetching topic:', error)
+      showInfo('Failed to load topic')
     } finally {
       setLoading(false)
     }
@@ -98,10 +133,12 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
 
       if (error) throw error
 
+      // Update reply count
       await supabase.rpc('increment_reply_count', { topic_id: topicId })
 
+      await fetchTopic()
       setNewReply('')
-      fetchTopic()
+      showSuccess('Reply posted successfully!')
     } catch (error) {
       console.error('Error creating reply:', error)
       showInfo('Failed to post reply')
@@ -126,7 +163,8 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
         .update({ is_solved: true })
         .eq('id', topicId)
 
-      fetchTopic()
+      await fetchTopic()
+      showSuccess('Best answer marked!')
     } catch (error) {
       console.error('Error marking best answer:', error)
       showInfo('Failed to mark best answer')
@@ -134,6 +172,11 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
   }
 
   async function handleLike(replyId) {
+    if (!user) {
+      showInfo('Please login to like')
+      return
+    }
+
     try {
       const { data: existing } = await supabase
         .from('forum_likes')
@@ -143,22 +186,28 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
         .maybeSingle()
 
       if (existing) {
-        await supabase
+        const { error } = await supabase
           .from('forum_likes')
           .delete()
           .eq('id', existing.id)
-        setLikes({ ...likes, [replyId]: false })
+        
+        if (!error) {
+          setLikes({ ...likes, [replyId]: false })
+        }
       } else {
-        await supabase
+        const { error } = await supabase
           .from('forum_likes')
           .insert({
             reply_id: replyId,
             user_id: user.id
           })
-        setLikes({ ...likes, [replyId]: true })
+        
+        if (!error) {
+          setLikes({ ...likes, [replyId]: true })
+        }
       }
 
-      fetchTopic()
+      await fetchTopic()
     } catch (error) {
       console.error('Error liking reply:', error)
     }
@@ -174,9 +223,10 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
         .eq('id', replyId)
 
       if (error) throw error
-
+      
       await supabase.rpc('decrement_reply_count', { topic_id: topicId })
-      fetchTopic()
+      await fetchTopic()
+      showSuccess('Reply deleted')
     } catch (error) {
       console.error('Error deleting reply:', error)
       showInfo('Failed to delete reply')
@@ -193,6 +243,7 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
         .eq('id', topicId)
 
       if (error) throw error
+      showSuccess('Topic deleted')
       onBack()
     } catch (error) {
       console.error('Error deleting topic:', error)
@@ -200,7 +251,6 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
     }
   }
 
-  // Helper to get user role badge
   const getUserRoleBadge = (role) => {
     if (role === 'teacher') {
       return <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded ml-2">Teacher</span>
@@ -211,21 +261,36 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
     return null
   }
 
-  if (loading) return <Spinner />
+  const formatViewCount = (views) => {
+    if (!views) return '0 views'
+    if (views >= 1000) {
+      return `${(views / 1000).toFixed(1)}k views`
+    }
+    return `${views} view${views !== 1 ? 's' : ''}`
+  }
 
-  if (!topic) return <div>Topic not found</div>
+  if (loading) return (
+    <div className="flex justify-center py-8">
+      <Spinner />
+    </div>
+  )
+
+  if (!topic) return (
+    <div className="text-center py-8">
+      <p>Topic not found</p>
+      <Button onClick={onBack} className="mt-4">Back to Topics</Button>
+    </div>
+  )
 
   const isTeacher = profile?.role === 'teacher' || profile?.role === 'admin'
   const isOwner = user?.id === topic.user_id
 
   return (
     <div className="space-y-4">
-      {/* Back Button */}
-      <button onClick={onBack} className="text-blue-600 hover:underline mb-2">
+      <button onClick={onBack} className="text-blue-600 hover:underline mb-2 flex items-center gap-1">
         ← Back to Topics
       </button>
 
-      {/* Topic */}
       <Card>
         <div className="flex items-start gap-3">
           <Avatar
@@ -243,7 +308,7 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
                 </div>
                 <div className="flex items-center gap-2 mt-1">
                   <p className="text-sm text-gray-500">
-                    Posted by {topic.profiles?.full_name}
+                    Posted by {topic.profiles?.full_name || 'Anonymous'}
                   </p>
                   {getUserRoleBadge(topic.profiles?.role)}
                   <span className="text-xs text-gray-400">
@@ -258,16 +323,18 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
               )}
             </div>
             <div className="mt-4 prose max-w-none">
-              <p>{topic.content}</p>
+              <p className="whitespace-pre-wrap">{topic.content}</p>
             </div>
-            <div className="mt-4 text-sm text-gray-400">
-              👁️ {topic.views || 0} views • 💬 {topic.replies_count || 0} replies
+            <div className="mt-4 text-sm text-gray-400 flex items-center gap-4">
+              <span className="flex items-center gap-1" title={`${topic.views || 0} total views`}>
+                👁️ {formatViewCount(topic.views || 0)}
+              </span>
+              <span>💬 {topic.replies_count || replies.length} replies</span>
             </div>
           </div>
         </div>
       </Card>
 
-      {/* Replies */}
       <div className="space-y-3">
         <h3 className="font-semibold text-lg">
           {replies.length} {replies.length === 1 ? 'Reply' : 'Replies'}
@@ -285,7 +352,7 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
                 <div className="flex justify-between items-start flex-wrap gap-2">
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <p className="font-medium">{reply.profiles?.full_name}</p>
+                      <p className="font-medium">{reply.profiles?.full_name || 'Anonymous'}</p>
                       {getUserRoleBadge(reply.profiles?.role)}
                     </div>
                     <p className="text-xs text-gray-500">
@@ -303,7 +370,7 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
                         Mark as Best
                       </Button>
                     )}
-                    {user?.id === reply.user_id && (
+                    {(user?.id === reply.user_id || isTeacher) && (
                       <Button size="sm" variant="danger" onClick={() => handleDeleteReply(reply.id)}>
                         Delete
                       </Button>
@@ -311,11 +378,11 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
                   </div>
                 </div>
                 <div className="mt-2 prose max-w-none">
-                  <p>{reply.content}</p>
+                  <p className="whitespace-pre-wrap">{reply.content}</p>
                 </div>
                 <button
                   onClick={() => handleLike(reply.id)}
-                  className="mt-2 text-sm text-gray-500 hover:text-red-500 flex items-center gap-1"
+                  className="mt-2 text-sm text-gray-500 hover:text-red-500 flex items-center gap-1 transition"
                 >
                   {likes[reply.id] ? '❤️' : '🤍'} {reply.likes?.[0]?.count || 0} likes
                 </button>
@@ -324,8 +391,7 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
           </Card>
         ))}
 
-        {/* Reply Form */}
-        {user && (
+        {user ? (
           <Card>
             <form onSubmit={handleCreateReply} className="space-y-3">
               <label className="block text-gray-700 dark:text-gray-300 font-medium">
@@ -343,6 +409,15 @@ export default function TopicDetail({ topicId, courseId, onBack }) {
                 {submitting ? 'Posting...' : 'Post Reply'}
               </Button>
             </form>
+          </Card>
+        ) : (
+          <Card>
+            <div className="text-center py-4">
+              <p className="text-gray-500">Please login to reply</p>
+              <Button onClick={() => window.location.href = '/login'} className="mt-2">
+                Login
+              </Button>
+            </div>
           </Card>
         )}
       </div>

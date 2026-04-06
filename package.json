@@ -10,11 +10,23 @@
     "start": "vite --port 3000 --open"
   },
   "dependencies": {
+    "@emailjs/browser": "^4.4.1",
     "@supabase/supabase-js": "^2.39.0",
+    "@tiptap/extension-image": "^3.21.0",
+    "@tiptap/extension-link": "^3.21.0",
+    "@tiptap/extension-placeholder": "^3.21.0",
+    "@tiptap/extension-text-align": "^3.21.0",
+    "@tiptap/react": "^3.21.0",
+    "@tiptap/starter-kit": "^3.21.0",
     "html2canvas": "^1.4.1",
+    "i18next": "^25.10.9",
+    "i18next-browser-languagedetector": "^8.2.1",
     "jspdf": "^2.5.1",
+    "pdfjs-dist": "^5.5.207",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-i18next": "^16.6.6",
+    "react-quill": "^2.0.0",
     "react-router-dom": "^6.20.0",
     "recharts": "^2.12.0"
   },

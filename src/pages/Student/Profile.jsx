@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../context/AuthContext'
 import { ProfileForm } from '../../components/forms'
 import { Spinner } from '../../components/ui'
 
 export default function StudentProfile() {
   const { loading } = useAuth()
+  const { t } = useTranslation()
 
   if (loading) {
     return (
@@ -16,7 +18,7 @@ export default function StudentProfile() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">My Profile</h1>
+        <h1 className="text-3xl font-bold mb-8">{t('student.profile.title')}</h1>
         <ProfileForm userRole="student" />
       </div>
     </div>

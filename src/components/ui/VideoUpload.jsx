@@ -1,146 +1,79 @@
 import { useState } from 'react'
-import { supabase } from '../../supabase/client'
-import Button from './Button'
-import Spinner from './Spinner'
+import { Input, Button } from './index'
 
-export default function VideoUpload({ 
-  onUploadComplete, 
-  courseId,
-  existingUrl = null,
-  label = 'Upload Video',
-  className = ''
-}) {
-  const [uploading, setUploading] = useState(false)
-  const [videoUrl, setVideoUrl] = useState(existingUrl)
-  const [progress, setProgress] = useState(0)
-  const [error, setError] = useState('')
+export default function VideoUpload({ onUploadComplete, existingUrl = null, label = 'Video URL' }) {
+  const [url, setUrl] = useState(existingUrl || '')
+  const [videoType, setVideoType] = useState('')
 
-  const handleFileChange = async (e) => {
-    const file = e.target.files[0]
-    if (!file) return
-
-    // Validate file type
-    if (!file.type.startsWith('video/')) {
-      setError('Please upload a video file')
-      return
-    }
-
-    // Validate file size (max 100MB)
-    if (file.size > 100 * 1024 * 1024) {
-      setError('File size must be less than 100MB')
-      return
-    }
-
-    setError('')
-    setUploading(true)
-    setProgress(0)
-
-    try {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('You must be logged in')
-      if (!courseId) throw new Error('Course ID is required')
-
-      // Generate unique filename
-      const fileExt = file.name.split('.').pop()
-      const fileName = `${user.id}/${courseId}/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`
-      const filePath = `${fileName}`
-
-      // Upload to Supabase Storage with progress tracking
-      const { error: uploadError, data } = await supabase.storage
-        .from('lesson-videos')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-          onUploadProgress: (progress) => {
-            const percent = (progress.loaded / progress.total) * 100
-            setProgress(Math.round(percent))
-          }
-        })
-
-      if (uploadError) throw uploadError
-
-      // Get the URL (not public, will be accessed via signed URL)
-      const { data: { publicUrl } } = supabase.storage
-        .from('lesson-videos')
-        .getPublicUrl(filePath)
-
-      setVideoUrl(publicUrl)
-      onUploadComplete(publicUrl, filePath)
-
-    } catch (error) {
-      console.error('Error uploading video:', error)
-      setError(error.message)
-    } finally {
-      setUploading(false)
-      setProgress(0)
-      // Clear the input
-      e.target.value = ''
-    }
+  const detectVideoType = (url) => {
+    if (!url) return ''
+    if (url.includes('youtube.com') || url.includes('youtu.be')) return 'YouTube'
+    if (url.includes('vimeo.com')) return 'Vimeo'
+    if (url.includes('cloudinary.com') && url.includes('/video/')) return 'Cloudinary Video'
+    return 'Direct URL'
   }
 
-  const handleRemove = () => {
-    setVideoUrl(null)
-    onUploadComplete(null, null)
+  const handleUrlChange = (e) => {
+    const newUrl = e.target.value
+    setUrl(newUrl)
+    setVideoType(detectVideoType(newUrl))
+  }
+
+  const handleSave = () => {
+    if (url.trim()) {
+      onUploadComplete(url)
+    }
   }
 
   return (
-    <div className={`space-y-2 ${className}`}>
-      {label && <label className="block text-gray-700 font-medium">{label}</label>}
+    <div className="space-y-3">
+      {label && <label className="block text-gray-700 dark:text-gray-300 font-medium">{label}</label>}
       
       <div className="space-y-3">
-        {videoUrl ? (
-          <div className="flex items-center gap-2">
-            <div className="flex-1 bg-gray-100 p-2 rounded">
-              <span className="text-sm text-gray-600 truncate block">
-                {videoUrl.split('/').pop()}
-              </span>
-            </div>
-            <button
-              type="button"
-              onClick={handleRemove}
-              className="text-red-500 hover:text-red-700"
-            >
-              Remove
-            </button>
-          </div>
-        ) : (
-          <div className="border-2 border-dashed rounded-lg p-6 text-center">
-            <input
-              type="file"
-              id="video-upload"
-              accept="video/*"
-              onChange={handleFileChange}
-              className="hidden"
-              disabled={uploading}
-            />
-            <label
-              htmlFor="video-upload"
-              className={`cursor-pointer block ${
-                uploading ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
-            >
-              <div className="text-4xl mb-2">📹</div>
-              <p className="text-gray-600 mb-2">
-                {uploading ? 'Uploading...' : 'Click to upload video'}
-              </p>
-              {uploading && (
-                <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-                  <div 
-                    className="bg-blue-600 h-2.5 rounded-full" 
-                    style={{ width: `${progress}%` }}
-                  ></div>
-                </div>
-              )}
-              {uploading && <p className="text-sm text-gray-500">{progress}% uploaded</p>}
-              <p className="text-xs text-gray-400">
-                MP4, WebM, OGG (max 100MB)
-              </p>
-            </label>
+        <Input
+          type="url"
+          value={url}
+          onChange={handleUrlChange}
+          placeholder="https://www.youtube.com/watch?v=... or https://vimeo.com/..."
+        />
+        
+        {videoType && (
+          <div className="flex items-center gap-2 text-sm">
+            <span className={`px-2 py-1 rounded ${
+              videoType === 'YouTube' ? 'bg-red-100 text-red-700' :
+              videoType === 'Vimeo' ? 'bg-blue-100 text-blue-700' :
+              'bg-gray-100 text-gray-700'
+            }`}>
+              {videoType}
+            </span>
+            <span className="text-gray-500">Video will be embedded from {videoType}</span>
           </div>
         )}
         
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        <div className="text-xs text-gray-500 space-y-1 bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+          <p className="font-medium text-blue-800 dark:text-blue-300">📹 Video Hosting Tips:</p>
+          <ul className="list-disc list-inside ml-2 space-y-1">
+            <li><strong>YouTube:</strong> Set video to "Unlisted" for privacy</li>
+            <li><strong>Vimeo:</strong> Use "Hide from Vimeo.com" for privacy</li>
+            <li><strong>Direct URL:</strong> Use a direct MP4 link (hosted elsewhere)</li>
+          </ul>
+          <p className="mt-2 text-yellow-700 dark:text-yellow-400">⚠️ Do NOT upload video files directly to Darasaone. Use the platforms above.</p>
+        </div>
+        
+        {url && url !== existingUrl && (
+          <Button size="sm" onClick={handleSave}>
+            Save Video URL
+          </Button>
+        )}
+        
+        {existingUrl && (
+          <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+            <p className="text-sm text-green-700 dark:text-green-400 flex items-center gap-2">
+              ✓ Video URL saved
+              <span className="text-xs font-mono break-all">{existingUrl}</span>
+            </p>
+          </div>
+        )}
       </div>
     </div>
   )

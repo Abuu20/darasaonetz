@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../context/AuthContext'
 import { useTheme } from '../../context/ThemeContext'
 import { useCart } from '../../context/CartContext'
 import { Avatar, Button } from '../ui'
 import NotificationBell from '../ui/NotificationBell'
+import LanguageSwitcher from '../../i18n/LanguageSwitcher'
 
 export default function DesktopNavbar() {
   const navigate = useNavigate()
@@ -12,6 +14,7 @@ export default function DesktopNavbar() {
   const { user, profile, logout } = useAuth()
   const { theme, toggleTheme, toggleSidebar, isMobile } = useTheme()
   const { cartCount } = useCart()
+  const { t } = useTranslation()
   const [showUserMenu, setShowUserMenu] = useState(false)
 
   const handleLogout = async () => {
@@ -60,15 +63,15 @@ export default function DesktopNavbar() {
             {user && isDashboardPage ? (
               <>
                 <Link to={getDashboardLink()} className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400">
-                  Dashboard
+                  {t('navigation.dashboard')}
                 </Link>
                 {profile?.role === 'student' && (
                   <>
                     <Link to="/student/my-courses" className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400">
-                      My Courses
+                      {t('navigation.myCourses')}
                     </Link>
                     <Link to="/student/browse" className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400">
-                      Browse
+                      {t('courses.browseCourses')}
                     </Link>
                     <Link to="/student/wishlist" className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400">
                       Wishlist
@@ -80,7 +83,7 @@ export default function DesktopNavbar() {
                 )}
                 {profile?.role === 'teacher' && (
                   <Link to="/teacher/courses" className="text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400">
-                    My Courses
+                    {t('navigation.myCourses')}
                   </Link>
                 )}
                 {profile?.role === 'admin' && (
@@ -92,10 +95,10 @@ export default function DesktopNavbar() {
             ) : (
               <>
                 <Link to="/" className="text-gray-700 dark:text-gray-200 hover:text-blue-600">
-                  Home
+                  {t('navigation.home')}
                 </Link>
                 <Link to="/about" className="text-gray-700 dark:text-gray-200 hover:text-blue-600">
-                  About
+                  {t('navigation.about')}
                 </Link>
               </>
             )}
@@ -103,6 +106,9 @@ export default function DesktopNavbar() {
 
           {/* Right section */}
           <div className="flex items-center gap-2 sm:gap-4">
+            {/* Language Switcher - Visible on desktop */}
+            <LanguageSwitcher variant="dropdown" />
+            
             {/* Cart Icon */}
             {user && profile?.role === 'student' && (
               <Link to="/student/cart" className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
@@ -153,14 +159,14 @@ export default function DesktopNavbar() {
                       className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
                       onClick={() => setShowUserMenu(false)}
                     >
-                      Profile
+                      {t('navigation.profile')}
                     </Link>
                     <Link
                       to={getDashboardLink()}
                       className="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
                       onClick={() => setShowUserMenu(false)}
                     >
-                      Dashboard
+                      {t('navigation.dashboard')}
                     </Link>
                     {profile?.role === 'student' && (
                       <Link
@@ -176,7 +182,7 @@ export default function DesktopNavbar() {
                       onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
-                      Logout
+                      {t('auth.signOut')}
                     </button>
                   </div>
                 )}
@@ -184,10 +190,10 @@ export default function DesktopNavbar() {
             ) : (
               <div className="flex items-center gap-2">
                 <Link to="/login">
-                  <Button variant="outline" size="sm">Login</Button>
+                  <Button variant="outline" size="sm">{t('auth.signIn')}</Button>
                 </Link>
                 <Link to="/register">
-                  <Button variant="primary" size="sm">Sign Up</Button>
+                  <Button variant="primary" size="sm">{t('auth.signUp')}</Button>
                 </Link>
               </div>
             )}

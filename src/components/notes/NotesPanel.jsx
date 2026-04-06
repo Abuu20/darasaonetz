@@ -1,12 +1,12 @@
-import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { supabase } from '../../supabase/client'
 import { useAuth } from '../../context/AuthContext'
+import { useTheme } from '../../context/ThemeContext'
 import { Card, Button, Input, Modal, Spinner } from '../ui'
 
 export default function NotesPanel({ courseId, lessonId }) {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
   const { user } = useAuth()
+  const { isMobile } = useTheme()
   const [notes, setNotes] = useState([])
   const [loading, setLoading] = useState(true)
   const [showNoteModal, setShowNoteModal] = useState(false)
@@ -87,7 +87,7 @@ export default function NotesPanel({ courseId, lessonId }) {
       fetchNotes()
     } catch (error) {
       console.error('Error saving note:', error)
-      showInfo('Failed to save note')
+      alert('Failed to save note')
     } finally {
       setSubmitting(false)
     }
@@ -106,7 +106,7 @@ export default function NotesPanel({ courseId, lessonId }) {
       fetchNotes()
     } catch (error) {
       console.error('Error deleting note:', error)
-      showInfo('Failed to delete note')
+      alert('Failed to delete note')
     }
   }
 
@@ -129,8 +129,8 @@ export default function NotesPanel({ courseId, lessonId }) {
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
+      <div className="flex justify-between items-center flex-wrap gap-2">
+        <h3 className="text-base md:text-lg font-semibold flex items-center gap-2">
           📝 My Notes
           <span className="text-sm text-gray-500">({notes.length})</span>
         </h3>
@@ -139,13 +139,13 @@ export default function NotesPanel({ courseId, lessonId }) {
         </Button>
       </div>
 
-      {/* Notes List */}
+      {/* Notes List - Responsive Grid */}
       {notes.length === 0 ? (
         <Card>
           <div className="text-center py-6">
             <p className="text-4xl mb-2">📝</p>
-            <p className="text-gray-500">No notes yet</p>
-            <p className="text-sm text-gray-400">Take notes to remember important points</p>
+            <p className="text-gray-500 text-sm">No notes yet</p>
+            <p className="text-xs text-gray-400 mt-1">Take notes to remember important points</p>
           </div>
         </Card>
       ) : (
@@ -155,22 +155,22 @@ export default function NotesPanel({ courseId, lessonId }) {
             return (
               <div key={note.id} className={`${colorStyle.class} rounded-lg p-3 border`}>
                 <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      {note.is_pinned && <span className="text-yellow-500">📌</span>}
-                      <h4 className="font-medium">{note.title}</h4>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1 flex-wrap">
+                      {note.is_pinned && <span className="text-yellow-500 text-sm">📌</span>}
+                      <h4 className="font-medium text-sm md:text-base truncate">{note.title}</h4>
                     </div>
-                    <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">
+                    <p className="text-xs md:text-sm text-gray-600 mt-1 whitespace-pre-wrap break-words">
                       {note.content}
                     </p>
                     <p className="text-xs text-gray-400 mt-2">
                       {new Date(note.updated_at).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="flex gap-1">
+                  <div className="flex gap-1 ml-2 flex-shrink-0">
                     <button
                       onClick={() => handleTogglePin(note)}
-                      className="p-1 hover:bg-gray-200 rounded"
+                      className="p-1 hover:bg-gray-200 rounded text-xs"
                       title={note.is_pinned ? 'Unpin' : 'Pin'}
                     >
                       📌
@@ -185,13 +185,13 @@ export default function NotesPanel({ courseId, lessonId }) {
                         })
                         setShowNoteModal(true)
                       }}
-                      className="p-1 hover:bg-gray-200 rounded"
+                      className="p-1 hover:bg-gray-200 rounded text-xs"
                     >
                       ✏️
                     </button>
                     <button
                       onClick={() => handleDeleteNote(note.id)}
-                      className="p-1 hover:bg-gray-200 rounded text-red-500"
+                      className="p-1 hover:bg-gray-200 rounded text-xs text-red-500"
                     >
                       🗑️
                     </button>
@@ -203,7 +203,7 @@ export default function NotesPanel({ courseId, lessonId }) {
         </div>
       )}
 
-      {/* Note Modal */}
+      {/* Note Modal - Full width on mobile */}
       <Modal isOpen={showNoteModal} onClose={() => {
         setShowNoteModal(false)
         setEditingNote(null)
@@ -218,19 +218,19 @@ export default function NotesPanel({ courseId, lessonId }) {
             required
           />
           <div>
-            <label className="block text-gray-700 mb-2">Content</label>
+            <label className="block text-gray-700 mb-2 text-sm">Content</label>
             <textarea
               value={noteForm.content}
               onChange={(e) => setNoteForm({ ...noteForm, content: e.target.value })}
-              rows="6"
-              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={isMobile ? 6 : 8}
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
               placeholder="Write your notes here..."
               required
             />
           </div>
           <div>
-            <label className="block text-gray-700 mb-2">Note Color</label>
-            <div className="flex gap-2">
+            <label className="block text-gray-700 mb-2 text-sm">Note Color</label>
+            <div className="flex gap-2 flex-wrap">
               {colors.map(color => (
                 <button
                   key={color.value}
@@ -243,14 +243,14 @@ export default function NotesPanel({ courseId, lessonId }) {
             </div>
           </div>
           <div className="flex gap-2">
-            <Button type="submit" disabled={submitting}>
+            <Button type="submit" disabled={submitting} size={isMobile ? 'sm' : 'md'}>
               {submitting ? 'Saving...' : editingNote ? 'Update Note' : 'Save Note'}
             </Button>
             <Button type="button" variant="outline" onClick={() => {
               setShowNoteModal(false)
               setEditingNote(null)
               setNoteForm({ title: '', content: '', color: '#fef3c7' })
-            }}>
+            }} size={isMobile ? 'sm' : 'md'}>
               Cancel
             </Button>
           </div>

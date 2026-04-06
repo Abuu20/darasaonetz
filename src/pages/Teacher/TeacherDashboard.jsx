@@ -1,3 +1,4 @@
+// src/pages/Teacher/TeacherDashboard.jsx
 import { useTheme } from '../../context/ThemeContext'
 import { useEffect, useState } from 'react'
 import { supabase } from '../../supabase/client'
@@ -13,6 +14,7 @@ import TeacherAnalytics from './Analytics'
 import TeacherCertificates from './Certificates'
 import TeacherForum from './TeacherForum'
 import TeacherTopicDetail from './TeacherTopicDetail'
+import CourseQuizResults from './CourseQuizResults'
 
 export default function TeacherDashboard() {
   const { showSuccess, showError, showWarning, showInfo } = useTheme()
@@ -66,78 +68,124 @@ export default function TeacherDashboard() {
   async function fetchCourses() {
     if (!user) return
 
-    const { data, error } = await supabase
-      .from('courses')
-      .select(`
-        *,
-        categories (
-          id,
-          name
-        ),
-        lessons (count),
-        course_reviews (rating)
-      `)
-      .eq('teacher_id', user.id)
-      .order('created_at', { ascending: false })
+    try {
+      // First get courses
+      const { data: coursesData, error: coursesError } = await supabase
+        .from('courses')
+        .select(`
+          *,
+          categories (
+            id,
+            name
+          ),
+          quizzes (id)
+        `)
+        .eq('teacher_id', user.id)
+        .order('created_at', { ascending: false })
 
-    if (!error && data) {
-      setCourses(data)
+      if (coursesError) throw coursesError
+
+      // Get lesson counts and student counts for each course
+      const coursesWithStats = await Promise.all(
+        (coursesData || []).map(async (course) => {
+          // Get lesson count
+          const { count: lessonCount, error: lessonError } = await supabase
+            .from('lessons')
+            .select('*', { count: 'exact', head: true })
+            .eq('course_id', course.id)
+
+          if (lessonError) console.error('Error counting lessons:', lessonError)
+
+          // Get enrolled students count
+          const { count: studentCount, error: studentError } = await supabase
+            .from('enrollments')
+            .select('*', { count: 'exact', head: true })
+            .eq('course_id', course.id)
+
+          if (studentError) console.error('Error counting students:', studentError)
+
+          // Get reviews for rating calculation
+          const { data: reviews, error: reviewsError } = await supabase
+            .from('course_reviews')
+            .select('rating')
+            .eq('course_id', course.id)
+
+          if (reviewsError) console.error('Error fetching reviews:', reviewsError)
+
+          const avgRating = reviews?.length > 0 
+            ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length 
+            : 0
+
+          return {
+            ...course,
+            lessons_count: lessonCount || 0,
+            students_count: studentCount || 0,
+            average_rating: avgRating,
+            review_count: reviews?.length || 0,
+            has_quiz: course.quizzes && course.quizzes.length > 0
+          }
+        })
+      )
+
+      setCourses(coursesWithStats)
       
-      const published = data.filter(c => c.status === 'published').length
-      const draft = data.filter(c => c.status === 'draft').length
-      const totalStudents = data.reduce((acc, course) => acc + (course.enrolled_students || 0), 0)
-      const totalRevenue = data.reduce((acc, course) => acc + ((course.enrolled_students || 0) * (course.price || 0)), 0)
+      // Calculate stats
+      const published = coursesWithStats.filter(c => c.status === 'published').length
+      const draft = coursesWithStats.filter(c => c.status === 'draft').length
+      const totalStudents = coursesWithStats.reduce((acc, course) => acc + (course.students_count || 0), 0)
+      const totalRevenue = coursesWithStats.reduce((acc, course) => acc + ((course.students_count || 0) * (course.price || 0)), 0)
       
       let totalRating = 0
       let totalReviews = 0
-      data.forEach(course => {
-        const reviews = course.course_reviews || []
-        if (reviews.length > 0) {
-          const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
-          totalRating += avgRating
-          totalReviews += reviews.length
+      coursesWithStats.forEach(course => {
+        if (course.review_count > 0) {
+          totalRating += course.average_rating
+          totalReviews += course.review_count
         }
       })
       
       setStats({
-        totalCourses: data.length,
+        totalCourses: coursesWithStats.length,
         publishedCourses: published,
         draftCourses: draft,
         totalStudents: totalStudents,
         totalRevenue: totalRevenue,
-        averageRating: data.filter(c => c.course_reviews?.length > 0).length > 0 
-          ? totalRating / data.filter(c => c.course_reviews?.length > 0).length 
+        averageRating: coursesWithStats.filter(c => c.review_count > 0).length > 0 
+          ? totalRating / coursesWithStats.filter(c => c.review_count > 0).length 
           : 0,
         totalReviews: totalReviews
       })
+    } catch (error) {
+      console.error('Error fetching courses:', error)
     }
   }
 
   async function fetchReviews() {
     if (!user || !courses.length) return
 
-    const { data, error } = await supabase
-      .from('course_reviews')
-      .select(`
-        *,
-        courses!inner (
-          id,
-          title,
-          teacher_id
-        ),
-        profiles:student_id (
-          id,
-          full_name,
-          avatar_url
-        )
-      `)
-      .in('course_id', courses.map(c => c.id))
-      .order('created_at', { ascending: false })
+    try {
+      const { data, error } = await supabase
+        .from('course_reviews')
+        .select(`
+          *,
+          courses!inner (
+            id,
+            title,
+            teacher_id
+          ),
+          profiles:student_id (
+            id,
+            full_name,
+            avatar_url
+          )
+        `)
+        .in('course_id', courses.map(c => c.id))
+        .order('created_at', { ascending: false })
 
-    if (error) {
-      console.error('Error fetching reviews:', error)
-    } else {
+      if (error) throw error
       setReviews(data || [])
+    } catch (error) {
+      console.error('Error fetching reviews:', error)
     }
   }
 
@@ -275,22 +323,30 @@ export default function TeacherDashboard() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <Card>
-                  <h3 className="text-gray-500 text-sm mb-1">Total Courses</h3>
-                  <p className="text-3xl font-bold text-purple-600">{stats.totalCourses}</p>
+                  <div className="p-4">
+                    <h3 className="text-gray-500 text-sm mb-1">Total Courses</h3>
+                    <p className="text-3xl font-bold text-purple-600">{stats.totalCourses}</p>
+                  </div>
                 </Card>
                 <Card>
-                  <h3 className="text-gray-500 text-sm mb-1">Total Students</h3>
-                  <p className="text-3xl font-bold text-green-600">{stats.totalStudents}</p>
+                  <div className="p-4">
+                    <h3 className="text-gray-500 text-sm mb-1">Total Students</h3>
+                    <p className="text-3xl font-bold text-green-600">{stats.totalStudents}</p>
+                  </div>
                 </Card>
                 <Card>
-                  <h3 className="text-gray-500 text-sm mb-1">Total Revenue</h3>
-                  <p className="text-3xl font-bold text-blue-600">${stats.totalRevenue}</p>
+                  <div className="p-4">
+                    <h3 className="text-gray-500 text-sm mb-1">Total Revenue</h3>
+                    <p className="text-3xl font-bold text-blue-600">${stats.totalRevenue.toLocaleString()}</p>
+                  </div>
                 </Card>
                 <Card>
-                  <h3 className="text-gray-500 text-sm mb-1">Average Rating</h3>
-                  <p className="text-3xl font-bold text-yellow-600">
-                    {stats.averageRating > 0 ? stats.averageRating.toFixed(1) : 'N/A'} ⭐
-                  </p>
+                  <div className="p-4">
+                    <h3 className="text-gray-500 text-sm mb-1">Average Rating</h3>
+                    <p className="text-3xl font-bold text-yellow-600">
+                      {stats.averageRating > 0 ? stats.averageRating.toFixed(1) : 'N/A'} ⭐
+                    </p>
+                  </div>
                 </Card>
               </div>
 
@@ -307,27 +363,37 @@ export default function TeacherDashboard() {
                   <div id="overview" className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <Card>
-                        <h3 className="font-semibold mb-2">Quick Stats</h3>
-                        <div className="space-y-2">
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Published Courses:</span>
-                            <span className="font-medium text-green-600">{stats.publishedCourses}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-gray-600">Draft Courses:</span>
-                            <span className="font-medium text-orange-600">{stats.draftCourses}</span>
+                        <div className="p-4">
+                          <h3 className="font-semibold mb-2">Quick Stats</h3>
+                          <div className="space-y-2">
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Published Courses:</span>
+                              <span className="font-medium text-green-600">{stats.publishedCourses}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Draft Courses:</span>
+                              <span className="font-medium text-orange-600">{stats.draftCourses}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Total Lessons:</span>
+                              <span className="font-medium text-blue-600">
+                                {courses.reduce((sum, c) => sum + (c.lessons_count || 0), 0)}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </Card>
                       <Card>
-                        <h3 className="font-semibold mb-2">Recent Activity</h3>
-                        {reviews.length > 0 ? (
-                          <p className="text-sm text-gray-500">
-                            {reviews.length} new review{reviews.length !== 1 ? 's' : ''}
-                          </p>
-                        ) : (
-                          <p className="text-gray-500 text-sm">No recent activity</p>
-                        )}
+                        <div className="p-4">
+                          <h3 className="font-semibold mb-2">Recent Activity</h3>
+                          {reviews.length > 0 ? (
+                            <p className="text-sm text-gray-500">
+                              {reviews.length} new review{reviews.length !== 1 ? 's' : ''}
+                            </p>
+                          ) : (
+                            <p className="text-gray-500 text-sm">No recent activity</p>
+                          )}
+                        </div>
                       </Card>
                     </div>
                   </div>
@@ -335,24 +401,19 @@ export default function TeacherDashboard() {
                   <div id="courses" className="space-y-4">
                     {courses.length > 0 ? (
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {courses.map(course => {
-                          const courseReviews = course.course_reviews || []
-                          const avgRating = courseReviews.length > 0 
-                            ? courseReviews.reduce((sum, r) => sum + r.rating, 0) / courseReviews.length 
-                            : 0
-                          
-                          return (
-                            <Card key={course.id} hover>
-                              <h3 className="font-semibold text-lg mb-2">{course.title}</h3>
+                        {courses.map(course => (
+                          <Card key={course.id} hover>
+                            <div className="p-4">
+                              <h3 className="font-semibold text-lg mb-2 line-clamp-1">{course.title}</h3>
                               <div className="space-y-2 text-sm">
-                                <p className="text-gray-500">Level: {course.level}</p>
-                                <p className="text-gray-500">Lessons: {course.lessons?.count || 0}</p>
-                                <p className="text-gray-500">Students: {course.enrolled_students || 0}</p>
-                                {courseReviews.length > 0 && (
+                                <p className="text-gray-500">Level: {course.level || 'Not specified'}</p>
+                                <p className="text-gray-500">Lessons: {course.lessons_count || 0}</p>
+                                <p className="text-gray-500">Students: {course.students_count || 0}</p>
+                                {course.review_count > 0 && (
                                   <div className="flex items-center gap-2">
-                                    <RatingStars rating={avgRating} readonly size="sm" />
+                                    <RatingStars rating={course.average_rating} readonly size="sm" />
                                     <span className="text-xs text-gray-500">
-                                      ({courseReviews.length} reviews)
+                                      ({course.review_count} reviews)
                                     </span>
                                   </div>
                                 )}
@@ -365,12 +426,27 @@ export default function TeacherDashboard() {
                                   </span>
                                 </p>
                               </div>
-                              <div className="mt-4 flex gap-2">
-                                <Link to={`/teacher/courses/${course.id}/lessons`} className="flex-1">
+                              <div className="mt-4 flex gap-2 flex-wrap">
+                                <Link to={`/teacher/courses/${course.id}/lessons`} className="flex-1 min-w-[100px]">
                                   <Button variant="primary" size="sm" fullWidth>
                                     Manage Lessons
                                   </Button>
                                 </Link>
+                                
+                                {course.has_quiz && (
+                                  <Link to={`/teacher/courses/${course.id}/results`}>
+                                    <Button variant="outline" size="sm">
+                                      📊 Results
+                                    </Button>
+                                  </Link>
+                                )}
+                                
+                                <Link to={`/teacher/forum/${course.id}`}>
+                                  <Button variant="outline" size="sm">
+                                    💬 Forum
+                                  </Button>
+                                </Link>
+                                
                                 {course.status === 'draft' ? (
                                   <Button 
                                     variant="success" 
@@ -388,15 +464,10 @@ export default function TeacherDashboard() {
                                     Unpublish
                                   </Button>
                                 )}
-                                <Link to={`/teacher/forum/${course.id}`} className="flex-1">
-                                  <Button variant="outline" size="sm" fullWidth>
-                                    💬 Forum
-                                  </Button>
-                                </Link>
                               </div>
-                            </Card>
-                          )
-                        })}
+                            </div>
+                          </Card>
+                        ))}
                       </div>
                     ) : (
                       <div className="text-center py-8">
@@ -419,91 +490,93 @@ export default function TeacherDashboard() {
                       <div className="space-y-4">
                         {reviews.map(review => (
                           <Card key={review.id}>
-                            <div className="flex items-start gap-4">
-                              <Avatar 
-                                src={review.profiles?.avatar_url} 
-                                alt={review.profiles?.full_name} 
-                                size="md" 
-                              />
-                              <div className="flex-1">
-                                <div className="flex justify-between items-start flex-wrap gap-2">
-                                  <div>
-                                    <p className="font-semibold">
-                                      {review.profiles?.full_name || 'Anonymous'}
-                                    </p>
-                                    <p className="text-sm text-gray-500">
-                                      Course: {review.courses?.title}
-                                    </p>
-                                  </div>
-                                  <div className="text-right">
-                                    <RatingStars rating={review.rating} readonly size="sm" />
-                                    <p className="text-xs text-gray-500 mt-1">
-                                      {new Date(review.created_at).toLocaleDateString()}
-                                    </p>
-                                  </div>
-                                </div>
-                                {review.comment && (
-                                  <p className="mt-3 text-gray-700 dark:text-gray-300">
-                                    "{review.comment}"
-                                  </p>
-                                )}
-                                
-                                {review.teacher_response ? (
-                                  <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                                    <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">
-                                      Your Response:
-                                    </p>
-                                    <p className="text-sm text-gray-700 dark:text-gray-300">
-                                      {review.teacher_response}
-                                    </p>
-                                    <button
-                                      onClick={() => {
-                                        setRespondingTo(review.id)
-                                        setResponseText(review.teacher_response || '')
-                                      }}
-                                      className="text-xs text-blue-600 hover:underline mt-2"
-                                    >
-                                      Edit Response
-                                    </button>
-                                  </div>
-                                ) : respondingTo === review.id ? (
-                                  <div className="mt-3">
-                                    <textarea
-                                      value={responseText}
-                                      onChange={(e) => setResponseText(e.target.value)}
-                                      rows="3"
-                                      className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                      placeholder="Write your response to this student..."
-                                      disabled={submitting}
-                                    />
-                                    <div className="flex gap-2 mt-2">
-                                      <Button
-                                        size="sm"
-                                        onClick={() => handleRespondToReview(review.id, review.course_id, responseText)}
-                                        disabled={submitting}
-                                      >
-                                        {submitting ? 'Sending...' : 'Send Response'}
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant="outline"
-                                        onClick={() => {
-                                          setRespondingTo(null)
-                                          setResponseText('')
-                                        }}
-                                      >
-                                        Cancel
-                                      </Button>
+                            <div className="p-4">
+                              <div className="flex items-start gap-4">
+                                <Avatar 
+                                  src={review.profiles?.avatar_url} 
+                                  alt={review.profiles?.full_name} 
+                                  size="md" 
+                                />
+                                <div className="flex-1">
+                                  <div className="flex justify-between items-start flex-wrap gap-2">
+                                    <div>
+                                      <p className="font-semibold">
+                                        {review.profiles?.full_name || 'Anonymous'}
+                                      </p>
+                                      <p className="text-sm text-gray-500">
+                                        Course: {review.courses?.title}
+                                      </p>
+                                    </div>
+                                    <div className="text-right">
+                                      <RatingStars rating={review.rating} readonly size="sm" />
+                                      <p className="text-xs text-gray-500 mt-1">
+                                        {new Date(review.created_at).toLocaleDateString()}
+                                      </p>
                                     </div>
                                   </div>
-                                ) : (
-                                  <button
-                                    onClick={() => setRespondingTo(review.id)}
-                                    className="mt-3 text-sm text-blue-600 hover:underline"
-                                  >
-                                    Respond to this review
-                                  </button>
-                                )}
+                                  {review.comment && (
+                                    <p className="mt-3 text-gray-700 dark:text-gray-300">
+                                      "{review.comment}"
+                                    </p>
+                                  )}
+                                  
+                                  {review.teacher_response ? (
+                                    <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                      <p className="text-sm font-medium text-blue-600 dark:text-blue-400 mb-1">
+                                        Your Response:
+                                      </p>
+                                      <p className="text-sm text-gray-700 dark:text-gray-300">
+                                        {review.teacher_response}
+                                      </p>
+                                      <button
+                                        onClick={() => {
+                                          setRespondingTo(review.id)
+                                          setResponseText(review.teacher_response || '')
+                                        }}
+                                        className="text-xs text-blue-600 hover:underline mt-2"
+                                      >
+                                        Edit Response
+                                      </button>
+                                    </div>
+                                  ) : respondingTo === review.id ? (
+                                    <div className="mt-3">
+                                      <textarea
+                                        value={responseText}
+                                        onChange={(e) => setResponseText(e.target.value)}
+                                        rows="3"
+                                        className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        placeholder="Write your response to this student..."
+                                        disabled={submitting}
+                                      />
+                                      <div className="flex gap-2 mt-2">
+                                        <Button
+                                          size="sm"
+                                          onClick={() => handleRespondToReview(review.id, review.course_id, responseText)}
+                                          disabled={submitting}
+                                        >
+                                          {submitting ? 'Sending...' : 'Send Response'}
+                                        </Button>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          onClick={() => {
+                                            setRespondingTo(null)
+                                            setResponseText('')
+                                          }}
+                                        >
+                                          Cancel
+                                        </Button>
+                                      </div>
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={() => setRespondingTo(review.id)}
+                                      className="mt-3 text-sm text-blue-600 hover:underline"
+                                    >
+                                      Respond to this review
+                                    </button>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           </Card>
@@ -529,6 +602,7 @@ export default function TeacherDashboard() {
           <Route path="/profile" element={<TeacherProfile />} />
           <Route path="/courses/new" element={<CreateCourse />} />
           <Route path="/courses/:courseId/lessons" element={<LessonManager />} />
+          <Route path="/courses/:courseId/results" element={<CourseQuizResults />} />
           <Route path="/courses" element={<TeacherMyCourses />} />
           <Route path="/students" element={<StudentsList />} />
           <Route path="/analytics" element={<TeacherAnalytics />} />

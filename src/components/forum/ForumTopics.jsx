@@ -1,3 +1,4 @@
+// src/components/forum/ForumTopics.jsx
 import { useTheme } from '../../context/ThemeContext'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
@@ -37,6 +38,7 @@ export default function ForumTopics({ courseId, onSelectTopic }) {
         .order('created_at', { ascending: false })
 
       if (error) throw error
+      console.log('Fetched topics:', data) // Debug log
       setTopics(data || [])
     } catch (error) {
       console.error('Error fetching topics:', error)
@@ -57,7 +59,9 @@ export default function ForumTopics({ courseId, onSelectTopic }) {
           course_id: courseId,
           user_id: user.id,
           title: newTopic.title,
-          content: newTopic.content
+          content: newTopic.content,
+          views: 0,
+          replies_count: 0
         })
 
       if (error) throw error
@@ -65,6 +69,7 @@ export default function ForumTopics({ courseId, onSelectTopic }) {
       setNewTopic({ title: '', content: '' })
       setShowCreateForm(false)
       fetchTopics()
+      showSuccess('Topic created successfully!')
     } catch (error) {
       console.error('Error creating topic:', error)
       showInfo('Failed to create topic')
@@ -82,6 +87,15 @@ export default function ForumTopics({ courseId, onSelectTopic }) {
       return <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded ml-2">Admin</span>
     }
     return null
+  }
+
+  // Format view count for display
+  const formatViewCount = (views) => {
+    if (!views) return '0 views'
+    if (views >= 1000) {
+      return `${(views / 1000).toFixed(1)}k views`
+    }
+    return `${views} view${views !== 1 ? 's' : ''}`
   }
 
   if (loading) return <Spinner />
@@ -142,7 +156,11 @@ export default function ForumTopics({ courseId, onSelectTopic }) {
       ) : (
         <div className="space-y-3">
           {topics.map(topic => (
-            <div key={topic.id} onClick={() => onSelectTopic && onSelectTopic(topic.id)} className="cursor-pointer">
+            <div 
+              key={topic.id} 
+              onClick={() => onSelectTopic && onSelectTopic(topic.id)} 
+              className="cursor-pointer"
+            >
               <Card hover>
                 <div className="flex items-start gap-3">
                   <Avatar
@@ -174,7 +192,10 @@ export default function ForumTopics({ courseId, onSelectTopic }) {
                     </p>
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-400">
                       <span>💬 {topic.replies?.[0]?.count || 0} replies</span>
-                      <span>👁️ {topic.views || 0} views</span>
+                      {/* View count display - NOW SHOWING REAL COUNTS */}
+                      <span className="flex items-center gap-1" title={`${topic.views || 0} total views`}>
+                        👁️ {formatViewCount(topic.views || 0)}
+                      </span>
                     </div>
                   </div>
                   {topic.replies?.[0]?.count > 0 && (

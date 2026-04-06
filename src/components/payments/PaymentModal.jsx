@@ -1,9 +1,11 @@
-import { useTheme } from '../../context/ThemeContext'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { Modal, Button, Input } from '../ui'
+import { useTheme } from '../../context/ThemeContext'
 
 export default function PaymentModal({ isOpen, onClose, items, total, onSuccess }) {
-  const { showSuccess, showError, showWarning, showInfo } = useTheme()
+  const { t } = useTranslation()
+  const { showSuccess, showError } = useTheme()
   const [loading, setLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
@@ -11,17 +13,20 @@ export default function PaymentModal({ isOpen, onClose, items, total, onSuccess 
   const handleSubmit = async (e) => {
     e.preventDefault()
     if (!paymentMethod) {
-      showWarning('Please select a payment method')
+      showError('Please select a payment method')
+      return
+    }
+
+    if (['mpesa', 'tigo_pesa', 'airtel_money', 'azampay'].includes(paymentMethod) && !phoneNumber) {
+      showError('Please enter your phone number')
       return
     }
 
     setLoading(true)
 
     try {
-      // Simulate payment processing
       await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      showSuccess(`Payment of TZS ${total.toLocaleString()} processed successfully!`)
+      showSuccess(`${t('payment.pay')} TZS ${total.toLocaleString()} ${t('payment.success') || 'processed successfully!'}`)
       onSuccess && onSuccess()
       onClose()
     } catch (error) {
@@ -33,30 +38,30 @@ export default function PaymentModal({ isOpen, onClose, items, total, onSuccess 
   }
 
   const paymentMethods = [
-    { value: 'mpesa', label: 'M-Pesa', icon: '📱', description: 'Pay with M-Pesa', color: 'bg-green-50 dark:bg-green-900/20' },
-    { value: 'tigo_pesa', label: 'Tigo Pesa', icon: '📱', description: 'Pay with Tigo Pesa', color: 'bg-blue-50 dark:bg-blue-900/20' },
-    { value: 'airtel_money', label: 'Airtel Money', icon: '📱', description: 'Pay with Airtel Money', color: 'bg-red-50 dark:bg-red-900/20' },
-    { value: 'azampay', label: 'AzamPay', icon: '💳', description: 'Pay with AzamPay', color: 'bg-purple-50 dark:bg-purple-900/20' },
-    { value: 'bank', label: 'Bank Transfer', icon: '🏦', description: 'CRDB, NMB, NBC', color: 'bg-yellow-50 dark:bg-yellow-900/20' }
+    { value: 'mpesa', label: t('payment.mpesa'), icon: '📱', desc: t('payment.payWithMpesa'), iconBg: 'bg-green-500' },
+    { value: 'tigo_pesa', label: t('payment.tigoPesa'), icon: '📱', desc: t('payment.payWithTigo'), iconBg: 'bg-blue-500' },
+    { value: 'airtel_money', label: t('payment.airtelMoney'), icon: '📱', desc: t('payment.payWithAirtel'), iconBg: 'bg-red-500' },
+    { value: 'azampay', label: t('payment.azamPay'), icon: '💳', desc: t('payment.payWithAzam'), iconBg: 'bg-purple-500' },
+    { value: 'bank', label: t('payment.bankTransfer'), icon: '🏦', desc: t('payment.bankAccounts'), iconBg: 'bg-gray-600' }
   ]
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Complete Payment">
-      <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
-        {/* Payment Methods - Responsive Grid */}
+    <Modal isOpen={isOpen} onClose={onClose} title={t('payment.title')} size="md">
+      <div className="space-y-5">
+        {/* Payment Methods */}
         <div>
-          <label className="block text-gray-700 dark:text-gray-300 mb-3 font-medium text-sm md:text-base">
-            Select Payment Method
+          <label className="block text-gray-700 dark:text-gray-300 mb-3 font-semibold text-sm md:text-base">
+            {t('payment.selectMethod')}
           </label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {paymentMethods.map(method => (
               <label
                 key={method.value}
                 className={`
-                  flex items-center p-3 md:p-4 border rounded-lg cursor-pointer transition-all
+                  flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all
                   ${paymentMethod === method.value
-                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 ring-2 ring-blue-500/20'
-                    : 'border-gray-200 dark:border-gray-700 hover:border-blue-300 hover:shadow-md'
+                    ? 'border-2 border-blue-500 bg-blue-50 dark:bg-blue-900/20 shadow-md'
+                    : 'border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-blue-300'
                   }
                 `}
               >
@@ -65,101 +70,102 @@ export default function PaymentModal({ isOpen, onClose, items, total, onSuccess 
                   value={method.value}
                   checked={paymentMethod === method.value}
                   onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="mr-3 w-4 h-4 md:w-5 md:h-5"
+                  className="hidden"
                 />
-                <div className={`w-8 h-8 md:w-10 md:h-10 rounded-full ${method.color} flex items-center justify-center text-xl md:text-2xl mr-3 flex-shrink-0`}>
+                <div className={`w-10 h-10 rounded-full ${method.iconBg} flex items-center justify-center text-xl text-white flex-shrink-0`}>
                   {method.icon}
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm md:text-base">{method.label}</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{method.description}</p>
+                <div className="flex-1">
+                  <p className="font-semibold text-sm md:text-base">{method.label}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{method.desc}</p>
                 </div>
+                {paymentMethod === method.value && (
+                  <div className="w-5 h-5 rounded-full bg-blue-500 flex items-center justify-center">
+                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                )}
               </label>
             ))}
           </div>
         </div>
 
-        {/* Phone Number (for mobile money) */}
+        {/* Phone Number Input */}
         {['mpesa', 'tigo_pesa', 'airtel_money', 'azampay'].includes(paymentMethod) && (
           <div className="animate-fadeIn">
             <Input
-              label="Phone Number"
+              label={t('payment.phoneNumber')}
               type="tel"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
-              placeholder="Enter your phone number (e.g., 0712345678)"
+              placeholder="0712 345 678"
               required
-              className="text-base"
+              className="text-center text-base md:text-lg"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              You will receive a prompt on your phone to complete payment
+            <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-2">
+              {t('payment.phoneHint')}
             </p>
           </div>
         )}
 
-        {/* Payment Summary - Responsive */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 md:p-4">
-          <h3 className="font-semibold text-sm md:text-base mb-2">Order Summary</h3>
-          <div className="space-y-2 text-xs md:text-sm">
-            {items.map(item => (
-              <div key={item.id} className="flex justify-between">
-                <span className="truncate flex-1 mr-2">{item.title}</span>
-                <span className="font-medium whitespace-nowrap">TZS {item.price.toLocaleString()}</span>
+        {/* Order Summary */}
+        <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-4">
+          <h3 className="font-semibold text-sm md:text-base mb-3 text-center">{t('payment.orderSummary')}</h3>
+          <div className="space-y-2 max-h-40 overflow-y-auto">
+            {items.map((item, idx) => (
+              <div key={idx} className="flex justify-between text-sm">
+                <span className="text-gray-600 dark:text-gray-400 truncate flex-1 mr-4">
+                  {item.title}
+                </span>
+                <span className="font-medium whitespace-nowrap">
+                  TZS {item.price.toLocaleString()}
+                </span>
               </div>
             ))}
-            <div className="border-t pt-2 mt-2 font-semibold flex justify-between">
-              <span>Total</span>
-              <span className="text-blue-600 dark:text-blue-400 text-sm md:text-base">TZS {total.toLocaleString()}</span>
-            </div>
+          </div>
+          <div className="border-t dark:border-gray-700 pt-3 mt-3 font-bold flex justify-between text-sm md:text-base">
+            <span>{t('payment.total')}</span>
+            <span className="text-blue-600 dark:text-blue-400 text-base md:text-lg">
+              TZS {total.toLocaleString()}
+            </span>
           </div>
         </div>
 
         {/* Bank Transfer Instructions */}
         {paymentMethod === 'bank' && (
-          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 md:p-4 animate-fadeIn">
-            <p className="font-semibold text-sm md:text-base mb-2">Bank Transfer Details:</p>
-            <div className="space-y-1 text-xs md:text-sm">
-              <p><span className="font-medium">Bank:</span> CRDB / NMB / NBC</p>
-              <p><span className="font-medium">Account Name:</span> Darasaone Limited</p>
-              <p><span className="font-medium">Account Number:</span> 01-234567-89</p>
-            </div>
-            <p className="mt-2 text-xs text-gray-500">
-              Use your email as reference
+          <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 text-center animate-fadeIn">
+            <p className="font-semibold text-sm mb-2">{t('payment.bankDetails')}</p>
+            <p className="text-sm">{t('payment.bankAccounts')}</p>
+            <p className="text-sm font-mono mt-1">Darasaone Limited</p>
+            <p className="text-sm font-mono">01-234567-89</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+              {t('payment.bankHint')}
             </p>
           </div>
         )}
 
-        {/* Action Buttons - Responsive */}
-        <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 pt-2">
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
           <Button 
-            type="submit" 
-            variant="primary" 
-            fullWidth={false}
-            disabled={loading}
-            className="w-full sm:w-auto py-3 text-base"
-          >
-            {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                </svg>
-                Processing...
-              </span>
-            ) : (
-              `Pay TZS ${total.toLocaleString()}`
-            )}
-          </Button>
-          <Button 
-            type="button" 
             variant="outline" 
             onClick={onClose}
-            className="w-full sm:w-auto py-3 text-base"
+            fullWidth
+            className="order-2 sm:order-1"
           >
-            Cancel
+            {t('common.cancel')}
+          </Button>
+          <Button 
+            onClick={handleSubmit}
+            disabled={loading}
+            variant="primary"
+            fullWidth
+            className="order-1 sm:order-2"
+          >
+            {loading ? t('payment.processing') : `${t('payment.pay')} TZS ${total.toLocaleString()}`}
           </Button>
         </div>
-      </form>
+      </div>
     </Modal>
   )
 }

@@ -1,3 +1,4 @@
+// src/router/index.jsx
 import { lazy, Suspense } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
 import MainLayout from '../components/layout/MainLayout'
@@ -7,12 +8,18 @@ import DashboardLayout from '../components/layout/DashboardLayout'
 import ProtectedRoute from '../components/layout/ProtectedRoute'
 import { Spinner } from '../components/ui'
 import NotFound from '../pages/NotFound'
+import CourseDetails from '../pages/Student/CourseDetails'
+
 
 // Lazy load pages
 const Landing = lazy(() => import('../pages/Public/Landing'))
 const Login = lazy(() => import('../pages/Public/Login'))
 const Register = lazy(() => import('../pages/Public/Register'))
 const About = lazy(() => import('../pages/Public/About'))
+const VerifyEmail = lazy(() => import('../pages/Public/VerifyEmail'))  
+const CheckEmail = lazy(() => import('../pages/Public/CheckEmail'))
+
+// - Public folder
 const StudentDashboard = lazy(() => import('../pages/Student/StudentDashboard'))
 const MyCourses = lazy(() => import('../pages/Student/MyCourses'))
 const BrowseCourses = lazy(() => import('../pages/Student/BrowseCourses'))
@@ -33,6 +40,7 @@ const TeacherAnalytics = lazy(() => import('../pages/Teacher/Analytics'))
 const TeacherCertificates = lazy(() => import('../pages/Teacher/Certificates'))
 const TeacherForum = lazy(() => import('../pages/Teacher/TeacherForum'))
 const TeacherTopicDetail = lazy(() => import('../pages/Teacher/TeacherTopicDetail'))
+const CourseQuizResults = lazy(() => import('../pages/Teacher/CourseQuizResults'))
 
 const AdminDashboard = lazy(() => import('../pages/Admin/AdminDashboard'))
 const UserManagement = lazy(() => import('../pages/Admin/UserManagement'))
@@ -41,7 +49,7 @@ const Reports = lazy(() => import('../pages/Admin/Reports'))
 const SystemSettings = lazy(() => import('../pages/Admin/SystemSettings'))
 const CertificateManagement = lazy(() => import('../pages/Admin/CertificateManagement'))
 const ForumManagement = lazy(() => import('../pages/Admin/ForumManagement'))
-
+const TeamManagement = lazy(() => import('../pages/Admin/TeamManagement'))
 const CertificateView = lazy(() => import('../pages/CertificateView'))
 const VerifyCertificate = lazy(() => import('../pages/VerifyCertificate'))
 
@@ -84,6 +92,22 @@ export const router = createBrowserRouter([
     ]
   },
   
+  // Email Verification Route 
+  {
+    path: '/verify-email',
+    element: <PublicLayout />,
+    children: [
+      { index: true, element: withSuspense(VerifyEmail) }
+    ]
+  },
+  {
+  path: '/check-email',
+  element: <PublicLayout />,
+  children: [
+    { index: true, element: withSuspense(CheckEmail) }
+  ]
+},
+  
   // Certificate routes (public for verification)
   {
     path: '/certificate/:id',
@@ -116,7 +140,8 @@ export const router = createBrowserRouter([
           { path: 'profile', element: withSuspense(StudentProfile) },
           { path: 'wishlist', element: withSuspense(Wishlist) },
           { path: 'cart', element: withSuspense(ShoppingCart) },
-          { path: 'notes', element: withSuspense(AllNotes) }
+          { path: 'notes', element: withSuspense(AllNotes) },
+          { path: 'course-details/:courseId', element: withSuspense(CourseDetails) }
         ]
       }
     ]
@@ -135,6 +160,7 @@ export const router = createBrowserRouter([
           { path: 'courses', element: withSuspense(TeacherMyCourses) },
           { path: 'courses/new', element: withSuspense(CreateCourse) },
           { path: 'courses/:courseId/lessons', element: withSuspense(LessonManager) },
+          { path: 'courses/:courseId/results', element: withSuspense(CourseQuizResults) },
           { path: 'students', element: withSuspense(StudentsList) },
           { path: 'analytics', element: withSuspense(TeacherAnalytics) },
           { path: 'certificates', element: withSuspense(TeacherCertificates) },
@@ -159,7 +185,8 @@ export const router = createBrowserRouter([
           { path: 'certificates', element: withSuspense(CertificateManagement) },
           { path: 'forum', element: withSuspense(ForumManagement) },
           { path: 'reports', element: withSuspense(Reports) },
-          { path: 'settings', element: withSuspense(SystemSettings) }
+          { path: 'settings', element: withSuspense(SystemSettings) },
+          { path: 'team', element: withSuspense(TeamManagement) },
         ]
       }
     ]

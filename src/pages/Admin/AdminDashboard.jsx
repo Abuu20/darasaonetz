@@ -126,6 +126,7 @@ export default function AdminDashboard() {
               <Link to="/admin/certificates" className="text-gray-600 hover:text-red-600">Certificates</Link>
               <Link to="/admin/reports" className="text-gray-600 hover:text-red-600">Reports</Link>
               <Link to="/admin/forum" className="text-gray-600 hover:text-red-600">Forum</Link>
+              <Link to="/admin/team" className="text-gray-600 hover:text-red-600">Team</Link>
               <Link to="/admin/settings" className="text-gray-600 hover:text-red-600">Settings</Link>
             </div>
           </div>

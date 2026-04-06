@@ -5,6 +5,8 @@ import { ThemeProvider } from './context/ThemeContext'
 import { CartProvider } from './context/CartContext'
 import { router } from './router'
 import ToastContainer from './components/ui/ToastContainer'
+import VerifyEmail from './pages/VerifyEmail'
+
 
 function App() {
   return (

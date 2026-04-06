@@ -294,3 +294,80 @@ a:hover {
 .animate-fade-out-down {
   animation: fade-out-down 0.2s ease-in forwards;
 }
+/* Toast animations */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.3s ease-out forwards;
+}
+
+/* Hide Google Docs pop-out button - Global CSS */
+.ndfHFb-c4YZDc-Wrql6b,
+.ndfHFb-c4YZDc-Wrql6b-OWXEXe,
+[aria-label="Pop out"],
+button[aria-label*="out"],
+div[role="button"][aria-label*="out"],
+.ndfHFb-c4YZDc {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Block all print/download buttons */
+[aria-label*="print"],
+[aria-label*="download"],
+[aria-label*="save"] {
+  display: none !important;
+}
+
+/* Prevent selection of PDF content */
+iframe[src*="docs.google.com"] {
+  pointer-events: auto;
+}
+
+/* Ensure overlays work */
+.pdf-viewer-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80px;
+  height: 60px;
+  z-index: 100;
+  cursor: default;
+}/* Smooth tab transitions */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+/* Tab bar shadow */
+.tab-bar-shadow {
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Safe area for mobile (notch) */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

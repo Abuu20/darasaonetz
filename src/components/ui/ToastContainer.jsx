@@ -6,13 +6,12 @@ export default function ToastContainer() {
 
   return (
     <>
-      {toasts.map((toast, index) => (
+      {toasts.map(toast => (
         <Toast
           key={toast.id}
           message={toast.message}
           type={toast.type}
           onClose={() => removeToast(toast.id)}
-          index={index}
         />
       ))}
     </>
