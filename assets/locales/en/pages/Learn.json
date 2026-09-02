@@ -1,0 +1,15 @@
+{
+  "pages.Learn.seoPrefix": "Learning",
+  "pages.Learn.exit": "Back to course page",
+  "pages.Learn.curriculum": "Curriculum",
+  "pages.Learn.closeSidebar": "Close curriculum",
+  "pages.Learn.lesson": "Lesson",
+  "pages.Learn.noVideo": "This lesson has no video — read the notes below.",
+  "pages.Learn.noLessons": "This course has no lessons yet.",
+  "pages.Learn.resources": "Resources",
+  "pages.Learn.previous": "Previous",
+  "pages.Learn.next": "Next",
+  "pages.Learn.markComplete": "Mark as complete",
+  "pages.Learn.completed": "Completed",
+  "pages.Learn.ownerPreview": "Previewing your course"
+}

@@ -1,0 +1,6 @@
+{
+  "components.account.AvatarUpload.change": "Badilisha picha ya wasifu",
+  "components.account.AvatarUpload.invalidType": "Tafadhali chagua faili ya picha.",
+  "components.account.AvatarUpload.tooLarge": "Picha lazima iwe chini ya MB 5.",
+  "components.account.AvatarUpload.failed": "Imeshindwa kupakia picha. Tafadhali jaribu tena."
+}

@@ -1,0 +1,18 @@
+{
+  "components.layout.Header.brand": "Darasaone",
+  "components.layout.Header.logoAlt": "Darasaone",
+  "components.layout.Header.home": "Darasaone home",
+  "components.layout.Header.navCourses": "Browse Courses",
+  "components.layout.Header.navAbout": "Who We Are",
+  "components.layout.Header.navTeach": "Teach With Us",
+  "components.layout.Header.navContact": "Contact",
+  "components.layout.Header.search": "Search courses",
+  "components.layout.Header.account": "Open account menu",
+  "components.layout.Header.dashboard": "My dashboard",
+  "components.layout.Header.teacherDashboard": "Teacher dashboard",
+  "components.layout.Header.signOut": "Sign out",
+  "components.layout.Header.signIn": "Sign in",
+  "components.layout.Header.cta": "Enroll",
+  "components.layout.Header.menu": "Toggle menu",
+  "components.layout.Header.contactMessages": "Contact messages"
+}

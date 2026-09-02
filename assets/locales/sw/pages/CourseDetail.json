@@ -1,0 +1,23 @@
+{
+  "pages.CourseDetail.back": "Rudi kwenye kozi",
+  "pages.CourseDetail.notFound": "Kozi hii haikupatikana.",
+  "pages.CourseDetail.lessonsLabel": "masomo",
+  "pages.CourseDetail.enrolled": "Umeshajiunga",
+  "pages.CourseDetail.ownerPreview": "Kozi yako",
+  "pages.CourseDetail.enrollCta": "Jiunge ili ufungue",
+  "pages.CourseDetail.enrolling": "Inajiunga",
+  "pages.CourseDetail.lessonsHeading": "Tazama masomo",
+  "pages.CourseDetail.lessonLabel": "Somo",
+  "pages.CourseDetail.locked": "Jiunge na kozi hii ili kutazama masomo yake.",
+  "pages.CourseDetail.continueLearning": "Endelea kujifunza",
+  "pages.CourseDetail.startLearning": "Anza kujifunza",
+  "pages.CourseDetail.materialsHeading": "Vitabu na vifaa",
+  "pages.CourseDetail.materialsLocked": "Jiunge na kozi hii ili kupakua vitabu na vifaa vyake.",
+  "pages.CourseDetail.noLessons": "Kozi hii bado haina masomo — rejea hivi karibuni.",
+  "pages.CourseDetail.markComplete": "Weka alama kama limekamilika",
+  "pages.CourseDetail.completed": "Limekamilika",
+  "pages.CourseDetail.showAll": "Onyesha masomo yote",
+  "pages.CourseDetail.showLess": "Onyesha machache",
+  "pages.CourseDetail.more": "zaidi",
+  "pages.CourseDetail.aboutTeacher": "Kuhusu mwalimu"
+}
