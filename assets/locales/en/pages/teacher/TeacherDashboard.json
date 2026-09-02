@@ -1,0 +1,16 @@
+{
+  "pages.teacher.TeacherDashboard.seo.title": "Teacher Dashboard",
+  "pages.teacher.TeacherDashboard.seo.description": "Manage your Darasaone courses, lessons and students.",
+  "pages.teacher.TeacherDashboard.badge": "Teacher",
+  "pages.teacher.TeacherDashboard.newCourse": "New course",
+  "pages.teacher.TeacherDashboard.statCourses": "Courses",
+  "pages.teacher.TeacherDashboard.statPublished": "Published",
+  "pages.teacher.TeacherDashboard.statDraft": "Drafts",
+  "pages.teacher.TeacherDashboard.statStudents": "Students",
+  "pages.teacher.TeacherDashboard.coursesHeading": "Your courses",
+  "pages.teacher.TeacherDashboard.empty": "You haven't created a course yet. Start your first one now.",
+  "pages.teacher.TeacherDashboard.lessons": "lessons",
+  "pages.teacher.TeacherDashboard.students": "students",
+  "pages.teacher.TeacherDashboard.edit": "Edit course",
+  "pages.teacher.TeacherDashboard.manageLessons": "Manage lessons"
+}

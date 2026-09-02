@@ -1,0 +1,17 @@
+{
+  "components.layout.Header.brand": "Darasaone",
+  "components.layout.Header.logoAlt": "Darasaone",
+  "components.layout.Header.home": "Nyumbani Darasaone",
+  "components.layout.Header.navCourses": "Angalia Kozi",
+  "components.layout.Header.navAbout": "Sisi Ni Nani",
+  "components.layout.Header.navTeach": "Fundisha Nasi",
+  "components.layout.Header.navContact": "Wasiliana Nasi",
+  "components.layout.Header.search": "Tafuta kozi",
+  "components.layout.Header.account": "Fungua menyu ya akaunti",
+  "components.layout.Header.dashboard": "Dashibodi yangu",
+  "components.layout.Header.teacherDashboard": "Dashibodi ya mwalimu",
+  "components.layout.Header.signOut": "Toka",
+  "components.layout.Header.signIn": "Ingia",
+  "components.layout.Header.cta": "Jiunge",
+  "components.layout.Header.menu": "Fungua/funga menyu"
+}

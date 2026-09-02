@@ -1,0 +1,5 @@
+{
+  "components.ui.NotificationBell.label": "Notifications",
+  "components.ui.NotificationBell.title": "Notifications",
+  "components.ui.NotificationBell.empty": "You're all caught up — no notifications yet."
+}

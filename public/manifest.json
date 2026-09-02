@@ -1,0 +1,33 @@
+{
+  "name": "Darasaone",
+  "short_name": "Darasaone",
+  "description": "Darasaone — Jifunze Kiislamu na Kiarabu mtandaoni. Learn Islamic and Arabic studies online.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0B0A17",
+  "theme_color": "#0B0A17",
+  "orientation": "portrait-primary",
+  "lang": "sw",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "https://images.remixer.ai/ai/2997526/logo/abstract-geometric-open-book-crescent-mark-deep-indigo-flat-symbol",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://images.remixer.ai/ai/2997526/logo/abstract-geometric-open-book-crescent-mark-deep-indigo-flat-symbol",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://images.remixer.ai/ai/2997526/logo/abstract-geometric-open-book-crescent-mark-deep-indigo-flat-symbol",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

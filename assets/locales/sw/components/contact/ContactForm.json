@@ -1,0 +1,17 @@
+{
+  "components.contact.ContactForm.name.label": "Jina lako",
+  "components.contact.ContactForm.name.placeholder": "Ni nani anayetuandikia?",
+  "components.contact.ContactForm.email.label": "Barua pepe",
+  "components.contact.ContactForm.email.placeholder": "Tukujibu wapi?",
+  "components.contact.ContactForm.phone.label": "Namba ya simu",
+  "components.contact.ContactForm.phone.placeholder": "Si lazima, ambatanisha msimbo wa nchi",
+  "components.contact.ContactForm.role.label": "Mwanafunzi au mwalimu",
+  "components.contact.ContactForm.role.placeholder": "Tuambie unavyopanga kutumia Darasaone",
+  "components.contact.ContactForm.message.label": "Ujumbe wako",
+  "components.contact.ContactForm.message.placeholder": "Uliza kuhusu kozi, kufundisha nasi, au chochote kingine",
+  "components.contact.ContactForm.submit": "Tuma ujumbe",
+  "components.contact.ContactForm.sending": "Inatuma",
+  "components.contact.ContactForm.success": "Jazak Allahu khairan. Ujumbe wako umetumwa na tutakujibu hivi karibuni.",
+  "components.contact.ContactForm.invalid": "Tafadhali jaza jina lako, barua pepe sahihi na ujumbe kabla ya kutuma.",
+  "components.contact.ContactForm.error": "Hatukuweza kutuma ujumbe wako sasa hivi. Tafadhali jaribu tena baada ya muda."
+}
