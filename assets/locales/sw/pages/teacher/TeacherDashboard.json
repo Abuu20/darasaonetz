@@ -1,0 +1,16 @@
+{
+  "pages.teacher.TeacherDashboard.seo.title": "Dashibodi ya Mwalimu",
+  "pages.teacher.TeacherDashboard.seo.description": "Simamia kozi, masomo na wanafunzi wako wa Darasaone.",
+  "pages.teacher.TeacherDashboard.badge": "Mwalimu",
+  "pages.teacher.TeacherDashboard.newCourse": "Kozi mpya",
+  "pages.teacher.TeacherDashboard.statCourses": "Kozi",
+  "pages.teacher.TeacherDashboard.statPublished": "Zilizochapishwa",
+  "pages.teacher.TeacherDashboard.statDraft": "Rasimu",
+  "pages.teacher.TeacherDashboard.statStudents": "Wanafunzi",
+  "pages.teacher.TeacherDashboard.coursesHeading": "Kozi zako",
+  "pages.teacher.TeacherDashboard.empty": "Bado hujatengeneza kozi yoyote. Anza ya kwanza sasa.",
+  "pages.teacher.TeacherDashboard.lessons": "masomo",
+  "pages.teacher.TeacherDashboard.students": "wanafunzi",
+  "pages.teacher.TeacherDashboard.edit": "Hariri kozi",
+  "pages.teacher.TeacherDashboard.manageLessons": "Simamia masomo"
+}

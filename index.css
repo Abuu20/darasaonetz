@@ -1,0 +1,328 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* index.css */
+
+:root {
+  /* Core surfaces */
+  --color-background: #FFFFFF;
+  --color-foreground: #1A0B54;
+  --color-ink: #1A0B54;
+  --color-ink-foreground: #FFFFFF;
+  --color-night: #050211;
+  --color-night-foreground: #FFFFFF;
+  --color-panel: #0D0A1A;
+  --color-panel-foreground: #FFFFFF;
+  --color-mist: #F9F9F9;
+  --color-mist-foreground: #1A0B54;
+
+  /* Brand */
+  --color-primary: #1C4EFF;
+  --color-primary-foreground: #FFFFFF;
+  --color-accent: #C86FFF;
+  --color-accent-foreground: #1A0B54;
+  --color-ember: #FE881B;
+  --color-ember-foreground: #1A0B54;
+
+  /* Muted text tiers */
+  --color-lavender: #A997CE;
+  --color-lavender-foreground: #050211;
+  --color-lilac: #BDAEE7;
+  --color-lilac-foreground: #050211;
+  --color-slate: #83799E;
+  --color-slate-foreground: #FFFFFF;
+
+  /* Lines & states */
+  --color-line: #E4E0F0;
+  --color-line-foreground: #1A0B54;
+  --color-hairline: #1E1B2E;
+  --color-hairline-foreground: #FFFFFF;
+  --color-success: #27BD09;
+  --color-success-foreground: #FFFFFF;
+  --color-danger: #FF1F1F;
+  --color-danger-foreground: #FFFFFF;
+
+  /* Typography */
+  --font-heading: "Sora", "Helvetica Neue", sans-serif;
+  --font-sans: "Manrope", "Helvetica Neue", sans-serif;
+  --font-quran: "Amiri", Georgia, serif;
+
+  /* Section rhythm */
+  --spacing-section: 8.5rem;
+  --spacing-section-mobile: 4.5rem;
+  --spacing-gutter: 1.25rem;
+  --spacing-gutter-lg: 3rem;
+  --spacing-block: 2.75rem;
+  --spacing-stack: 1.5rem;
+  --spacing-tight: 0.75rem;
+
+  /* Radii */
+  --radius-pill: 999px;
+  --radius-card: 2.25rem;
+  --radius-panel: 1.25rem;
+  --radius-control: 0.75rem;
+
+  /* Motion */
+  --duration-fast: 200ms;
+  --duration-base: 300ms;
+  --duration-slow: 500ms;
+
+  /* Interaction */
+  --scale-hover: 1.02;
+  --scale-active: 0.98;
+  --lift-hover: 3px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-sans);
+  color: var(--color-foreground);
+  background-color: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ---------------------------------------------------------------------
+   Lesson content ("lesson-content")
+   Renders sanitized Quill/HTML lesson bodies inside a light "paper" card
+   (see .lesson-card below) — the same pattern Udemy, Coursera, Khan
+   Academy and every other mature course platform use: dark chrome around
+   the player, but a light, high-contrast surface for the actual reading
+   text, because sustained reading on a dark background is worse for
+   comprehension and eye strain than short UI copy is.
+   Generous line-height (~1.8) for sustained reading, a capped measure
+   (handled by the parent's max-w-3xl), clear block spacing instead of a
+   dense wall of text, and links styled as identifiable chips rather than
+   raw underlines. `unicode-bidi: plaintext` lets each paragraph
+   auto-detect its own direction, so Kiswahili sentences that quote
+   Arabic terms or ayah fragments don't need explicit dir="rtl" wrapping.
+------------------------------------------------------------------------ */
+.lesson-card {
+  background-color: var(--color-background);
+  color: var(--color-ink);
+  border-radius: var(--radius-card);
+  box-shadow: 0 3px 9px rgba(63, 74, 126, 0.05), 0 1px 29px rgba(63, 74, 126, 0.1);
+}
+
+.lesson-content {
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  color: var(--color-ink);
+  unicode-bidi: plaintext;
+}
+
+.lesson-content > * + * {
+  margin-top: 1.1em;
+}
+
+.lesson-content p {
+  unicode-bidi: plaintext;
+}
+
+.lesson-content strong {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+.lesson-content em {
+  color: var(--color-ink);
+  font-style: normal;
+  font-family: var(--font-quran);
+  font-size: 1.15em;
+}
+
+.lesson-content ul,
+.lesson-content ol {
+  padding-inline-start: 1.4em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+}
+
+.lesson-content li {
+  padding-inline-start: 0.25em;
+}
+
+.lesson-content li::marker {
+  color: var(--color-primary);
+}
+
+.lesson-content a {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-primary) 40%, transparent);
+  transition: border-color var(--duration-base);
+}
+
+.lesson-content a:hover {
+  border-color: var(--color-primary);
+}
+
+.lesson-content h1,
+.lesson-content h2,
+.lesson-content h3 {
+  color: var(--color-ink);
+  line-height: 1.4;
+  font-family: var(--font-heading);
+}
+
+.lesson-content h1 { font-size: 1.3rem; }
+.lesson-content h2 { font-size: 1.15rem; }
+.lesson-content h3 { font-size: 1.05rem; }
+
+.lesson-content blockquote {
+  margin: 0;
+  padding-inline-start: 1em;
+  border-inline-start: 3px solid var(--color-primary);
+  color: var(--color-slate);
+}
+
+.lesson-content img {
+  border-radius: var(--radius-panel);
+  max-width: 100%;
+  height: auto;
+}
+
+.lesson-content code {
+  background: var(--color-mist);
+  color: var(--color-ink);
+  padding: 0.15em 0.4em;
+  border-radius: 0.35em;
+  font-size: 0.85em;
+}
+
+/* Light-surface counterpart of .lesson-content, used only by the teacher's
+   RichTextEditor (components/lesson/RichTextEditor.tsx). Same typographic
+   rhythm — spacing, list markers, heading scale — as the real lesson card,
+   recolored to match the light editing chrome so what's typed here stays
+   clearly legible instead of low-contrast text on a near-black surface. */
+.editor-content {
+  font-size: 0.9375rem;
+  line-height: 1.8;
+  color: var(--color-ink);
+  unicode-bidi: plaintext;
+}
+
+.editor-content > * + * {
+  margin-top: 1.1em;
+}
+
+.editor-content strong {
+  color: var(--color-ink);
+  font-weight: 700;
+}
+
+.editor-content ul,
+.editor-content ol {
+  padding-inline-start: 1.4em;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6em;
+}
+
+.editor-content li::marker {
+  color: var(--color-primary);
+}
+
+.editor-content a {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.editor-content h1,
+.editor-content h2,
+.editor-content h3 {
+  color: var(--color-ink);
+  line-height: 1.4;
+  font-family: var(--font-heading);
+}
+
+.editor-content h1 { font-size: 1.3rem; }
+.editor-content h2 { font-size: 1.15rem; }
+.editor-content h3 { font-size: 1.05rem; }
+
+.editor-content blockquote {
+  margin: 0;
+  padding-inline-start: 1em;
+  border-inline-start: 3px solid var(--color-primary);
+  color: var(--color-slate);
+}
+
+/* Cursor artifacts some rich-text editors (e.g. Quill) leave behind when
+   content is copy-pasted rather than authored in-place. They carry no
+   visible glyph in their own editor, so hide them everywhere else too. */
+.lesson-content .ql-cursor {
+  display: none;
+}
+
+@layer utilities {
+  .gradient-brand {
+    background-image: linear-gradient(90deg, #1C4EFF, #AC24FF 50%, #FE881B);
+  }
+  .gradient-head {
+    background-image: linear-gradient(90deg, #2BA7FF, #CA45FF 50%, #FE881B);
+  }
+  .text-gradient-head {
+    background-image: linear-gradient(90deg, #2BA7FF, #CA45FF 50%, #FE881B);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    padding-bottom: 0.12em;
+  }
+  .gradient-rail {
+    background-image: linear-gradient(#1C4EFF, #FE881B 0%, #AC24FF 25%, #F79FFF 50%, #FFD600 66%, #FE881B 84%, rgba(254, 136, 27, 0) 102%);
+  }
+  .card-lift {
+    box-shadow: 0 3px 9px rgba(63, 74, 126, 0.05), 0 1px 29px rgba(63, 74, 126, 0.1);
+  }
+  .glass-panel {
+    background-color: rgba(10, 5, 20, 0.88);
+    backdrop-filter: blur(36px);
+  }
+
+  /* Full-screen backdrop for the student "Quiz Arena" — a distinct,
+     occasion-marking surface (not just another dark panel) so stepping into
+     a quiz feels like arriving somewhere, the way a game level-select or
+     esports scoreboard screen does. Layered radial glows in the brand
+     gradient colors + a faint perspective grid, all decorative (no text
+     sits directly on it — QuizPlayer's own .lesson-card stays the readable
+     surface on top). */
+  .quiz-arena-bg {
+    background-color: var(--color-night);
+    background-image:
+      radial-gradient(ellipse 60% 40% at 15% 0%, rgba(28, 78, 255, 0.35), transparent 60%),
+      radial-gradient(ellipse 50% 45% at 100% 15%, rgba(200, 111, 255, 0.3), transparent 60%),
+      radial-gradient(ellipse 55% 40% at 50% 100%, rgba(254, 136, 27, 0.18), transparent 60%),
+      linear-gradient(rgba(228, 224, 240, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(228, 224, 240, 0.06) 1px, transparent 1px);
+    background-size: auto, auto, auto, 42px 42px, 42px 42px;
+    background-position: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+@media print {
+  nav, footer, button {
+    display: none !important;
+  }
+}

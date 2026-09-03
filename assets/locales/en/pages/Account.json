@@ -1,0 +1,22 @@
+{
+  "pages.Account.logoAlt": "Darasaone",
+  "pages.Account.welcome": "Welcome back",
+  "pages.Account.signOut": "Sign out",
+  "pages.Account.signedOutTitle": "Sign in to your dashboard",
+  "pages.Account.signedOutBody": "Your enrolled courses, learning path, quiz results and course discussions all live here.",
+  "pages.Account.signIn": "Sign in",
+  "pages.Account.exchangeError": "We could not complete your sign-in. Please try again.",
+  "pages.Account.statCourses": "Courses enrolled",
+  "pages.Account.statProgress": "Average progress",
+  "pages.Account.statQuizzes": "Quizzes recorded",
+  "pages.Account.pathHeading": "Your learning path",
+  "pages.Account.pathEmpty": "You have not enrolled in a course yet. Browse the catalogue and your path will start building here.",
+  "pages.Account.lessonsDone": "lessons completed",
+  "pages.Account.resultsHeading": "Quiz results",
+  "pages.Account.resultsEmpty": "No quiz results yet. Sit a live quiz in one of your courses and the score will appear here.",
+  "pages.Account.seo.title": "My Learning Dashboard",
+  "pages.Account.seo.description": "Follow your Darasaone learning path: enrolled courses, lessons completed, live quiz results and the discussion inside every course you study.",
+  "pages.Account.teacherDashboard": "Teacher dashboard",
+  "pages.Account.statLessons": "Total lessons",
+  "pages.Account.browseCourses": "Browse courses"
+}

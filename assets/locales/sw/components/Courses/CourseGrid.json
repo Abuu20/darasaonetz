@@ -1,0 +1,18 @@
+{
+  "components.Courses.CourseGrid.searchLabel": "Tafuta kozi",
+  "components.Courses.CourseGrid.searchPlaceholder": "Tafuta kwa jina la kozi, mkondo au mwalimu",
+  "components.Courses.CourseGrid.filterLabel": "Chuja kwa mkondo",
+  "components.Courses.CourseGrid.trackAll": "Mikondo yote",
+  "components.Courses.CourseGrid.trackQuran": "Qur'an",
+  "components.Courses.CourseGrid.trackArabic": "Kiarabu",
+  "components.Courses.CourseGrid.trackFiqh": "Fiqh",
+  "components.Courses.CourseGrid.trackSeerah": "Seerah",
+  "components.Courses.CourseGrid.trackHadith": "Hadith",
+  "components.Courses.CourseGrid.lessons": "masomo",
+  "components.Courses.CourseGrid.materials": "vifaa",
+  "components.Courses.CourseGrid.enroll": "Jiunge sasa",
+  "components.Courses.CourseGrid.enrolling": "Inajiunga",
+  "components.Courses.CourseGrid.enrolled": "Umeshajiunga",
+  "components.Courses.CourseGrid.newBadge": "Mpya",
+  "components.Courses.CourseGrid.empty": "Hakuna kozi inayolingana na utafutaji huo bado. Jaribu mkondo mwingine au futa utafutaji."
+}

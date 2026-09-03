@@ -1,0 +1,6 @@
+{
+  "components.account.AvatarUpload.change": "Change profile photo",
+  "components.account.AvatarUpload.invalidType": "Please choose an image file.",
+  "components.account.AvatarUpload.tooLarge": "Image must be under 5MB.",
+  "components.account.AvatarUpload.failed": "Could not upload photo. Please try again."
+}
