@@ -1,0 +1,11 @@
+{
+  "components.Home.NewsletterSection.headA": "Tafuta",
+  "components.Home.NewsletterSection.headB": "elimu",
+  "components.Home.NewsletterSection.headC": "pamoja nasi kila wiki.",
+  "components.Home.NewsletterSection.blurb": "Pata kozi mpya za Darasaone, tarehe za maswali ya moja kwa moja na matangazo ya walimu kwa Kiingereza na Kiswahili.",
+  "components.Home.NewsletterSection.label": "Anwani ya barua pepe",
+  "components.Home.NewsletterSection.placeholder": "wewe@barua.com",
+  "components.Home.NewsletterSection.submit": "Jisajili",
+  "components.Home.NewsletterSection.success": "Umeorodheshwa. Angalia sanduku lako la barua pepe kwa tangazo la kozi lijalo.",
+  "components.Home.NewsletterSection.error": "Hatukuweza kuhifadhi barua pepe yako sasa hivi. Tafadhali jaribu tena."
+}

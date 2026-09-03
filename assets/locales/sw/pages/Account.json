@@ -1,0 +1,22 @@
+{
+  "pages.Account.logoAlt": "Darasaone",
+  "pages.Account.welcome": "Karibu tena",
+  "pages.Account.signOut": "Toka",
+  "pages.Account.signedOutTitle": "Ingia kwenye dashibodi yako",
+  "pages.Account.signedOutBody": "Kozi ulizojiunga, njia yako ya kujifunza, matokeo ya maswali na majadiliano ya kozi vyote viko hapa.",
+  "pages.Account.signIn": "Ingia",
+  "pages.Account.exchangeError": "Hatukuweza kukamilisha kuingia kwako. Tafadhali jaribu tena.",
+  "pages.Account.statCourses": "Kozi ulizojiunga",
+  "pages.Account.statProgress": "Wastani wa maendeleo",
+  "pages.Account.statQuizzes": "Maswali yaliyorekodiwa",
+  "pages.Account.pathHeading": "Njia yako ya kujifunza",
+  "pages.Account.pathEmpty": "Bado hujajiunga na kozi yoyote. Tazama orodha ya kozi na njia yako itaanza kujengwa hapa.",
+  "pages.Account.lessonsDone": "masomo yaliyokamilika",
+  "pages.Account.resultsHeading": "Matokeo ya maswali",
+  "pages.Account.resultsEmpty": "Bado hakuna matokeo ya maswali. Fanya maswali ya moja kwa moja kwenye kozi yako na alama zitaonekana hapa.",
+  "pages.Account.seo.title": "Dashibodi Yangu ya Kujifunza",
+  "pages.Account.seo.description": "Fuatilia njia yako ya kujifunza ya Darasaone: kozi ulizojiunga, masomo uliyokamilisha, matokeo ya maswali ya moja kwa moja na majadiliano ndani ya kila kozi unayosoma.",
+  "pages.Account.teacherDashboard": "Dashibodi ya mwalimu",
+  "pages.Account.statLessons": "Jumla ya masomo",
+  "pages.Account.browseCourses": "Angalia kozi"
+}

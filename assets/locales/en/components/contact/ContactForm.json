@@ -1,0 +1,17 @@
+{
+  "components.contact.ContactForm.name.label": "Your name",
+  "components.contact.ContactForm.name.placeholder": "Who is writing to us?",
+  "components.contact.ContactForm.email.label": "Email",
+  "components.contact.ContactForm.email.placeholder": "Where should we reply?",
+  "components.contact.ContactForm.phone.label": "Phone number",
+  "components.contact.ContactForm.phone.placeholder": "Optional, with country code",
+  "components.contact.ContactForm.role.label": "Student or teacher",
+  "components.contact.ContactForm.role.placeholder": "Tell us how you plan to use Darasaone",
+  "components.contact.ContactForm.message.label": "Your message",
+  "components.contact.ContactForm.message.placeholder": "Ask about a course, teaching with us, or anything else",
+  "components.contact.ContactForm.submit": "Send message",
+  "components.contact.ContactForm.sending": "Sending",
+  "components.contact.ContactForm.success": "Jazak Allahu khairan. Your message has been sent and we will reply shortly.",
+  "components.contact.ContactForm.invalid": "Please add your name, a valid email and a message before sending.",
+  "components.contact.ContactForm.error": "We could not send your message just now. Please try again in a moment."
+}
