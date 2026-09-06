@@ -343,10 +343,12 @@ export default function QuranJuz() {
                     <button
                       type="button"
                       onClick={() => setSelection({ kind: "picker" })}
-                      className="inline-flex min-w-0 items-center gap-1 truncate text-sm text-accent hover:underline"
+                      aria-label={t("pages.tools.QuranJuz.backToSurahs")}
+                      title={t("pages.tools.QuranJuz.backToSurahs")}
+                      className="inline-flex min-w-0 shrink-0 items-center gap-1 truncate text-sm text-accent hover:underline"
                     >
                       <ChevronLeft size={14} className="shrink-0" aria-hidden="true" />
-                      {t("pages.tools.QuranJuz.backToSurahs")}
+                      <span className="hidden sm:inline">{t("pages.tools.QuranJuz.backToSurahs")}</span>
                     </button>
                     <div className="flex shrink-0 items-center gap-tight">
                       <VerseSearch

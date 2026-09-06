@@ -347,7 +347,9 @@ export default function QuranSurah() {
               </div>
 
               <div className="sticky top-block z-10 -mx-gutter mt-block flex items-center justify-between gap-stack border-b border-line bg-background/95 px-gutter py-tight backdrop-blur md:-mx-gutter-lg md:px-gutter-lg">
-                <span className="min-w-0 truncate font-heading text-sm text-ink">{reading.arabic.englishName}</span>
+                <span className="hidden min-w-0 truncate font-heading text-sm text-ink sm:block">
+                  {reading.arabic.englishName}
+                </span>
                 <div className="flex shrink-0 items-center gap-tight">
                   <VerseSearch
                     ayahs={searchableAyahs}
