@@ -22,12 +22,19 @@ export default function ViewModeToggle({ mode, onChange, ayahLabel, mushafLabel 
           type="button"
           onClick={() => onChange(option.value)}
           aria-pressed={mode === option.value}
-          className={`inline-flex items-center gap-tight rounded-pill px-stack py-1.5 text-sm transition-colors duration-base ${
+          aria-label={option.label}
+          title={option.label}
+          className={`inline-flex items-center gap-tight rounded-pill px-2.5 py-1.5 text-sm transition-colors duration-base sm:px-stack ${
             mode === option.value ? "gradient-brand text-primary-foreground" : "text-slate hover:text-ink"
           }`}
         >
           <option.icon size={14} aria-hidden="true" />
-          {option.label}
+          {/* Labels only from sm up — on a phone this toggle sits in a
+              non-wrapping toolbar alongside search and settings, and full
+              text labels here were wide enough to push the settings gear
+              off the right edge of the screen. quran.com's own mobile
+              toolbar is icon-only for the same reason. */}
+          <span className="hidden sm:inline">{option.label}</span>
         </button>
       ))}
     </div>
