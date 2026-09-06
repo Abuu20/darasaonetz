@@ -301,8 +301,8 @@ function MushafLine({ children }: { children: ReactNode }) {
     <div ref={outerRef} className="w-full overflow-hidden">
       <div
         ref={innerRef}
-        className="flex flex-nowrap items-baseline justify-between gap-x-1"
-        style={fontSize ? { fontSize: `${fontSize}px` } : undefined}
+        className="flex flex-nowrap items-baseline justify-between"
+        style={{ gap: "0.2em", ...(fontSize ? { fontSize: `${fontSize}px` } : undefined) }}
       >
         {children}
       </div>
