@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { AlertTriangle, Pause, Play, RotateCw } from "lucide-react";
 import {
   ayahNumberFromVerseKey,
@@ -234,7 +234,7 @@ function MushafPage({ page, pageLabel, openAyah, playingAyah, onWordClick }: Mus
       */}
       <div dir="rtl" lang="ar" className="flex flex-col gap-3">
         {page.lines.map(line => (
-          <div key={line.line} className="flex flex-wrap items-baseline justify-between gap-x-1">
+          <MushafLine key={line.line}>
             {line.words.map((word, index) => (
               <MushafGlyph
                 key={`${line.line}-${index}`}
@@ -244,8 +244,67 @@ function MushafPage({ page, pageLabel, openAyah, playingAyah, onWordClick }: Mus
                 onClick={onWordClick}
               />
             ))}
-          </div>
+          </MushafLine>
         ))}
+      </div>
+    </div>
+  );
+}
+
+// One printed Mushaf line, laid out exactly like quran.com: the words
+// never wrap onto a second row. Instead, if a line is too wide for the
+// screen at its normal font size (always true on phones — these lines are
+// sized for a full print page), the whole line's font-size is shrunk down
+// by just enough to fit on one row at the current width, then spread with
+// `justify-between` so it still reaches both edges like a real page line.
+// Wrapping (the old behavior) is what broke on mobile: a wrapped line split
+// into sub-rows and `justify-between` then spaced those sub-rows unevenly,
+// which is the "looks fine on PC, messy on phone" symptom this replaces.
+function MushafLine({ children }: { children: ReactNode }) {
+  const outerRef = useRef<HTMLDivElement | null>(null);
+  const innerRef = useRef<HTMLDivElement | null>(null);
+  const [fontSize, setFontSize] = useState<number | undefined>(undefined);
+
+  useLayoutEffect(() => {
+    const outer = outerRef.current;
+    const inner = innerRef.current;
+    if (!outer || !inner) return;
+
+    const measure = () => {
+      // Reset to the CSS default before measuring, so shrinking a line at a
+      // narrow width doesn't permanently cap it once the viewport (or a
+      // sidebar) grows back — every measurement starts from full size.
+      inner.style.fontSize = "";
+      const availableWidth = outer.clientWidth;
+      const naturalWidth = inner.scrollWidth;
+      if (naturalWidth <= availableWidth || naturalWidth === 0) {
+        setFontSize(undefined);
+        return;
+      }
+      const baseSize = parseFloat(getComputedStyle(inner).fontSize);
+      // A hair under the exact ratio (0.98) so rounding in font metrics
+      // never leaves the last word clipped by a sub-pixel.
+      const nextSize = baseSize * (availableWidth / naturalWidth) * 0.98;
+      setFontSize(nextSize);
+    };
+
+    measure();
+
+    // Re-measure on rotation, window resize, or the sidebar/toolbar
+    // changing the container's width — not just on first mount.
+    const observer = new ResizeObserver(measure);
+    observer.observe(outer);
+    return () => observer.disconnect();
+  }, [children]);
+
+  return (
+    <div ref={outerRef} className="w-full overflow-hidden">
+      <div
+        ref={innerRef}
+        className="flex flex-nowrap items-baseline justify-between gap-x-1"
+        style={fontSize ? { fontSize: `${fontSize}px` } : undefined}
+      >
+        {children}
       </div>
     </div>
   );
