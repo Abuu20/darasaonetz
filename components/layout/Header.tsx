@@ -7,11 +7,14 @@ import AuthModal from "@/components/auth/AuthModal";
 import { onOpenAuthModal, type AuthModalRequest } from "@/lib/authModalBus";
 import ContactButton from "@/components/ui/ContactButton";
 import NotificationBell from "@/components/ui/NotificationBell";
+import StreakBadge from "@/components/streaks/StreakBadge";
 import LanguageSwitcher from "@/components/layout/LanguageSwitcher";
 import images from "@/assets/images.json";
 
 const NAV_ITEMS = [
   { id: "courses", to: "/courses", labelKey: "components.layout.Header.navCourses" },
+  { id: "games", to: "/games", labelKey: "components.layout.Header.navGames" },
+  { id: "tools", to: "/tools", labelKey: "components.layout.Header.navTools" },
   { id: "about", to: "/about", labelKey: "components.layout.Header.navAbout" },
   { id: "teach", to: "/about#teach", labelKey: "components.layout.Header.navTeach" },
   { id: "contact", to: "/contact", labelKey: "components.layout.Header.navContact" },
@@ -102,6 +105,7 @@ export default function Header() {
 
             {user ? (
               <>
+                <StreakBadge />
                 <NotificationBell />
                 <div className="relative" ref={menuRef}>
                   <button

@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, GraduationCap, TrendingUp } from "lucide-react";
+import { BookOpen, GraduationCap, Trophy, TrendingUp } from "lucide-react";
 import SEOHead from "@/components/seo/SEOHead";
 import { useAuth, displayNameFor } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import AuthModal from "@/components/auth/AuthModal";
 import AvatarUpload from "@/components/account/AvatarUpload";
 import { enrollmentQueries } from "@/lib/db/courses";
+import StreakWidget from "@/components/streaks/StreakWidget";
 import type { Enrollment } from "@/lib/db/types";
 import images from "@/assets/images.json";
 
@@ -100,7 +101,14 @@ export default function Account() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-stack sm:grid-cols-3">
+          <div className="grid grid-cols-2 gap-stack sm:grid-cols-4">
+            <div className="flex flex-col gap-1 rounded-card border border-hairline bg-panel p-block">
+              <Trophy size={18} className="text-accent" aria-hidden="true" />
+              <span className="font-heading text-3xl">{profile?.total_points ?? 0}</span>
+              <span data-text-id="pages.Account.statPoints" className="text-xs uppercase tracking-widest text-lavender">
+                {t("pages.Account.statPoints")}
+              </span>
+            </div>
             <div className="flex flex-col gap-1 rounded-card border border-hairline bg-panel p-block">
               <GraduationCap size={18} className="text-accent" aria-hidden="true" />
               <span className="font-heading text-3xl">{enrollments.length}</span>
@@ -125,6 +133,8 @@ export default function Account() {
               </span>
             </div>
           </div>
+
+          <StreakWidget />
 
           <section className="flex flex-col gap-stack">
             <h2 data-text-id="pages.Account.pathHeading" className="font-heading text-lg">

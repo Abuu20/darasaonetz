@@ -5,6 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Darasaone</title>
     <meta name="theme-color" content="#0B0A17" />
+    <!--
+      Fonts are also injected at runtime from fonts.ts (see index.tsx), but
+      that only starts the request once React has mounted. Loading the same
+      stylesheet here too means the browser starts fetching it in parallel
+      with the JS bundle instead of after it, so the Quran/mushaf text is far
+      less likely to render in a fallback font before Amiri/Amiri Quran
+      arrive. Keep this URL in sync with GOOGLE_FONTS_URL in fonts.ts.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600&family=Manrope:wght@400;500;600;700&family=Amiri:ital,wght@0,400;1,400;0,700&family=Amiri+Quran&display=swap"
+      rel="stylesheet"
+    />
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />

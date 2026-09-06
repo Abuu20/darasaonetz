@@ -18,5 +18,6 @@
   "pages.Account.seo.description": "Follow your Darasaone learning path: enrolled courses, lessons completed, live quiz results and the discussion inside every course you study.",
   "pages.Account.teacherDashboard": "Teacher dashboard",
   "pages.Account.statLessons": "Total lessons",
-  "pages.Account.browseCourses": "Browse courses"
+  "pages.Account.browseCourses": "Browse courses",
+  "pages.Account.statPoints": "Points"
 }

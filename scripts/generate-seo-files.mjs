@@ -43,6 +43,12 @@ if (!resolvedUrl) {
 const routes = [
   { path: "/", changefreq: "weekly", priority: "1.0" },
   { path: "/courses", changefreq: "daily", priority: "0.9" },
+  { path: "/tools", changefreq: "monthly", priority: "0.8" },
+  { path: "/tools/quran", changefreq: "monthly", priority: "0.8" },
+  { path: "/tools/prayer-times", changefreq: "monthly", priority: "0.7" },
+  { path: "/tools/qibla", changefreq: "monthly", priority: "0.6" },
+  { path: "/tools/tasbih", changefreq: "monthly", priority: "0.5" },
+  { path: "/tools/ramadan", changefreq: "monthly", priority: "0.6" },
   { path: "/about", changefreq: "monthly", priority: "0.6" },
   { path: "/contact", changefreq: "monthly", priority: "0.5" },
 ];

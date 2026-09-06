@@ -19,6 +19,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { quizAttemptQueries } from "@/lib/db/quizzes";
+import { useStreak } from "@/lib/hooks/useStreak";
 import type { Quiz, QuizAttempt, QuizQuestion } from "@/lib/db/types";
 
 type Stage = "intro" | "active" | "submitting" | "results";
@@ -71,6 +72,7 @@ function Sparkle() {
 export default function QuizPlayer({ quiz }: { quiz: Quiz }) {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { logActivity } = useStreak();
   const T = (key: string) => t(`components.quiz.QuizPlayer.${key}`);
 
   const [stage, setStage] = useState<Stage>("intro");
@@ -115,6 +117,7 @@ export default function QuizPlayer({ quiz }: { quiz: Quiz }) {
       setResult(attempt);
       setHistory(prev => [attempt, ...prev]);
       setStage("results");
+      logActivity();
     } catch (err) {
       console.error("[QuizPlayer] submit error:", err);
       setError(T("errorSubmit"));

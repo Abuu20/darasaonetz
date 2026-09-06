@@ -3,6 +3,8 @@
   "components.layout.Header.logoAlt": "Darasaone",
   "components.layout.Header.home": "Nyumbani Darasaone",
   "components.layout.Header.navCourses": "Angalia Kozi",
+  "components.layout.Header.navGames": "Michezo",
+  "components.layout.Header.navTools": "Zana za Kiislamu",
   "components.layout.Header.navAbout": "Sisi Ni Nani",
   "components.layout.Header.navTeach": "Fundisha Nasi",
   "components.layout.Header.navContact": "Wasiliana Nasi",
