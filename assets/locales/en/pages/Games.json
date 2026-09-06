@@ -1,0 +1,17 @@
+{
+  "pages.Games.seo.title": "Games — Learn the Quran While You Play",
+  "pages.Games.seo.description": "Darasaone's games hub — arcade-style Islamic learning games for kids and adults, in English and Swahili.",
+  "pages.Games.eyebrow": "Games Hub",
+  "pages.Games.title": "Learn while you play.",
+  "pages.Games.paragraph": "Quran, Arabic and Seerah games for every level. Pick one and start playing.",
+  "pages.GamePlayer.notFound": "We couldn't find that game.",
+  "pages.GamePlayer.backToGames": "Back to Games",
+  "pages.GamePlayer.leaderboardTitle": "Leaderboard",
+  "pages.GamePlayer.leaderboardComingSoon": "Live rankings for this game are coming soon.",
+  "pages.GamePlayer.leaderboardEmpty": "No scores yet — be the first!",
+  "pages.GamePlayer.anonymousPlayer": "Player",
+  "pages.GamePlayer.signInToSave": "Sign in to save your score and appear on the leaderboard.",
+  "pages.Games.viewLeaderboard": "View global leaderboard",
+  "pages.GamePlayer.enterFullscreen": "Play fullscreen",
+  "pages.GamePlayer.exitFullscreen": "Exit fullscreen"
+}

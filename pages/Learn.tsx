@@ -17,6 +17,7 @@ import {
 import SEOHead from "@/components/seo/SEOHead";
 import { courseQueries, enrollmentQueries, lessonQueries } from "@/lib/db/courses";
 import { quizQueries } from "@/lib/db/quizzes";
+import { useStreak } from "@/lib/hooks/useStreak";
 import type { Course, Lesson, Quiz } from "@/lib/db/types";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
@@ -29,6 +30,7 @@ export default function Learn() {
   const [searchParams] = useSearchParams();
   const { t } = useLanguage();
   const { user, isLoading: authLoading } = useAuth();
+  const { logActivity } = useStreak();
 
   const [course, setCourse] = useState<Course | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
@@ -124,6 +126,7 @@ export default function Learn() {
     try {
       await lessonQueries.markComplete(activeLesson.id, user.id, course.id);
       setCompletedIds(prev => (prev.includes(activeLesson.id) ? prev : [...prev, activeLesson.id]));
+      logActivity();
     } catch (err) {
       console.error("[Lesson completion] error:", err);
     } finally {

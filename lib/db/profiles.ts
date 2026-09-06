@@ -12,6 +12,32 @@ export const profileQueries = {
     return data as Profile | null;
   },
 
+  // Global "top players" across every game — reads straight from
+  // profiles.total_points, which the game_scores trigger keeps current, so
+  // this never has to sum across every game's scores at read time.
+  getTopPlayers: async (limit = 50): Promise<Profile[]> => {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .gt("total_points", 0)
+      .order("total_points", { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    return (data ?? []) as Profile[];
+  },
+
+  // Realtime: fires whenever any profile's total_points changes. One
+  // shared channel for the whole leaderboard page, not per-row.
+  subscribeToTopPlayers: (onChange: () => void): (() => void) => {
+    const channel = supabase
+      .channel("global-leaderboard")
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "profiles" }, onChange)
+      .subscribe();
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  },
+
   updateProfile: async (userId: string, updates: Partial<Profile>): Promise<Profile> => {
     const { data, error } = await supabase
       .from("profiles")

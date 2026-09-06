@@ -47,6 +47,10 @@
   --font-heading: "Sora", "Helvetica Neue", sans-serif;
   --font-sans: "Manrope", "Helvetica Neue", sans-serif;
   --font-quran: "Amiri", Georgia, serif;
+  /* Dedicated Uthmani-style face for full mushaf pages (see MushafView) —
+     correct tashkeel placement and letter joining that a general Arabic
+     text font like Amiri doesn't guarantee at this scale. */
+  --font-mushaf: "Amiri Quran", "Amiri", Georgia, serif;
 
   /* Section rhythm */
   --spacing-section: 8.5rem;

@@ -10,6 +10,7 @@ export interface Profile {
   qualifications: string | null;
   role: UserRole;
   phone?: string | null;
+  total_points?: number;
   created_at: string;
   updated_at?: string;
 }
@@ -18,6 +19,32 @@ export interface Category {
   id: string;
   name: string;
   type?: string | null;
+}
+
+export interface Game {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  category: string;
+  difficulty: string;
+  thumbnail_url: string | null;
+  file_url: string;
+  points_per_win: number;
+  orientation: "portrait" | "landscape";
+  status: "draft" | "published";
+  play_count: number;
+  created_at: string;
+}
+
+export interface GameScore {
+  id: string;
+  game_id: string;
+  user_id: string;
+  score: number;
+  points: number;
+  updated_at: string;
+  profiles?: Pick<Profile, "id" | "full_name" | "avatar_url"> | null;
 }
 
 export interface Course {
@@ -149,6 +176,16 @@ export interface QuizAttempt {
   responses: QuizAttemptResponse[];
   started_at: string;
   submitted_at: string;
+}
+
+// Generic per-user, per-tool progress row (Quran reading position, Tasbih
+// counts, saved prayer-times location, etc.) — one row per (user, tool),
+// with the shape of `data` left to whatever that tool needs.
+export interface ToolProgress {
+  user_id: string;
+  tool: string;
+  data: Record<string, unknown>;
+  updated_at: string;
 }
 
 export interface AppNotification {

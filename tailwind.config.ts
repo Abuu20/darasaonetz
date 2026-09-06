@@ -45,6 +45,7 @@ const tailwindConfig = {
         heading: ["var(--font-heading)"],
         sans: ["var(--font-sans)"],
         quran: ["var(--font-quran)"],
+        mushaf: ["var(--font-mushaf)"],
       },
       spacing: {
         "section-spacing": "var(--spacing-section)",

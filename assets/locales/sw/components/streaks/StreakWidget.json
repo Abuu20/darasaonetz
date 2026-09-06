@@ -1,0 +1,18 @@
+{
+  "components.streaks.StreakWidget.dayStreakSingular": "siku mfululizo",
+  "components.streaks.StreakWidget.dayStreakPlural": "siku mfululizo",
+  "components.streaks.StreakWidget.longest": "Rekodi",
+  "components.streaks.StreakWidget.subtitleZero": "Bado hujaanza mfululizo — kamilisha somo, jaribio, au ukumbusho wa leo hapa chini kuanza.",
+  "components.streaks.StreakWidget.daysToNext": "siku kufikia beji ya",
+  "components.streaks.StreakWidget.dayBadge": "siku",
+  "components.streaks.StreakWidget.todayLabel": "Ukumbusho wa leo",
+  "components.streaks.StreakWidget.loggedToday": "Umekamilisha leo",
+  "components.streaks.StreakWidget.markRead": "Weka kama nimesoma",
+  "components.streaks.StreakWidget.day.sun": "Jpi",
+  "components.streaks.StreakWidget.day.mon": "Jtt",
+  "components.streaks.StreakWidget.day.tue": "Jnn",
+  "components.streaks.StreakWidget.day.wed": "Jtn",
+  "components.streaks.StreakWidget.day.thu": "Alh",
+  "components.streaks.StreakWidget.day.fri": "Ijm",
+  "components.streaks.StreakWidget.day.sat": "Jms"
+}

@@ -1,0 +1,10 @@
+{
+  "components.tools.QuranSidebar.navLabel": "Surahs",
+  "components.tools.QuranSidebar.browseSurahs": "Browse surahs",
+  "components.tools.QuranSidebar.hideSurahs": "Hide surah list",
+  "components.tools.QuranSidebar.close": "Close",
+  "components.tools.QuranSidebar.filterLabel": "Filter surahs by name or number",
+  "components.tools.QuranSidebar.filterPlaceholder": "Find a surah…",
+  "components.tools.QuranSidebar.empty": "No surah matches that search.",
+  "components.tools.QuranSidebar.ayahsLabel": "ayahs"
+}

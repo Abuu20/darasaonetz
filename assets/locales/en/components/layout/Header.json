@@ -3,6 +3,8 @@
   "components.layout.Header.logoAlt": "Darasaone",
   "components.layout.Header.home": "Darasaone home",
   "components.layout.Header.navCourses": "Browse Courses",
+  "components.layout.Header.navGames": "Games",
+  "components.layout.Header.navTools": "Islamic Tools",
   "components.layout.Header.navAbout": "Who We Are",
   "components.layout.Header.navTeach": "Teach With Us",
   "components.layout.Header.navContact": "Contact",

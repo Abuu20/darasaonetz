@@ -1,0 +1,18 @@
+{
+  "components.streaks.StreakWidget.dayStreakSingular": "day streak",
+  "components.streaks.StreakWidget.dayStreakPlural": "day streak",
+  "components.streaks.StreakWidget.longest": "Longest",
+  "components.streaks.StreakWidget.subtitleZero": "No active streak yet — finish a lesson, a quiz, or today's reminder below to start one.",
+  "components.streaks.StreakWidget.daysToNext": "days to your next",
+  "components.streaks.StreakWidget.dayBadge": "day badge",
+  "components.streaks.StreakWidget.todayLabel": "Today's reminder",
+  "components.streaks.StreakWidget.loggedToday": "Done for today",
+  "components.streaks.StreakWidget.markRead": "Mark as read",
+  "components.streaks.StreakWidget.day.sun": "Sun",
+  "components.streaks.StreakWidget.day.mon": "Mon",
+  "components.streaks.StreakWidget.day.tue": "Tue",
+  "components.streaks.StreakWidget.day.wed": "Wed",
+  "components.streaks.StreakWidget.day.thu": "Thu",
+  "components.streaks.StreakWidget.day.fri": "Fri",
+  "components.streaks.StreakWidget.day.sat": "Sat"
+}

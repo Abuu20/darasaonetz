@@ -1,0 +1,22 @@
+{
+  "pages.tools.Qibla.seo.title": "Tafuta Mwelekeo wa Qibla | Darasaone",
+  "pages.tools.Qibla.seo.description": "Tafuta mwelekeo halisi wa Al-Kaaba mjini Makkah kutoka mahali ulipo sasa.",
+  "pages.tools.Qibla.eyebrow": "Qibla",
+  "pages.tools.Qibla.title": "Tafuta Qibla",
+  "pages.tools.Qibla.paragraph": "Tafuta mwelekeo wa Al-Kaaba popote ulipo.",
+  "pages.tools.Qibla.needLocation": "Tunahitaji mahali ulipo ili kuhesabu mwelekeo wa Qibla.",
+  "pages.tools.Qibla.useMyLocation": "Tumia mahali nilipo",
+  "pages.tools.Qibla.locating": "Inatafuta mahali…",
+  "pages.tools.Qibla.locationDenied": "Imeshindikana kupata mahali ulipo. Tafadhali ruhusu ufikiaji wa mahali na ujaribu tena.",
+  "pages.tools.Qibla.loadError": "Imeshindikana kuhesabu mwelekeo wa Qibla. Tafadhali angalia mtandao wako na ujaribu tena.",
+  "pages.tools.Qibla.retry": "Jaribu tena",
+  "pages.tools.Qibla.north": "Kask",
+  "pages.tools.Qibla.east": "Mash",
+  "pages.tools.Qibla.south": "Kus",
+  "pages.tools.Qibla.west": "Magh",
+  "pages.tools.Qibla.fromNorth": "kutoka kaskazini halisi",
+  "pages.tools.Qibla.enableCompass": "Washa dira ya moja kwa moja",
+  "pages.tools.Qibla.compassActive": "Dira imewashwa — geuka uelekee kwenye mshale.",
+  "pages.tools.Qibla.compassDenied": "Ufikiaji wa dira umekataliwa. Bado unaweza kutumia namba iliyo juu pamoja na programu yoyote ya dira.",
+  "pages.tools.Qibla.staticHint": "Hii inaonyesha mwelekeo kutoka kaskazini halisi. Washa dira ya moja kwa moja, au itumie pamoja na programu ya dira."
+}

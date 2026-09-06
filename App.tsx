@@ -13,6 +13,9 @@ import Home from "@/pages/Home";
 // single time. Home itself stays eager since it's what most reloads land
 // back on.
 const Courses = lazy(() => import("@/pages/Courses"));
+const Games = lazy(() => import("@/pages/Games"));
+const GamePlayer = lazy(() => import("@/pages/GamePlayer"));
+const TopPlayers = lazy(() => import("@/pages/TopPlayers"));
 const CourseDetail = lazy(() => import("@/pages/CourseDetail"));
 const Learn = lazy(() => import("@/pages/Learn"));
 const About = lazy(() => import("@/pages/About"));
@@ -21,6 +24,14 @@ const Account = lazy(() => import("@/pages/Account"));
 const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
 const TeacherDashboard = lazy(() => import("@/pages/teacher/TeacherDashboard"));
 const AdminMessages = lazy(() => import("@/pages/admin/Messages"));
+const IslamicTools = lazy(() => import("@/pages/tools/IslamicTools"));
+const Quran = lazy(() => import("@/pages/tools/Quran"));
+const QuranSurah = lazy(() => import("@/pages/tools/QuranSurah"));
+const QuranJuz = lazy(() => import("@/pages/tools/QuranJuz"));
+const PrayerTimes = lazy(() => import("@/pages/tools/PrayerTimes"));
+const Qibla = lazy(() => import("@/pages/tools/Qibla"));
+const Tasbih = lazy(() => import("@/pages/tools/Tasbih"));
+const RamadanPlanner = lazy(() => import("@/pages/tools/RamadanPlanner"));
 
 function RouteFallback() {
   return (
@@ -56,6 +67,9 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/courses" element={<Courses />} />
+              <Route path="/games" element={<Games />} />
+              <Route path="/games/:slug" element={<GamePlayer />} />
+              <Route path="/leaderboard" element={<TopPlayers />} />
               <Route path="/courses/:id" element={<CourseDetail />} />
               <Route path="/learn/:id" element={<Learn />} />
               <Route path="/about" element={<About />} />
@@ -64,6 +78,14 @@ export default function App() {
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/teacher" element={<TeacherDashboard />} />
               <Route path="/admin/messages" element={<AdminMessages />} />
+              <Route path="/tools" element={<IslamicTools />} />
+              <Route path="/tools/quran" element={<Quran />} />
+              <Route path="/tools/quran/:number" element={<QuranSurah />} />
+              <Route path="/tools/quran/juz/:number" element={<QuranJuz />} />
+              <Route path="/tools/prayer-times" element={<PrayerTimes />} />
+              <Route path="/tools/qibla" element={<Qibla />} />
+              <Route path="/tools/tasbih" element={<Tasbih />} />
+              <Route path="/tools/ramadan" element={<RamadanPlanner />} />
             </Routes>
           </Suspense>
         </SiteChrome>

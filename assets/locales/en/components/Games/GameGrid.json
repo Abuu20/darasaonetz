@@ -1,0 +1,7 @@
+{
+  "components.Games.GameGrid.searchLabel": "Search games",
+  "components.Games.GameGrid.searchPlaceholder": "Search games...",
+  "components.Games.GameGrid.filterLabel": "Filter by category",
+  "components.Games.GameGrid.categoryAll": "All",
+  "components.Games.GameGrid.empty": "No games match that search yet."
+}
