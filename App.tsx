@@ -33,6 +33,7 @@ const PrayerTimes = lazy(() => import("@/pages/tools/PrayerTimes"));
 const Qibla = lazy(() => import("@/pages/tools/Qibla"));
 const Tasbih = lazy(() => import("@/pages/tools/Tasbih"));
 const RamadanPlanner = lazy(() => import("@/pages/tools/RamadanPlanner"));
+const Privacy = lazy(() => import("@/pages/Privacy"));
 
 function RouteFallback() {
   return (
@@ -102,6 +103,7 @@ export default function App() {
               <Route path="/tools/qibla" element={<Qibla />} />
               <Route path="/tools/tasbih" element={<Tasbih />} />
               <Route path="/tools/ramadan" element={<RamadanPlanner />} />
+              <Route path="/privacy" element={<Privacy />} />
             </Routes>
           </Suspense>
         </SiteChrome>

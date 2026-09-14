@@ -10,6 +10,7 @@ const FOOTER_LINKS = [
   { id: "teach", to: "/about#teach", labelKey: "components.layout.Footer.navTeach" },
   { id: "contact", to: "/contact", labelKey: "components.layout.Footer.navContact" },
   { id: "account", to: "/account", labelKey: "components.layout.Footer.navAccount" },
+  { id: "privacy", to: "/privacy", labelKey: "components.layout.Footer.navPrivacy" },
 ] as const;
 
 export default function Footer() {
