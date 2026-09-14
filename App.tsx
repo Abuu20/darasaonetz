@@ -1,0 +1,114 @@
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { Suspense, lazy, type ReactNode } from "react";
+import ScrollTopRouting from "@/components/routing/ScrollTopRouting";
+import { AuthProvider } from "@/context/AuthContext";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import InstallPrompt from "@/components/pwa/InstallPrompt";
+import Home from "@/pages/Home";
+import LearnLayout from "@/components/learn/LearnLayout";
+
+// Everything past the landing page is lazy — a reload (tab switch,
+// backgrounding, a real crash) only has to re-parse the Home bundle before
+// the page is interactive again, instead of the whole site's JS every
+// single time. Home itself stays eager since it's what most reloads land
+// back on.
+const Courses = lazy(() => import("@/pages/Courses"));
+const Games = lazy(() => import("@/pages/Games"));
+const GamePlayer = lazy(() => import("@/pages/GamePlayer"));
+const TopPlayers = lazy(() => import("@/pages/TopPlayers"));
+const CourseDetail = lazy(() => import("@/pages/CourseDetail"));
+const Learn = lazy(() => import("@/pages/Learn"));
+const About = lazy(() => import("@/pages/About"));
+const Contact = lazy(() => import("@/pages/Contact"));
+const Account = lazy(() => import("@/pages/Account"));
+const ResetPassword = lazy(() => import("@/pages/ResetPassword"));
+const TeacherDashboard = lazy(() => import("@/pages/teacher/TeacherDashboard"));
+const AdminMessages = lazy(() => import("@/pages/admin/Messages"));
+const IslamicTools = lazy(() => import("@/pages/tools/IslamicTools"));
+const Quran = lazy(() => import("@/pages/tools/Quran"));
+const QuranSurah = lazy(() => import("@/pages/tools/QuranSurah"));
+const QuranJuz = lazy(() => import("@/pages/tools/QuranJuz"));
+const PrayerTimes = lazy(() => import("@/pages/tools/PrayerTimes"));
+const Qibla = lazy(() => import("@/pages/tools/Qibla"));
+const Tasbih = lazy(() => import("@/pages/tools/Tasbih"));
+const RamadanPlanner = lazy(() => import("@/pages/tools/RamadanPlanner"));
+const Privacy = lazy(() => import("@/pages/Privacy"));
+
+function RouteFallback() {
+  return (
+    <div className="flex min-h-[40vh] items-center justify-center">
+      <div className="h-6 w-6 animate-spin rounded-full border-2 border-hairline border-t-accent" aria-hidden="true" />
+    </div>
+  );
+}
+
+// The /learn player is a full-height, distraction-free workspace (like
+// Udemy/Coursera's course player) — the floating marketing header and
+// footer would eat into the video space and don't belong there.
+function SiteChrome({ children }: { children: ReactNode }) {
+  const { pathname } = useLocation();
+  // Any route that mounts a DashboardShell supplies its own chrome
+  // (sidebar + topbar + sub-headers), so the marketing Header/Footer
+  // must not render alongside it. Otherwise a fixed "Darasaone" pill
+  // floats permanently on top of the dashboard.
+  const isLearning = pathname.startsWith("/learn/");
+  const isTeacher = pathname.startsWith("/teacher");
+  const isAccount = pathname.startsWith("/account");
+  const isAdmin = pathname.startsWith("/admin");
+  const isDashboardRoute = isLearning || isTeacher || isAccount || isAdmin;
+  if (isDashboardRoute) return <>{children}</>;
+  return (
+    <>
+      <Header />
+      {children}
+      <Footer />
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <ScrollTopRouting />
+        <SiteChrome>
+          <Suspense fallback={<RouteFallback />}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/courses" element={<Courses />} />
+              <Route path="/games" element={<Games />} />
+              <Route path="/games/:slug" element={<GamePlayer />} />
+              <Route path="/leaderboard" element={<TopPlayers />} />
+              <Route path="/courses/:id" element={<CourseDetail />} />
+              <Route
+                path="/learn/:id"
+                element={
+                  <LearnLayout>
+                    <Learn />
+                  </LearnLayout>
+                }
+              />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/account" element={<Account />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/teacher" element={<TeacherDashboard />} />
+              <Route path="/admin/messages" element={<AdminMessages />} />
+              <Route path="/tools" element={<IslamicTools />} />
+              <Route path="/tools/quran" element={<Quran />} />
+              <Route path="/tools/quran/:number" element={<QuranSurah />} />
+              <Route path="/tools/quran/juz/:number" element={<QuranJuz />} />
+              <Route path="/tools/prayer-times" element={<PrayerTimes />} />
+              <Route path="/tools/qibla" element={<Qibla />} />
+              <Route path="/tools/tasbih" element={<Tasbih />} />
+              <Route path="/tools/ramadan" element={<RamadanPlanner />} />
+              <Route path="/privacy" element={<Privacy />} />
+            </Routes>
+          </Suspense>
+        </SiteChrome>
+        <InstallPrompt />
+      </BrowserRouter>
+    </AuthProvider>
+  );
+}

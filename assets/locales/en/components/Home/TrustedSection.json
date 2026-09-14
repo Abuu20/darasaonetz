@@ -1,0 +1,21 @@
+{
+  "components.Home.TrustedSection.headingA": "Everything a darasa needs,",
+  "components.Home.TrustedSection.headingB": "from first lesson to final quiz.",
+  "components.Home.TrustedSection.paragraph": "Built for teachers who publish real curricula and students who study on a phone between duties. Bilingual by default, structured throughout.",
+  "components.Home.TrustedSection.card1.label": "Materials",
+  "components.Home.TrustedSection.card1.title": "Publish videos, books and textbooks inside one course library.",
+  "components.Home.TrustedSection.card1.bullet1": "Video and audio lessons",
+  "components.Home.TrustedSection.card1.bullet2": "Downloadable books and notes",
+  "components.Home.TrustedSection.card2.label": "Assessment",
+  "components.Home.TrustedSection.card2.title": "Run live quizzes and return results the moment they finish.",
+  "components.Home.TrustedSection.card2.bullet1": "Timed live quiz rooms",
+  "components.Home.TrustedSection.card2.bullet2": "Instant scores and review",
+  "components.Home.TrustedSection.card3.label": "Discussion",
+  "components.Home.TrustedSection.card3.title": "Keep questions, comments and reactions beside each lesson.",
+  "components.Home.TrustedSection.card3.bullet1": "Course chat and comments",
+  "components.Home.TrustedSection.card3.bullet2": "Reactions on every answer",
+  "components.Home.TrustedSection.card4.label": "Progress",
+  "components.Home.TrustedSection.card4.title": "Show every student exactly where their learning path stands.",
+  "components.Home.TrustedSection.card4.bullet1": "Lesson-level tracking",
+  "components.Home.TrustedSection.card4.bullet2": "Dashboard notifications"
+}

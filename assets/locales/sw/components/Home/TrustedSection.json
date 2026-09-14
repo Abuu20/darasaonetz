@@ -1,0 +1,21 @@
+{
+  "components.Home.TrustedSection.headingA": "Kila kitu darasa linalohitaji,",
+  "components.Home.TrustedSection.headingB": "kutoka somo la kwanza hadi maswali ya mwisho.",
+  "components.Home.TrustedSection.paragraph": "Imejengwa kwa ajili ya walimu wanaochapisha mitaala halisi na wanafunzi wanaosoma kwa simu kati ya majukumu yao. Lugha mbili kwa default, mfumo mzuri kila mahali.",
+  "components.Home.TrustedSection.card1.label": "Vifaa",
+  "components.Home.TrustedSection.card1.title": "Chapisha video, vitabu na madaftari ndani ya maktaba moja ya kozi.",
+  "components.Home.TrustedSection.card1.bullet1": "Masomo ya video na sauti",
+  "components.Home.TrustedSection.card1.bullet2": "Vitabu na maelezo yanayopakuliwa",
+  "components.Home.TrustedSection.card2.label": "Tathmini",
+  "components.Home.TrustedSection.card2.title": "Endesha maswali ya moja kwa moja na urudishe matokeo mara yanapokwisha.",
+  "components.Home.TrustedSection.card2.bullet1": "Vyumba vya maswali vyenye muda",
+  "components.Home.TrustedSection.card2.bullet2": "Alama na mapitio ya haraka",
+  "components.Home.TrustedSection.card3.label": "Majadiliano",
+  "components.Home.TrustedSection.card3.title": "Weka maswali, maoni na miitikio karibu na kila somo.",
+  "components.Home.TrustedSection.card3.bullet1": "Mazungumzo na maoni ya kozi",
+  "components.Home.TrustedSection.card3.bullet2": "Miitikio kwenye kila jibu",
+  "components.Home.TrustedSection.card4.label": "Maendeleo",
+  "components.Home.TrustedSection.card4.title": "Onyesha kila mwanafunzi hasa alipofikia kwenye njia yake ya kujifunza.",
+  "components.Home.TrustedSection.card4.bullet1": "Ufuatiliaji wa kila somo",
+  "components.Home.TrustedSection.card4.bullet2": "Taarifa kwenye dashibodi"
+}

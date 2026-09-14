@@ -1,0 +1,10 @@
+{
+  "components.teacher.QuizResultsPanel.close": "Funga",
+  "components.teacher.QuizResultsPanel.studentsAttempted": "Waliojaribu",
+  "components.teacher.QuizResultsPanel.averageScore": "Wastani wa alama",
+  "components.teacher.QuizResultsPanel.studentsPassed": "Waliofaulu",
+  "components.teacher.QuizResultsPanel.empty": "Hakuna aliyefanya jaribio hili bado.",
+  "components.teacher.QuizResultsPanel.attempts": "majaribio",
+  "components.teacher.QuizResultsPanel.points": "pointi",
+  "components.teacher.QuizResultsPanel.unknownStudent": "Mwanafunzi hajulikani"
+}

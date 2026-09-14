@@ -1,0 +1,7 @@
+{
+  "components.pwa.InstallPrompt.title": "Install Darasaone",
+  "components.pwa.InstallPrompt.androidInstructions": "Add it to your home screen for faster, offline-friendly access.",
+  "components.pwa.InstallPrompt.iosInstructions": "Tap Share, then \"Add to Home Screen\"",
+  "components.pwa.InstallPrompt.install": "Install",
+  "components.pwa.InstallPrompt.dismiss": "Dismiss"
+}

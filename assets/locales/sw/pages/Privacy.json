@@ -1,0 +1,43 @@
+{
+  "pages.Privacy.seo.title": "Sera ya Faragha",
+  "pages.Privacy.seo.description": "Jinsi Darasaone inavyokusanya, kutumia, kuhifadhi na kulinda taarifa binafsi za wanafunzi, walimu na wageni wanaotumia kozi, zana na tovuti yetu.",
+  "pages.Privacy.eyebrow": "Kisheria",
+  "pages.Privacy.title": "Sera ya Faragha",
+  "pages.Privacy.lastUpdated": "Ilisasishwa mara ya mwisho: 14 Septemba 2026",
+
+  "pages.Privacy.intro.heading": "Muhtasari",
+  "pages.Privacy.intro.body": "Darasaone (\"Darasaone\", \"sisi\" au \"yetu\") hutoa kozi za masomo ya Kiislamu na Kiarabu mtandaoni, zana na huduma za jamii, kwa Kiingereza na Kiswahili, tukiwa Dar es Salaam, Tanzania. Sera hii ya Faragha inaeleza taarifa binafsi tunazokusanya unapotembelea tovuti yetu au kutumia programu yetu, sababu za kuzikusanya, jinsi tunavyozitumia na kuzilinda, na chaguo na haki ulizonazo juu yake. Kwa kufungua akaunti au kutumia Darasaone kwa njia nyingine, unakubaliana na taratibu zilizoelezwa katika sera hii.",
+
+  "pages.Privacy.infoWeCollect.heading": "Taarifa tunazokusanya",
+  "pages.Privacy.infoWeCollect.body": "Taarifa za akaunti: akaunti za Darasaone hufunguliwa na kuingiwa kwa kutumia Google Sign-In pekee. Unapojisajili, Google hutupatia jina lako, barua pepe na picha ya wasifu; hatupokei wala kuhifadhi nenosiri lako la Google. Taarifa za masomo: tunapokutumia kozi, tunahifadhi usajili wako, maendeleo ya masomo na mitihani, majibu na alama za mitihani, mfululizo wa masomo (streaks) na shughuli zako kwenye ubao wa ushindani (leaderboard). Maudhui ya mwalimu: kama unafundisha kwenye Darasaone, tunahifadhi kozi, masomo na video unazopakia (video huhifadhiwa kwenye hifadhi yetu ya Cloudflare R2). Mawasiliano: ukitumia fomu yetu ya mawasiliano, tunakusanya jina lako, barua pepe na ujumbe wako ili kukujibu (hupitishwa kupitia mfumo wetu wa EmailJS). Ukijisajili kwenye jarida letu la habari, tunakusanya barua pepe yako na kuihifadhi kwa mtoa huduma wetu, Brevo, ili tuweze kukutumia taarifa za kozi na matangazo; unaweza kujitoa wakati wowote. Maoni na tathmini za wanafunzi: ukiacha tathmini, kiwango au maoni kuhusu kozi, maudhui hayo, pamoja na jina lako na picha ya wasifu, huonekana kwa walimu na wanafunzi wengine. Taarifa za kifaa na matumizi: kama tovuti nyingi, watoa huduma wetu wa hifadhi na uchambuzi wanaweza kurekodi kiotomatiki maelezo ya kiufundi kama anwani yako ya IP, aina ya kivinjari, aina ya kifaa na kurasa ulizotembelea.",
+
+  "pages.Privacy.howWeUse.heading": "Jinsi tunavyotumia taarifa zako",
+  "pages.Privacy.howWeUse.body": "Tunatumia taarifa hizo kwa: kuunda na kusimamia akaunti yako; kukuwezesha kujisajili, kukamilisha na kufuatilia maendeleo ya kozi; kutathmini mitihani na kuhifadhi rekodi ya matokeo yako na mfululizo wa masomo; kuonyesha tathmini, maoni na nafasi za ubao wa ushindani kwa watumiaji wengine pale unapochagua kushiriki huduma hizo; kujibu ujumbe uliotumwa kupitia fomu yetu ya mawasiliano; kutuma taarifa za jarida na matangazo ya kozi kwa wanaojisajili kwa hiari; kuendesha, kulinda, kutatua matatizo na kuboresha tovuti na programu; na kutii wajibu wetu wa kisheria. Hatuuzi taarifa zako binafsi, wala hatuzitumii kuonyesha matangazo ya watu wengine.",
+
+  "pages.Privacy.cookiesStorage.heading": "Vidakuzi (cookies) na hifadhi ya kivinjari",
+  "pages.Privacy.cookiesStorage.body": "Darasaone hutumia vidakuzi na hifadhi ya kivinjari (kama local storage) ambavyo ni muhimu tu kukuwezesha kubaki umeingia, kukumbuka lugha unayopendelea, na kusaidia usakinishaji wa Darasaone kama programu kwenye kifaa chako (Progressive Web App / \"Add to Home Screen\"). Hatutumii vidakuzi vya matangazo ya watu wengine au ufuatiliaji wa tovuti mbalimbali. Unaweza kudhibiti au kufuta vidakuzi kupitia mipangilio ya kivinjari chako, ingawa hilo linaweza kuathiri uwezo wako wa kubaki umeingia.",
+
+  "pages.Privacy.thirdParties.heading": "Watoa huduma wa watu wengine",
+  "pages.Privacy.thirdParties.body": "Tunategemea idadi ndogo ya watoa huduma tunaowaamini kuendesha Darasaone, na kila mmoja hupokea taarifa zinazohitajika kutekeleza kazi yake tu: Google (uthibitishaji wa Sign-In), Supabase (miundombinu yetu ya hifadhidata na uthibitishaji, ambapo taarifa za akaunti, kozi, maendeleo na mitihani huhifadhiwa), Cloudflare (uhifadhi na usambazaji wa video za kozi, kupitia Worker yetu wenyewe), Brevo (utumaji wa barua pepe za jarida), EmailJS (utumaji wa fomu ya mawasiliano) na Vercel (uhifadhi wa tovuti). Watoa huduma hawa huchakata taarifa kwa niaba yetu chini ya ahadi zao za usalama na faragha na hawaruhusiwi kutumia taarifa zako kwa masoko yao wenyewe. Hatushiriki taarifa zako binafsi na mtu mwingine yeyote isipokuwa inapohitajika kisheria.",
+
+  "pages.Privacy.dataRetention.heading": "Muda tunaohifadhi taarifa zako",
+  "pages.Privacy.dataRetention.body": "Tunahifadhi taarifa za akaunti na masomo yako kwa muda akaunti yako inapokuwa hai, ili maendeleo ya kozi, vyeti na historia yako viendelee kupatikana. Ukituomba kufuta akaunti yako, tutafuta au kuficha utambulisho wa taarifa zako binafsi ndani ya muda unaofaa, isipokuwa pale tunapotakiwa kuhifadhi baadhi ya rekodi kwa sababu za kisheria, usalama au uhasibu. Barua pepe za jarida huhifadhiwa mpaka ujitoe au utuombe kuziondoa.",
+
+  "pages.Privacy.yourRights.heading": "Haki na chaguo zako",
+  "pages.Privacy.yourRights.body": "Unaweza kukagua na kusasisha taarifa za wasifu wako kutoka kwenye ukurasa wa akaunti wakati wowote. Unaweza kujitoa kwenye barua pepe za jarida kwa kutumia kiungo kilichopo kwenye ujumbe wowote wa jarida. Kuomba nakala ya taarifa binafsi tunazokuhifadhia, kutuomba tuzirekebishe, au kutuomba tufute akaunti yako na taarifa zinazohusiana, wasiliana nasi kwa maelezo yaliyo hapa chini nasi tutajibu haraka iwezekanavyo.",
+
+  "pages.Privacy.childrenPrivacy.heading": "Wanafunzi walio chini ya miaka 18",
+  "pages.Privacy.childrenPrivacy.body": "Kozi za Darasaone hutumiwa na wanafunzi wa rika mbalimbali, ikiwemo watoto wanaosoma chini ya uongozi wa mzazi, mlezi au mwalimu. Usajili wa akaunti unapatikana kwa njia ya Google Sign-In pekee, ambayo inamtaka mtumiaji awe na akaunti ya Google. Tunakusanya taarifa zilizoelezwa katika sera hii tu ili kuendesha kozi na hatutumii kwa makusudi taarifa za watoto kwa ajili ya masoko. Kama wewe ni mzazi au mlezi na unaamini mtoto wako ametoa taarifa binafsi zaidi ya zinazohitajika kutumia huduma, tafadhali wasiliana nasi nasi tutakagua na, inapofaa, kuziondoa.",
+
+  "pages.Privacy.security.heading": "Usalama",
+  "pages.Privacy.security.body": "Tunatumia hatua za kiwango cha kimataifa kulinda taarifa zako, ikiwemo miunganisho iliyosimbwa (HTTPS) kati ya kifaa chako na seva zetu, udhibiti wa ufikiaji kwenye hifadhidata yetu, na uthibitishaji unaosimamiwa na Google badala yetu moja kwa moja. Hakuna njia ya usambazaji au uhifadhi iliyo salama kabisa, hivyo ingawa tunafanya kazi kulinda taarifa zako hatuwezi kuhakikisha usalama wake kamili.",
+
+  "pages.Privacy.internationalTransfers.heading": "Uhamishaji wa taarifa kimataifa",
+  "pages.Privacy.internationalTransfers.body": "Darasaone iko Tanzania, lakini watoa huduma waliotajwa hapo juu wanaendesha vituo vya data katika nchi nyingine. Hii inamaanisha taarifa zako zinaweza kuhifadhiwa au kuchakatwa nje ya Tanzania. Hilo linapotokea, watoa huduma wetu huzingatia viwango vyao wenyewe vya usalama na uzingatiaji wa sheria katika kushughulikia taarifa hizo.",
+
+  "pages.Privacy.changes.heading": "Mabadiliko kwenye sera hii",
+  "pages.Privacy.changes.body": "Tunaweza kusasisha Sera hii ya Faragha mara kwa mara kadri huduma za Darasaone zinavyobadilika au kama sheria inavyohitaji. Tutasasisha tarehe ya \"Ilisasishwa mara ya mwisho\" juu ya ukurasa huu tutakapofanya hivyo, na endapo mabadiliko ni makubwa tutajitahidi kuwajulisha watumiaji, kwa mfano kupitia programu au barua pepe.",
+
+  "pages.Privacy.contact.heading": "Wasiliana nasi",
+  "pages.Privacy.contact.body": "Kama una maswali kuhusu Sera hii ya Faragha au jinsi tunavyoshughulikia taarifa zako, au unataka kutumia haki zozote zilizoelezwa hapo juu, tafadhali wasiliana nasi kupitia {email} au kupitia ukurasa wetu wa mawasiliano. Tuko Dar es Salaam, Tanzania."
+}

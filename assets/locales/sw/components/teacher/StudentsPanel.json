@@ -1,0 +1,18 @@
+{
+  "components.teacher.StudentsPanel.close": "Funga",
+  "components.teacher.StudentsPanel.heading": "Wanafunzi walioandikishwa",
+  "components.teacher.StudentsPanel.searchPlaceholder": "Tafuta kwa jina au barua pepe",
+  "components.teacher.StudentsPanel.avgProgress": "Wastani wa maendeleo",
+  "components.teacher.StudentsPanel.empty": "Bado hakuna mwanafunzi aliyeandikishwa.",
+  "components.teacher.StudentsPanel.noMatches": "Hakuna mwanafunzi anayelingana na utafutaji huo.",
+  "components.teacher.StudentsPanel.unknownStudent": "Mwanafunzi hajulikani",
+  "components.teacher.StudentsPanel.enrolledOn": "Aliandikishwa",
+  "components.teacher.StudentsPanel.sortAtRiskFirst": "Walio hatarini kwanza",
+  "components.teacher.StudentsPanel.sortProgressDesc": "Maendeleo zaidi",
+  "components.teacher.StudentsPanel.sortRecent": "Wapya kuandikishwa",
+  "components.teacher.StudentsPanel.sortName": "Jina (A-Z)",
+  "components.teacher.StudentsPanel.atRiskWarning": "Wanafunzi {count} bado hawajaanza, siku 14+ baada ya kuandikishwa.",
+  "components.teacher.StudentsPanel.quizResultsHeading": "Matokeo ya jaribio",
+  "components.teacher.StudentsPanel.loadingQuizzes": "Inapakia matokeo ya jaribio…",
+  "components.teacher.StudentsPanel.noQuizAttempts": "Bado hakuna jaribio lililofanywa."
+}

@@ -1,0 +1,18 @@
+{
+  "components.Courses.CourseGrid.searchLabel": "Search courses",
+  "components.Courses.CourseGrid.searchPlaceholder": "Search by course, track or teacher",
+  "components.Courses.CourseGrid.filterLabel": "Filter by track",
+  "components.Courses.CourseGrid.trackAll": "All tracks",
+  "components.Courses.CourseGrid.trackQuran": "Quran",
+  "components.Courses.CourseGrid.trackArabic": "Arabic",
+  "components.Courses.CourseGrid.trackFiqh": "Fiqh",
+  "components.Courses.CourseGrid.trackSeerah": "Seerah",
+  "components.Courses.CourseGrid.trackHadith": "Hadith",
+  "components.Courses.CourseGrid.lessons": "lessons",
+  "components.Courses.CourseGrid.materials": "materials",
+  "components.Courses.CourseGrid.enroll": "Enroll now",
+  "components.Courses.CourseGrid.enrolling": "Enrolling",
+  "components.Courses.CourseGrid.enrolled": "You are enrolled",
+  "components.Courses.CourseGrid.newBadge": "New",
+  "components.Courses.CourseGrid.empty": "No course matches that search yet. Try another track or clear the search."
+}

@@ -1,0 +1,13 @@
+{
+  "pages.tools.QuranJuz.seo.description": "Read this juz of the Quran in Arabic with translation, grouped by surah, and listen to verse-by-verse recitation.",
+  "pages.tools.QuranJuz.titlePrefix": "Juz",
+  "pages.tools.QuranJuz.backToList": "Back to the Quran",
+  "pages.tools.QuranJuz.loadError": "We couldn't load this juz. Please check your connection and try again.",
+  "pages.tools.QuranJuz.retry": "Try again",
+  "pages.tools.QuranJuz.previous": "Previous juz",
+  "pages.tools.QuranJuz.next": "Next juz",
+  "pages.tools.QuranJuz.surahsInJuz": "Surahs in this juz",
+  "pages.tools.QuranJuz.readAll": "Read the entire juz",
+  "pages.tools.QuranJuz.backToSurahs": "All surahs in this juz",
+  "pages.tools.QuranJuz.ayah": "Ayah"
+}

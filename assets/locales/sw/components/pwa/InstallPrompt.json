@@ -1,0 +1,7 @@
+{
+  "components.pwa.InstallPrompt.title": "Sakinisha Darasaone",
+  "components.pwa.InstallPrompt.androidInstructions": "Iweke kwenye skrini yako ya nyumbani kwa ufikiaji wa haraka zaidi, hata bila mtandao.",
+  "components.pwa.InstallPrompt.iosInstructions": "Gusa Share, kisha \"Add to Home Screen\"",
+  "components.pwa.InstallPrompt.install": "Sakinisha",
+  "components.pwa.InstallPrompt.dismiss": "Funga"
+}

@@ -1,0 +1,13 @@
+{
+  "pages.tools.QuranJuz.seo.description": "Soma juzuu hii ya Qur'an kwa Kiarabu pamoja na tafsiri, ikiwa imepangwa kwa sura, na usikilize usomaji wa aya kwa aya.",
+  "pages.tools.QuranJuz.titlePrefix": "Juzuu",
+  "pages.tools.QuranJuz.backToList": "Rudi kwenye Qur'an",
+  "pages.tools.QuranJuz.loadError": "Imeshindikana kupakia juzuu hii. Tafadhali angalia mtandao wako na ujaribu tena.",
+  "pages.tools.QuranJuz.retry": "Jaribu tena",
+  "pages.tools.QuranJuz.previous": "Juzuu iliyotangulia",
+  "pages.tools.QuranJuz.next": "Juzuu inayofuata",
+  "pages.tools.QuranJuz.surahsInJuz": "Sura zilizomo kwenye juzuu hii",
+  "pages.tools.QuranJuz.readAll": "Soma juzuu nzima",
+  "pages.tools.QuranJuz.backToSurahs": "Sura zote za juzuu hii",
+  "pages.tools.QuranJuz.ayah": "Aya"
+}
