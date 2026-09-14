@@ -1,0 +1,43 @@
+{
+  "pages.Privacy.seo.title": "Privacy Policy",
+  "pages.Privacy.seo.description": "How Darasaone collects, uses, stores and protects the personal information of students, teachers and visitors who use our courses, tools and website.",
+  "pages.Privacy.eyebrow": "Legal",
+  "pages.Privacy.title": "Privacy Policy",
+  "pages.Privacy.lastUpdated": "Last updated: 14 September 2026",
+
+  "pages.Privacy.intro.heading": "Overview",
+  "pages.Privacy.intro.body": "Darasaone (\"Darasaone\", \"we\", \"us\" or \"our\") provides Islamic and Arabic studies courses, tools and community features online, in English and Swahili, based in Dar es Salaam, Tanzania. This Privacy Policy explains what personal information we collect when you visit our website or use our app, why we collect it, how we use and protect it, and the choices and rights you have over it. By creating an account or otherwise using Darasaone, you agree to the practices described in this policy.",
+
+  "pages.Privacy.infoWeCollect.heading": "Information we collect",
+  "pages.Privacy.infoWeCollect.body": "Account information: Darasaone accounts are created and signed in to exclusively through Google Sign-In. When you sign up, Google shares your name, email address and profile photo with us; we do not receive or store your Google password. Learning data: as you use courses we store your enrollments, lesson and quiz progress, quiz answers and scores, study streaks and any leaderboard activity you take part in. Teacher content: if you teach on Darasaone, we store the courses, lessons and videos you upload (video files are hosted on our Cloudflare R2 storage). Communications: if you use our contact form, we collect your name, email address and message to respond to you (sent via our EmailJS integration). If you subscribe to our newsletter, we collect your email address and store it with our email provider, Brevo, so we can send course updates and announcements; you can unsubscribe at any time. Student comments and reviews: if you leave a course review, rating or comment, that content, along with your name and profile photo, is visible to teachers and other students. Device and usage information: like most websites, our hosting and analytics providers may automatically log technical details such as your IP address, browser type, device type and pages visited.",
+
+  "pages.Privacy.howWeUse.heading": "How we use your information",
+  "pages.Privacy.howWeUse.body": "We use the information above to: create and manage your account; let you enroll in, complete and track progress through courses; grade quizzes and keep a record of your results and study streaks; show course reviews, comments and leaderboard rankings to other users where you have chosen to take part in these features; respond to messages sent through our contact form; send newsletter updates and course announcements to subscribers who opt in; operate, secure, troubleshoot and improve the website and app; and comply with our legal obligations. We do not sell your personal information, and we do not use your data to serve third-party advertising.",
+
+  "pages.Privacy.cookiesStorage.heading": "Cookies and local storage",
+  "pages.Privacy.cookiesStorage.body": "Darasaone uses cookies and similar browser storage (such as local storage) that are strictly necessary to keep you signed in, remember your language preference, and support installing Darasaone as an app on your device (Progressive Web App / \"Add to Home Screen\"). We do not use third-party advertising or cross-site tracking cookies. You can control or clear cookies through your browser settings, though doing so may affect your ability to stay signed in.",
+
+  "pages.Privacy.thirdParties.heading": "Third-party service providers",
+  "pages.Privacy.thirdParties.body": "We rely on a small number of trusted service providers to run Darasaone, and each only receives the information needed to perform its function: Google (Sign-In authentication), Supabase (our database and authentication infrastructure, where account, course, progress and quiz data is stored), Cloudflare (video storage and delivery for course content, via our own Cloudflare Worker), Brevo (newsletter email delivery), EmailJS (contact form delivery) and Vercel (website hosting). These providers process data on our behalf under their own security and privacy commitments and are not permitted to use your information for their own marketing purposes. We do not share your personal information with any other third party except where required by law.",
+
+  "pages.Privacy.dataRetention.heading": "How long we keep your information",
+  "pages.Privacy.dataRetention.body": "We retain your account and learning data for as long as your account is active, so that your course progress, certificates and history remain available to you. If you ask us to delete your account, we will delete or anonymize your personal information within a reasonable time, except where we are required to retain certain records for legal, security or accounting purposes. Newsletter email addresses are kept until you unsubscribe or ask us to remove them.",
+
+  "pages.Privacy.yourRights.heading": "Your rights and choices",
+  "pages.Privacy.yourRights.body": "You can review and update your profile information from your account page at any time. You may unsubscribe from newsletter emails using the link in any newsletter message. To request a copy of the personal information we hold about you, ask us to correct it, or ask us to delete your account and associated data, contact us using the details below and we will respond as soon as reasonably possible.",
+
+  "pages.Privacy.childrenPrivacy.heading": "Students under 18",
+  "pages.Privacy.childrenPrivacy.body": "Darasaone's courses are used by students of many ages, including children studying under the guidance of a parent, guardian or teacher. Account sign-up is only available through Google Sign-In, which requires the user to hold a Google account. We collect only the information described in this policy to run the courses and do not knowingly use children's information for marketing. If you are a parent or guardian and believe your child has provided personal information beyond what is needed to use the service, please contact us and we will review and, where appropriate, remove it.",
+
+  "pages.Privacy.security.heading": "Security",
+  "pages.Privacy.security.body": "We use industry-standard measures to protect your information, including encrypted connections (HTTPS) between your device and our servers, access controls on our database, and authentication handled by Google rather than by us directly. No method of transmission or storage is completely secure, so while we work to protect your information we cannot guarantee its absolute security.",
+
+  "pages.Privacy.internationalTransfers.heading": "International data transfers",
+  "pages.Privacy.internationalTransfers.body": "Darasaone is based in Tanzania, but the service providers listed above operate data centers in other countries. This means your information may be stored or processed outside Tanzania. Where this happens, our providers maintain their own security and compliance standards for handling that data.",
+
+  "pages.Privacy.changes.heading": "Changes to this policy",
+  "pages.Privacy.changes.body": "We may update this Privacy Policy from time to time as Darasaone's features change or as required by law. We will update the \"Last updated\" date at the top of this page when we do, and if a change is significant we will make reasonable efforts to let users know, such as through the app or by email.",
+
+  "pages.Privacy.contact.heading": "Contact us",
+  "pages.Privacy.contact.body": "If you have any questions about this Privacy Policy or how we handle your information, or want to exercise any of the rights described above, please reach us at {email} or through our contact page. We are based in Dar es Salaam, Tanzania."
+}
