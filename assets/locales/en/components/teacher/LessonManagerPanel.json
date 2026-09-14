@@ -33,5 +33,6 @@
   "components.teacher.LessonManagerPanel.quizAdd": "Add a quiz to this lesson",
   "components.teacher.LessonManagerPanel.quizAddHint": "Give students a way to test what they learned",
   "components.teacher.LessonManagerPanel.quizQuestions": "questions",
-  "components.teacher.LessonManagerPanel.quizDraftBadge": "draft"
+  "components.teacher.LessonManagerPanel.quizDraftBadge": "draft",
+  "components.teacher.LessonManagerPanel.quizResults": "Results"
 }

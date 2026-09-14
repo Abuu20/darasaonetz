@@ -19,5 +19,9 @@
   "pages.Account.teacherDashboard": "Teacher dashboard",
   "pages.Account.statLessons": "Total lessons",
   "pages.Account.browseCourses": "Browse courses",
-  "pages.Account.statPoints": "Points"
+  "pages.Account.statPoints": "Points",
+  "pages.Account.navOverview": "Overview",
+  "pages.Account.navCourses": "Courses",
+  "pages.Account.navLearn": "Learn",
+  "pages.Account.navProfile": "Profile"
 }

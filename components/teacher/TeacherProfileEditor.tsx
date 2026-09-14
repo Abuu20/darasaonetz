@@ -47,27 +47,27 @@ export default function TeacherProfileEditor({ onClose }: { onClose: () => void 
   };
 
   const fieldClass =
-    "w-full rounded-control border border-hairline bg-night/60 px-stack py-tight text-sm text-night-foreground outline-none transition-colors duration-base placeholder:text-lavender focus:border-accent";
+    "w-full rounded-control border border-line bg-mist px-stack py-tight text-sm text-ink outline-none transition-colors duration-base placeholder:text-slate focus:border-accent";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-night/80 px-gutter py-block" role="dialog" aria-modal="true">
+    <div className="dash-theme fixed inset-0 z-50 flex items-center justify-center bg-ink/40 backdrop-blur-sm px-gutter py-block" role="dialog" aria-modal="true">
       <ResizablePanel
         defaultWidth={typeof window !== "undefined" ? Math.min(1040, window.innerWidth - 48) : 1040}
         defaultHeight={typeof window !== "undefined" ? Math.min(700, window.innerHeight - 48) : 700}
         minWidth={400}
         minHeight={420}
         storageKey="teacher-profile"
-        className="overflow-hidden rounded-panel border border-hairline bg-panel"
+        className="card-lift overflow-hidden rounded-panel border border-line bg-background"
         resizeLabel={t("components.teacher.TeacherProfileEditor.resizeWindow")}
         maximizeLabel={t("components.teacher.TeacherProfileEditor.maximizeWindow")}
         restoreLabel={t("components.teacher.TeacherProfileEditor.restoreWindow")}
       >
-        <div className="flex items-center justify-between gap-stack border-b border-hairline px-block py-tight">
+        <div className="flex items-center justify-between gap-stack border-b border-line px-block py-tight">
           <div>
-            <h2 className="font-heading text-lg text-night-foreground">{t("components.teacher.TeacherProfileEditor.title")}</h2>
-            <p className="mt-1 text-xs text-lavender">{t("components.teacher.TeacherProfileEditor.subtitle")}</p>
+            <h2 className="font-heading text-lg text-ink">{t("components.teacher.TeacherProfileEditor.title")}</h2>
+            <p className="mt-1 text-xs text-slate">{t("components.teacher.TeacherProfileEditor.subtitle")}</p>
           </div>
-          <button type="button" onClick={onClose} aria-label={t("components.teacher.TeacherProfileEditor.close")} className="text-lavender hover:text-night-foreground">
+          <button type="button" onClick={onClose} aria-label={t("components.teacher.TeacherProfileEditor.close")} className="text-slate hover:text-ink">
             <X size={20} />
           </button>
         </div>
@@ -77,15 +77,15 @@ export default function TeacherProfileEditor({ onClose }: { onClose: () => void 
           dividerLabel={t("components.teacher.TeacherProfileEditor.resizeSplit")}
           left={
             <div className="flex h-full flex-col gap-stack px-block py-block">
-              {error ? <div className="rounded-control border border-danger/50 bg-danger/10 px-stack py-tight text-sm text-night-foreground">{error}</div> : null}
+              {error ? <div className="rounded-control border border-danger/50 bg-danger/10 px-stack py-tight text-sm text-ink">{error}</div> : null}
 
               <div className="flex flex-col items-center gap-tight self-center">
                 <AvatarUpload size={96} />
-                <span className="text-xs text-lavender">{t("components.teacher.TeacherProfileEditor.avatarHint")}</span>
+                <span className="text-xs text-slate">{t("components.teacher.TeacherProfileEditor.avatarHint")}</span>
               </div>
 
               <div>
-                <label className="mb-1 block text-xs uppercase tracking-widest text-lavender" htmlFor="teacher-name">
+                <label className="mb-1 block text-xs uppercase tracking-widest text-slate" htmlFor="teacher-name">
                   {t("components.teacher.TeacherProfileEditor.nameLabel")}
                 </label>
                 <input
@@ -98,7 +98,7 @@ export default function TeacherProfileEditor({ onClose }: { onClose: () => void 
               </div>
 
               <div>
-                <label className="mb-1 block text-xs uppercase tracking-widest text-lavender" htmlFor="teacher-expertise">
+                <label className="mb-1 block text-xs uppercase tracking-widest text-slate" htmlFor="teacher-expertise">
                   {t("components.teacher.TeacherProfileEditor.expertiseLabel")}
                 </label>
                 <input
@@ -111,7 +111,7 @@ export default function TeacherProfileEditor({ onClose }: { onClose: () => void 
               </div>
 
               <div>
-                <label className="mb-1 block text-xs uppercase tracking-widest text-lavender" htmlFor="teacher-qualifications">
+                <label className="mb-1 block text-xs uppercase tracking-widest text-slate" htmlFor="teacher-qualifications">
                   {t("components.teacher.TeacherProfileEditor.qualificationsLabel")}
                 </label>
                 <input
@@ -125,10 +125,10 @@ export default function TeacherProfileEditor({ onClose }: { onClose: () => void 
 
               <div className="flex-1">
                 <div className="mb-1 flex items-center justify-between">
-                  <label className="block text-xs uppercase tracking-widest text-lavender" htmlFor="teacher-bio">
+                  <label className="block text-xs uppercase tracking-widest text-slate" htmlFor="teacher-bio">
                     {t("components.teacher.TeacherProfileEditor.bioLabel")}
                   </label>
-                  <span className="text-[10px] text-lavender">
+                  <span className="text-[10px] text-slate">
                     {bio.length}/{MAX_BIO}
                   </span>
                 </div>
@@ -141,7 +141,7 @@ export default function TeacherProfileEditor({ onClose }: { onClose: () => void 
                   placeholder={t("components.teacher.TeacherProfileEditor.bioPlaceholder")}
                   className={fieldClass}
                 />
-                <p className="mt-1 text-xs text-lavender">{t("components.teacher.TeacherProfileEditor.bioHint")}</p>
+                <p className="mt-1 text-xs text-slate">{t("components.teacher.TeacherProfileEditor.bioHint")}</p>
               </div>
 
               <div className="flex items-center gap-tight pt-tight">
@@ -154,7 +154,7 @@ export default function TeacherProfileEditor({ onClose }: { onClose: () => void 
                   {saving ? <Loader2 size={16} className="animate-spin" /> : saved ? <Check size={16} /> : null}
                   {t("components.teacher.TeacherProfileEditor.save")}
                 </button>
-                <button type="button" onClick={onClose} className="rounded-control border border-hairline px-block py-tight text-sm text-lavender">
+                <button type="button" onClick={onClose} className="rounded-control border border-line px-block py-tight text-sm text-slate hover:border-accent hover:text-ink">
                   {t("components.teacher.TeacherProfileEditor.done")}
                 </button>
               </div>

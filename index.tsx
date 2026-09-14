@@ -5,6 +5,7 @@ import tailwindConfig from "@/tailwind.config";
 import App from "@/App";
 import { GOOGLE_FONTS_URL } from "@/fonts";
 import { LanguageProvider } from "@/context/LanguageContext";
+import ErrorBoundary from "@/components/system/ErrorBoundary";
 import "@/index.css";
 
 // Auto-inject Google Fonts from fonts.googleapis.com
@@ -54,10 +55,12 @@ if (typeof window !== "undefined" && "serviceWorker" in navigator) {
 
 root.render(
   <React.StrictMode>
-    <HelmetProvider>
-      <LanguageProvider>
-        <App />
-      </LanguageProvider>
-    </HelmetProvider>
+    <ErrorBoundary>
+      <HelmetProvider>
+        <LanguageProvider>
+          <App />
+        </LanguageProvider>
+      </HelmetProvider>
+    </ErrorBoundary>
   </React.StrictMode>
 );

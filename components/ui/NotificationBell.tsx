@@ -6,6 +6,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { notificationQueries } from "@/lib/db/notifications";
 import type { AppNotification, NotificationType } from "@/lib/db/types";
+/* [apply-fixes] */
 
 const LIMIT = 30;
 // Below this width the panel becomes a full-screen sheet instead of a
@@ -125,8 +126,54 @@ export default function NotificationBell({ tone = "light" }: { tone?: "light" | 
       setItems(prev => prev.map(x => (x.id === item.id ? { ...x, is_read: true } : x)));
       notificationQueries.markAsRead(item.id).catch(() => {});
     }
-    const courseId = (item.data as { course_id?: string } | null)?.course_id;
-    if (courseId) navigate(`/courses/${courseId}`);
+
+    const data = (item.data as { course_id?: string; lesson_id?: string } | null) ?? {};
+    const courseId = data.course_id;
+    const lessonId = data.lesson_id;
+
+    // Route by notification type — the goal is to land the recipient on the
+    // screen where they can actually act on the notification, not just look
+    // at a public marketing page.
+    //
+    // "new_review" is overloaded in this app: it's the type used both for
+    // a course review AND for a student question on a lesson (see
+    // AskTeacherButton). AskTeacherButton always attaches a lesson_id, so
+    // we can tell them apart.
+    switch (item.type) {
+      case "new_review":
+      case "new_comment": {
+        const params = new URLSearchParams({ tab: "comments" });
+        if (courseId) params.set("course", courseId);
+        if (lessonId) params.set("lesson", lessonId);
+        navigate(`/teacher?${params.toString()}`);
+        return;
+      }
+      case "enrollment":
+      case "course_approved":
+      case "course_rejected": {
+        navigate("/teacher?tab=courses");
+        return;
+      }
+      case "quiz_result": {
+        navigate("/account");
+        return;
+      }
+      case "new_lesson": {
+        if (courseId && lessonId) {
+          navigate(`/learn/${courseId}?lesson=${lessonId}`);
+        } else if (courseId) {
+          navigate(`/courses/${courseId}`);
+        } else {
+          navigate("/account");
+        }
+        return;
+      }
+      case "announcement":
+      case "system":
+      default: {
+        if (courseId) navigate(`/courses/${courseId}`);
+      }
+    }
   };
 
   const markAllRead = async () => {

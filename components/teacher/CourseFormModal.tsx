@@ -191,7 +191,7 @@ export default function CourseFormModal({
   const isCurriculumStep = STEP_IDS[step] === "curriculum";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-night/80 px-gutter py-block" role="dialog" aria-modal="true">
+    <div className="dash-theme fixed inset-0 z-50 flex items-center justify-center bg-ink/40 backdrop-blur-sm px-gutter py-block" role="dialog" aria-modal="true">
       <ResizablePanel
         // Desktop teachers get a roomy, document-editor-sized canvas by
         // default (a small monitor still comfortably fits it); phones fall
@@ -204,7 +204,7 @@ export default function CourseFormModal({
         minWidth={480}
         minHeight={420}
         storageKey="course-form"
-        className="overflow-hidden rounded-panel border border-line bg-background"
+        className="card-lift overflow-hidden rounded-panel border border-line bg-background"
         resizeLabel={t("components.teacher.CourseFormModal.resizeWindow")}
         maximizeLabel={t("components.teacher.CourseFormModal.maximizeWindow")}
         restoreLabel={t("components.teacher.CourseFormModal.restoreWindow")}
@@ -413,7 +413,7 @@ export default function CourseFormModal({
         </div>
 
         {!isCurriculumStep ? (
-          <div className="hidden w-full max-w-xs flex-col overflow-hidden border-line bg-night/40 lg:flex lg:border-l">
+          <div className="hidden w-full max-w-xs flex-col overflow-hidden border-line bg-dash-tint lg:flex lg:border-l">
             <div className="flex items-center justify-between border-b border-line px-stack py-tight">
               <span className="text-xs uppercase tracking-widest text-slate">
                 {t("components.teacher.CourseFormModal.livePreview")}

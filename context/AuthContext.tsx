@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/lib/db/client";
 import { profileQueries } from "@/lib/db/profiles";
@@ -52,6 +52,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // Tracks the signed-in user's id across onAuthStateChange re-fires. Supabase
+  // re-validates/refreshes the session (and re-fires this listener) every
+  // time the browser tab regains focus, even when nothing actually changed.
+  // Without this guard, every re-fire creates a brand-new `user` object,
+  // which reruns every `useEffect(..., [user])` app-wide (NotificationBell,
+  // dashboard panels, admin Messages, etc.) — the cascade of refetches is
+  // what looks like a full page refresh on every tab switch.
+  const currentUserIdRef = useRef<string | null>(null);
 
   const loadProfile = async (nextUser: User | null) => {
     if (!nextUser) {
@@ -86,6 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     supabase.auth.getSession().then(async ({ data }) => {
       if (!isMounted) return;
+      currentUserIdRef.current = data.session?.user?.id ?? null;
       setSession(data.session);
       setUser(data.session?.user ?? null);
       await loadProfile(data.session?.user ?? null);
@@ -94,8 +103,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, nextSession) => {
+    } = supabase.auth.onAuthStateChange(async (event, nextSession) => {
       if (!isMounted) return;
+
+      const sameUser = nextSession?.user?.id === currentUserIdRef.current;
+
+      // Same signed-in user, just a background token refresh (typically
+      // fired right after the tab regains focus) — update the token quietly
+      // without touching user/profile state or triggering a refetch cascade.
+      if (sameUser && (event === "TOKEN_REFRESHED" || event === "INITIAL_SESSION")) {
+        setSession(nextSession);
+        return;
+      }
+
+      currentUserIdRef.current = nextSession?.user?.id ?? null;
       setSession(nextSession);
       setUser(nextSession?.user ?? null);
       await loadProfile(nextSession?.user ?? null);
@@ -176,7 +197,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profile,
         isLoading,
         isTeacher: profile?.role === "teacher",
-        isStudent: profile?.role === "student" || !profile,
+        // [fix-role-flip]
+        // A null profile is NOT "student" — it means the read failed.
+        // Treating it as student is what caused the role to flip.
+        isStudent: profile?.role === "student",
         isAdmin: profile?.role === "admin",
         signInWithGoogle,
         signInWithEmail,

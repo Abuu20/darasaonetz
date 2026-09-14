@@ -70,10 +70,17 @@ export const notificationQueries = {
     return result;
   },
 
-  // Realtime: fires `onInsert` the moment a new notification row lands for this user.
+  // Realtime: fires `onInsert` the moment a new notification row lands for
+  // this user.
+  //
+  // The channel name carries a random suffix because React 19's StrictMode
+  // mounts every effect twice in dev, and removeChannel() is async: without
+  // a unique name the second mount's .channel() call finds the first mount's
+  // still-in-flight channel and .on() throws "cannot add ... after subscribe()".
   subscribe: (userId: string, onInsert: (n: AppNotification) => void) => {
+    const uniqueSuffix = Math.random().toString(36).slice(2, 10);
     const channel = supabase
-      .channel(`notifications-${userId}`)
+      .channel(`notifications-${userId}-${uniqueSuffix}`)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "email_notifications", filter: `user_id=eq.${userId}` },

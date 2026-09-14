@@ -142,13 +142,21 @@ export default function Header() {
                           <span data-text-id="components.layout.Header.contactMessages">{t("components.layout.Header.contactMessages")}</span>
                         </Link>
                       ) : null}
-                      <Link
-                        to="/account"
-                        onClick={() => setMenuOpen(false)}
-                        className="block px-stack py-tight text-sm text-ink transition-colors duration-base hover:bg-mist"
-                      >
-                        <span data-text-id="components.layout.Header.dashboard">{t("components.layout.Header.dashboard")}</span>
-                      </Link>
+                      {/* Only offer "My dashboard" to non-teachers. A teacher's
+                          dashboard is the teacher dashboard — the account
+                          page still works if they navigate to it directly,
+                          it's just not duplicated in this menu. Admins keep
+                          it because their admin view lives at /admin/messages,
+                          not /account. */}
+                      {!isTeacher || isAdmin ? (
+                        <Link
+                          to="/account"
+                          onClick={() => setMenuOpen(false)}
+                          className="block px-stack py-tight text-sm text-ink transition-colors duration-base hover:bg-mist"
+                        >
+                          <span data-text-id="components.layout.Header.dashboard">{t("components.layout.Header.dashboard")}</span>
+                        </Link>
+                      ) : null}
                       <button
                         onClick={() => {
                           signOut();
@@ -221,12 +229,14 @@ export default function Header() {
                     <span data-text-id="components.layout.Header.contactMessages">{t("components.layout.Header.contactMessages")}</span>
                   </Link>
                 ) : null}
-                <Link
-                  to="/account"
-                  className="rounded-control px-stack py-tight text-center text-sm text-ink transition-colors duration-base hover:bg-mist"
-                >
-                  <span data-text-id="components.layout.Header.dashboard">{t("components.layout.Header.dashboard")}</span>
-                </Link>
+                {!isTeacher || isAdmin ? (
+                  <Link
+                    to="/account"
+                    className="rounded-control px-stack py-tight text-center text-sm text-ink transition-colors duration-base hover:bg-mist"
+                  >
+                    <span data-text-id="components.layout.Header.dashboard">{t("components.layout.Header.dashboard")}</span>
+                  </Link>
+                ) : null}
               </>
             ) : (
               <button

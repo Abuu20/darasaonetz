@@ -33,5 +33,6 @@
   "components.teacher.LessonManagerPanel.quizAdd": "Ongeza jaribio kwa somo hili",
   "components.teacher.LessonManagerPanel.quizAddHint": "Wape wanafunzi njia ya kupima walichojifunza",
   "components.teacher.LessonManagerPanel.quizQuestions": "maswali",
-  "components.teacher.LessonManagerPanel.quizDraftBadge": "rasimu"
+  "components.teacher.LessonManagerPanel.quizDraftBadge": "rasimu",
+  "components.teacher.LessonManagerPanel.quizResults": "Matokeo"
 }

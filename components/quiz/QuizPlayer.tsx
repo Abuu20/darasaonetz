@@ -162,7 +162,7 @@ export default function QuizPlayer({ quiz }: { quiz: Quiz }) {
   const ringOffset = RING_CIRCUMFERENCE - (RING_CIRCUMFERENCE * scorePct) / 100;
 
   return (
-    <div className="lesson-card overflow-hidden rounded-card border border-line">
+    <div className="quiz-player lesson-card overflow-hidden rounded-card border border-line">
       <div className="flex items-center gap-tight border-b border-line bg-mist/60 px-stack py-tight">
         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-control bg-accent/10 text-accent">
           <ClipboardCheck size={16} aria-hidden="true" />

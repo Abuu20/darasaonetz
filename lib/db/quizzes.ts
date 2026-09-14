@@ -1,5 +1,5 @@
 import { supabase } from "./client";
-import type { Quiz, QuizAttempt, QuizQuestion, QuizOption } from "./types";
+import type { Profile, Quiz, QuizAttempt, QuizQuestion, QuizOption } from "./types";
 
 // Draft question/option shape used while a teacher is still building a quiz
 // client-side, before ids exist. Keeps QuizBuilder's local state simple and
@@ -236,7 +236,38 @@ export const quizQueries = {
   },
 };
 
+export type QuizAttemptWithStudent = QuizAttempt & {
+  student: Pick<Profile, "id" | "full_name" | "email" | "avatar_url"> | null;
+};
+
 export const quizAttemptQueries = {
+  // Every attempt on a quiz, across every student, newest first — this is
+  // what powers the teacher's results view. quiz_attempts only carries
+  // student_id, so this does a manual second lookup into profiles rather
+  // than assuming a specific FK constraint name (the table predates this
+  // file — see the schema note at the top of this file).
+  getByQuiz: async (quizId: string): Promise<QuizAttemptWithStudent[]> => {
+    const { data, error } = await supabase
+      .from("quiz_attempts")
+      .select("*")
+      .eq("quiz_id", quizId)
+      .order("completed_at", { ascending: false });
+    if (error) throw error;
+    const attempts = (data ?? []).map(mapAttempt);
+
+    const studentIds = [...new Set(attempts.map(a => a.student_id))];
+    if (studentIds.length === 0) return attempts.map(a => ({ ...a, student: null }));
+
+    const { data: profileRows, error: profileError } = await supabase
+      .from("profiles")
+      .select("id, full_name, email, avatar_url")
+      .in("id", studentIds);
+    if (profileError) throw profileError;
+    const profileMap = new Map((profileRows ?? []).map((p: any) => [p.id, p as Profile]));
+
+    return attempts.map(a => ({ ...a, student: profileMap.get(a.student_id) ?? null }));
+  },
+
   getHistory: async (quizId: string, studentId: string): Promise<QuizAttempt[]> => {
     const { data, error } = await supabase
       .from("quiz_attempts")
@@ -246,6 +277,47 @@ export const quizAttemptQueries = {
       .order("started_at", { ascending: false });
     if (error) throw error;
     return (data ?? []).map(mapAttempt);
+  },
+
+  // One row per quiz in the course, with its average score across every
+  // attempt (most-recent attempt per student, so a retake doesn't count
+  // the same student twice) — powers the teacher's "Quiz performance"
+  // chart. Aggregated client-side rather than a SQL view, since a
+  // teacher's per-course attempt volume is small and this keeps the same
+  // pattern the rest of the dashboard's charts already use.
+  getAverageScoresByCourse: async (
+    courseId: string
+  ): Promise<{ quizId: string; title: string; avgScore: number; attempts: number }[]> => {
+    const { data, error } = await supabase
+      .from("quiz_attempts")
+      .select("quiz_id, student_id, score, submitted_at, quizzes!inner(title, course_id)")
+      .eq("quizzes.course_id", courseId)
+      .order("submitted_at", { ascending: false });
+    if (error) throw error;
+
+    // Keep only each student's latest attempt per quiz.
+    const latestPerStudentQuiz = new Map<string, { score: number; title: string }>();
+    for (const row of (data ?? []) as any[]) {
+      const key = `${row.quiz_id}:${row.student_id}`;
+      if (!latestPerStudentQuiz.has(key)) {
+        latestPerStudentQuiz.set(key, { score: row.score, title: row.quizzes?.title ?? "Untitled quiz" });
+      }
+    }
+
+    const byQuiz = new Map<string, { title: string; scores: number[] }>();
+    for (const [key, { score, title }] of latestPerStudentQuiz) {
+      const quizId = key.split(":")[0];
+      const entry = byQuiz.get(quizId) ?? { title, scores: [] };
+      entry.scores.push(score);
+      byQuiz.set(quizId, entry);
+    }
+
+    return [...byQuiz.entries()].map(([quizId, { title, scores }]) => ({
+      quizId,
+      title,
+      avgScore: Math.round(scores.reduce((a, b) => a + b, 0) / scores.length),
+      attempts: scores.length,
+    }));
   },
 
   // Grading happens server-side in the `grade_quiz_attempt` RPC (see
@@ -269,5 +341,33 @@ export const quizAttemptQueries = {
       await new Promise(resolve => setTimeout(resolve, 1200));
       return await attempt();
     }
+  },
+};
+
+// Every attempt by one student, with the quiz title joined in so the
+// student dashboard can render a score-history list without a second
+// round trip per row. Newest first.
+export type StudentAttemptRow = QuizAttempt & {
+  quiz_title: string | null;
+  course_id: string | null;
+};
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const mapStudentAttempt = (row: any): StudentAttemptRow => ({
+  ...mapAttempt(row),
+  quiz_title: row.quizzes?.title ?? null,
+  course_id: row.quizzes?.course_id ?? null,
+});
+
+export const studentQuizQueries = {
+  getByStudent: async (studentId: string, limit = 100): Promise<StudentAttemptRow[]> => {
+    const { data, error } = await supabase
+      .from("quiz_attempts")
+      .select("*, quizzes (title, course_id)")
+      .eq("student_id", studentId)
+      .order("started_at", { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    return (data ?? []).map(mapStudentAttempt);
   },
 };

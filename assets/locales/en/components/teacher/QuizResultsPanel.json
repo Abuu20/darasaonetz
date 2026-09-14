@@ -1,0 +1,10 @@
+{
+  "components.teacher.QuizResultsPanel.close": "Close",
+  "components.teacher.QuizResultsPanel.studentsAttempted": "Attempted",
+  "components.teacher.QuizResultsPanel.averageScore": "Avg. score",
+  "components.teacher.QuizResultsPanel.studentsPassed": "Passed",
+  "components.teacher.QuizResultsPanel.empty": "No one has taken this quiz yet.",
+  "components.teacher.QuizResultsPanel.attempts": "attempts",
+  "components.teacher.QuizResultsPanel.points": "pts",
+  "components.teacher.QuizResultsPanel.unknownStudent": "Unknown student"
+}

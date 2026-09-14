@@ -284,3 +284,18 @@ export const enrollmentQueries = {
     return data as Enrollment;
   },
 };
+
+// Read-only view of lesson_completions. Written to by lessonQueries.markComplete;
+// this is the read side that the student dashboard's activity chart and
+// "lessons completed" counter use.
+export const lessonCompletionQueries = {
+  getByStudent: async (studentId: string): Promise<{ lesson_id: string; course_id: string; completed_at: string }[]> => {
+    const { data, error } = await supabase
+      .from("lesson_completions")
+      .select("lesson_id, course_id, completed_at")
+      .eq("student_id", studentId)
+      .order("completed_at", { ascending: false });
+    if (error) throw error;
+    return (data ?? []) as { lesson_id: string; course_id: string; completed_at: string }[];
+  },
+};

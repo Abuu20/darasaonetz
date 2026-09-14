@@ -6,6 +6,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import InstallPrompt from "@/components/pwa/InstallPrompt";
 import Home from "@/pages/Home";
+import LearnLayout from "@/components/learn/LearnLayout";
 
 // Everything past the landing page is lazy — a reload (tab switch,
 // backgrounding, a real crash) only has to re-parse the Home bundle before
@@ -46,8 +47,16 @@ function RouteFallback() {
 // footer would eat into the video space and don't belong there.
 function SiteChrome({ children }: { children: ReactNode }) {
   const { pathname } = useLocation();
+  // Any route that mounts a DashboardShell supplies its own chrome
+  // (sidebar + topbar + sub-headers), so the marketing Header/Footer
+  // must not render alongside it. Otherwise a fixed "Darasaone" pill
+  // floats permanently on top of the dashboard.
   const isLearning = pathname.startsWith("/learn/");
-  if (isLearning) return <>{children}</>;
+  const isTeacher = pathname.startsWith("/teacher");
+  const isAccount = pathname.startsWith("/account");
+  const isAdmin = pathname.startsWith("/admin");
+  const isDashboardRoute = isLearning || isTeacher || isAccount || isAdmin;
+  if (isDashboardRoute) return <>{children}</>;
   return (
     <>
       <Header />
@@ -71,7 +80,14 @@ export default function App() {
               <Route path="/games/:slug" element={<GamePlayer />} />
               <Route path="/leaderboard" element={<TopPlayers />} />
               <Route path="/courses/:id" element={<CourseDetail />} />
-              <Route path="/learn/:id" element={<Learn />} />
+              <Route
+                path="/learn/:id"
+                element={
+                  <LearnLayout>
+                    <Learn />
+                  </LearnLayout>
+                }
+              />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/account" element={<Account />} />

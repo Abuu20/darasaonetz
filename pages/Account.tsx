@@ -1,46 +1,59 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { BookOpen, GraduationCap, Trophy, TrendingUp } from "lucide-react";
+import { Home, BookOpen, ClipboardCheck, User, GraduationCap, PlayCircle, CalendarDays, Trophy } from "lucide-react";
 import SEOHead from "@/components/seo/SEOHead";
-import { useAuth, displayNameFor } from "@/context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import AuthModal from "@/components/auth/AuthModal";
-import AvatarUpload from "@/components/account/AvatarUpload";
-import { enrollmentQueries } from "@/lib/db/courses";
-import StreakWidget from "@/components/streaks/StreakWidget";
-import type { Enrollment } from "@/lib/db/types";
+import DashboardShell, { type DashboardNavItem } from "@/components/dashboard/DashboardShell";
+import DashboardTabs, { type DashboardTab } from "@/components/dashboard/DashboardTabs";
+import StudentOverviewPanel from "@/components/student/StudentOverviewPanel";
+import StudentCoursesPanel from "@/components/student/StudentCoursesPanel";
+import StudentQuizzesPanel from "@/components/student/StudentQuizzesPanel";
+import StudentProfilePanel from "@/components/student/StudentProfilePanel";
+import StudentLearnPanel from "@/components/student/StudentLearnPanel";
+import StudentCalendarPanel from "@/components/student/StudentCalendarPanel";
+import StudentLeaderboardPanel from "@/components/student/StudentLeaderboardPanel";
 import images from "@/assets/images.json";
 
-function courseProgress(enrollment: Enrollment): number {
-  return Math.round(enrollment.progress ?? 0);
-}
+type TabId = "overview" | "learn" | "courses" | "calendar" | "quizzes" | "leaderboard" | "profile";
 
 export default function Account() {
   const { t } = useLanguage();
-  const { user, profile, isLoading, isTeacher, signOut } = useAuth();
+  const { user, profile, isLoading, isTeacher, isAdmin } = useAuth();
   const [authOpen, setAuthOpen] = useState(false);
-  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
-  const [dataLoading, setDataLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabId>("overview");
 
-  useEffect(() => {
-    if (!user) return;
-    setDataLoading(true);
-    enrollmentQueries
-      .getByStudent(user.id)
-      .then(setEnrollments)
-      .catch(() => setEnrollments([]))
-      .finally(() => setDataLoading(false));
-  }, [user]);
+  // Tabs and nav items share their labels/icons; tabs also get badges
+  // where useful. `useMemo` because DashboardTabs/DashboardShell are
+  // re-rendered on tab switch and we don't want new arrays each time.
+  const tabs: DashboardTab[] = useMemo(
+    () => [
+      { id: "overview", label: t("pages.Account.navOverview"), icon: Home },
+      { id: "learn", label: "Learn", icon: PlayCircle },
+      { id: "courses", label: t("pages.Account.pathHeading"), icon: BookOpen },
+      { id: "calendar", label: "Calendar", icon: CalendarDays },
+      { id: "quizzes", label: "Quizzes", icon: ClipboardCheck },
+      { id: "leaderboard", label: "Leaderboard", icon: Trophy },
+      { id: "profile", label: "Profile", icon: User },
+    ],
+    [t]
+  );
 
-  if (isLoading) {
-    return (
-      <main className="flex min-h-screen items-center justify-center bg-night">
-        <div className="h-10 w-10 animate-spin rounded-pill border-4 border-hairline border-t-accent" />
-      </main>
-    );
-  }
+  const navItems: DashboardNavItem[] = useMemo(
+    () =>
+      tabs.map(tab => ({
+        id: tab.id,
+        label: tab.label,
+        icon: tab.icon!,
+        onClick: () => setActiveTab(tab.id as TabId),
+        active: activeTab === tab.id,
+      })),
+    [tabs, activeTab]
+  );
 
-  if (!user) {
+  // Signed-out: keep the marketing-style gate.
+  if (!isLoading && !user) {
     return (
       <>
         <SEOHead titleKey={t("pages.Account.seo.title")} descriptionKey={t("pages.Account.seo.description")} />
@@ -64,119 +77,73 @@ export default function Account() {
     );
   }
 
-  const averageProgress =
-    enrollments.length > 0
-      ? Math.round(enrollments.reduce((total, item) => total + courseProgress(item), 0) / enrollments.length)
-      : 0;
+  if (isLoading || !user) {
+    return (
+      <main className="dash-theme flex min-h-screen items-center justify-center bg-mist">
+        <div className="h-10 w-10 animate-spin rounded-pill border-4 border-line border-t-accent" />
+      </main>
+    );
+  }
+
+  const greeting = `${t("pages.Account.welcome")}${profile?.full_name ? `, ${profile.full_name.split(" ")[0]}` : ""}`;
 
   return (
-    <>
+    <div className="dash-theme">
       <SEOHead titleKey={t("pages.Account.seo.title")} descriptionKey={t("pages.Account.seo.description")} />
-      <main className="min-h-screen bg-night px-gutter py-section-spacing-mobile text-night-foreground md:px-gutter-lg md:py-section-spacing">
-        <div className="mx-auto flex max-w-shell flex-col gap-block">
-          <div className="flex flex-col items-center gap-stack rounded-card border border-hairline bg-panel p-block text-center md:flex-row md:items-center md:text-left">
-            <AvatarUpload />
-            <div className="flex flex-1 flex-col gap-1">
-              <span data-text-id="pages.Account.welcome" className="text-xs uppercase tracking-widest text-lavender">
-                {t("pages.Account.welcome")}
-              </span>
-              <h1 className="font-heading text-2xl">{displayNameFor(user, profile)}</h1>
-              <p className="text-sm text-lilac">{user.email}</p>
+      <DashboardShell
+        navItems={navItems}
+        roleBadge={isTeacher ? t("pages.teacher.TeacherDashboard.badge") : isAdmin ? "Admin" : "Student"}
+        title={t("pages.Account.welcome")}
+      >
+        {/* Violet header — same shape as the teacher dashboard */}
+        <section className="dash-header-block px-gutter pb-24 pt-8 md:px-gutter-lg md:pb-28 md:pt-10">
+          <div className="mx-auto flex max-w-shell flex-wrap items-end justify-between gap-stack">
+            <div className="min-w-0">
+              <p className="dash-header-eyebrow text-xs uppercase tracking-[0.2em]">
+                {isTeacher ? t("pages.teacher.TeacherDashboard.badge") : "Student"}
+              </p>
+              <h1 className="mt-1 font-heading text-2xl leading-tight text-white md:text-3xl">
+                {greeting}
+              </h1>
+              <p className="mt-2 max-w-prose text-sm text-white/75">
+                {t("pages.Account.seo.description")}
+              </p>
             </div>
-            <div className="flex flex-col gap-tight sm:flex-row">
-              {isTeacher ? (
-                <Link
-                  to="/teacher"
-                  className="rounded-control border border-accent px-stack py-tight text-sm text-night-foreground transition-colors duration-base hover:bg-accent/10"
-                >
-                  <span data-text-id="pages.Account.teacherDashboard">{t("pages.Account.teacherDashboard")}</span>
-                </Link>
-              ) : null}
-              <button
-                onClick={signOut}
-                className="rounded-control border border-hairline px-stack py-tight text-sm text-night-foreground transition-colors duration-base hover:border-accent"
+
+            {/* Small banner for a teacher browsing their learner view —
+                a quick jump back to their teaching dashboard. */}
+            {isTeacher ? (
+              <Link
+                to="/teacher"
+                className="inline-flex items-center gap-2 rounded-control bg-white px-4 py-2 text-sm font-medium text-[#624BFF] shadow-sm transition-transform duration-base hover:-translate-y-0.5"
               >
-                <span data-text-id="pages.Account.signOut">{t("pages.Account.signOut")}</span>
-              </button>
-            </div>
+                <GraduationCap size={16} />
+                Teaching dashboard
+              </Link>
+            ) : null}
           </div>
+        </section>
 
-          <div className="grid grid-cols-2 gap-stack sm:grid-cols-4">
-            <div className="flex flex-col gap-1 rounded-card border border-hairline bg-panel p-block">
-              <Trophy size={18} className="text-accent" aria-hidden="true" />
-              <span className="font-heading text-3xl">{profile?.total_points ?? 0}</span>
-              <span data-text-id="pages.Account.statPoints" className="text-xs uppercase tracking-widest text-lavender">
-                {t("pages.Account.statPoints")}
-              </span>
-            </div>
-            <div className="flex flex-col gap-1 rounded-card border border-hairline bg-panel p-block">
-              <GraduationCap size={18} className="text-accent" aria-hidden="true" />
-              <span className="font-heading text-3xl">{enrollments.length}</span>
-              <span data-text-id="pages.Account.statCourses" className="text-xs uppercase tracking-widest text-lavender">
-                {t("pages.Account.statCourses")}
-              </span>
-            </div>
-            <div className="flex flex-col gap-1 rounded-card border border-hairline bg-panel p-block">
-              <TrendingUp size={18} className="text-accent" aria-hidden="true" />
-              <span className="font-heading text-3xl">{averageProgress}%</span>
-              <span data-text-id="pages.Account.statProgress" className="text-xs uppercase tracking-widest text-lavender">
-                {t("pages.Account.statProgress")}
-              </span>
-            </div>
-            <div className="flex flex-col gap-1 rounded-card border border-hairline bg-panel p-block">
-              <BookOpen size={18} className="text-accent" aria-hidden="true" />
-              <span className="font-heading text-3xl">
-                {enrollments.reduce((total, e) => total + (Array.isArray(e.courses?.lessons) ? e.courses!.lessons!.length : 0), 0)}
-              </span>
-              <span data-text-id="pages.Account.statLessons" className="text-xs uppercase tracking-widest text-lavender">
-                {t("pages.Account.statLessons")}
-              </span>
-            </div>
+        <DashboardTabs
+          tabs={tabs}
+          activeId={activeTab}
+          onChange={id => setActiveTab(id as TabId)}
+        />
+
+        <div className="relative z-10 -mt-16 px-gutter pb-block md:px-gutter-lg">
+          <div className="mx-auto max-w-shell">
+            {activeTab === "overview" ? <StudentOverviewPanel /> : null}
+            {activeTab === "learn" ? <StudentLearnPanel /> : null}
+            {activeTab === "courses" ? <StudentCoursesPanel /> : null}
+            {activeTab === "calendar" ? <StudentCalendarPanel /> : null}
+            {activeTab === "quizzes" ? <StudentQuizzesPanel /> : null}
+            {activeTab === "leaderboard" ? <StudentLeaderboardPanel /> : null}
+            {activeTab === "profile" ? <StudentProfilePanel /> : null}
           </div>
-
-          <StreakWidget />
-
-          <section className="flex flex-col gap-stack">
-            <h2 data-text-id="pages.Account.pathHeading" className="font-heading text-lg">
-              {t("pages.Account.pathHeading")}
-            </h2>
-            {dataLoading ? (
-              <div className="h-32 animate-pulse rounded-card bg-panel" />
-            ) : enrollments.length === 0 ? (
-              <div className="flex flex-col items-start gap-stack rounded-card border border-hairline bg-panel p-block">
-                <img src={images["account.empty"]} data-image-id="account.empty" alt="" aria-hidden="true" className="h-40 w-full max-w-sm rounded-panel object-cover" />
-                <p data-text-id="pages.Account.pathEmpty" className="text-sm text-lilac">
-                  {t("pages.Account.pathEmpty")}
-                </p>
-                <Link to="/courses" className="gradient-brand rounded-control px-stack py-tight text-sm text-primary-foreground">
-                  {t("pages.Account.browseCourses")}
-                </Link>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-tight">
-                {enrollments.map(item => {
-                  const progress = courseProgress(item);
-                  return (
-                    <Link
-                      key={item.id}
-                      to={`/courses/${item.course_id}`}
-                      className="flex flex-col gap-tight rounded-card border border-hairline bg-panel/60 px-block py-stack text-left transition-colors duration-base hover:border-accent"
-                    >
-                      <div className="flex flex-wrap items-center justify-between gap-tight">
-                        <span className="font-heading text-base">{item.courses?.title ?? ""}</span>
-                        <span className="text-xs text-lavender">{progress}%</span>
-                      </div>
-                      <div className="h-2 w-full overflow-hidden rounded-pill bg-hairline">
-                        <div className="gradient-brand h-full rounded-pill transition-all duration-slow" style={{ width: `${Math.min(progress, 100)}%` }} />
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </section>
         </div>
-      </main>
-    </>
+      </DashboardShell>
+
+      <AuthModal isOpen={authOpen} onClose={() => setAuthOpen(false)} />
+    </div>
   );
 }

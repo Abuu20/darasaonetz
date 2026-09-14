@@ -19,5 +19,9 @@
   "pages.Account.teacherDashboard": "Dashibodi ya mwalimu",
   "pages.Account.statLessons": "Jumla ya masomo",
   "pages.Account.browseCourses": "Angalia kozi",
-  "pages.Account.statPoints": "Pointi"
+  "pages.Account.statPoints": "Pointi",
+  "pages.Account.navOverview": "Muhtasari",
+  "pages.Account.navCourses": "Kozi",
+  "pages.Account.navLearn": "Jifunze",
+  "pages.Account.navProfile": "Wasifu"
 }

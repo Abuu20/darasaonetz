@@ -69,7 +69,7 @@ export default function CourseCardPreview({
           <button
             type="button"
             disabled
-            className="rounded-control px-stack py-tight text-sm gradient-brand text-primary-foreground disabled:cursor-default"
+            className="force-public-brand rounded-control px-stack py-tight text-sm gradient-brand text-primary-foreground disabled:cursor-default"
           >
             {price > 0
               ? `${t("components.teacher.CourseCardPreview.enroll")} — ${price}`

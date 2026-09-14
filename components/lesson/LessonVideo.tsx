@@ -28,7 +28,7 @@ export default function LessonVideo({ url, emptyLabel, title }: LessonVideoProps
     const videoId = extractYouTubeId(url);
     if (!videoId) return null;
     return (
-      <div className="aspect-video w-full overflow-hidden rounded-panel bg-black">
+      <div className="lesson-video aspect-video w-full overflow-hidden rounded-panel bg-black">
         <YouTubePlayer key={videoId} videoId={videoId} />
       </div>
     );
@@ -41,7 +41,7 @@ export default function LessonVideo({ url, emptyLabel, title }: LessonVideoProps
   }
 
   return (
-    <div className="aspect-video w-full overflow-hidden rounded-panel bg-black">
+    <div className="lesson-video aspect-video w-full overflow-hidden rounded-panel bg-black">
       <video key={url} src={url} controls playsInline className="h-full w-full" />
     </div>
   );

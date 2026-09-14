@@ -82,8 +82,11 @@ export const gameScoreQueries = {
   // game_id) so a viewer only subscribes to the leaderboard they're
   // actually looking at, not every game's scores at once.
   subscribeToLeaderboard: (gameId: string, onChange: () => void): (() => void) => {
+    // Random suffix per call — React 19 StrictMode double-mounts effects and
+    // removeChannel is async, so a fixed channel name collides on remount.
+    const uniqueSuffix = Math.random().toString(36).slice(2, 10);
     const channel = supabase
-      .channel(`game-leaderboard-${gameId}`)
+      .channel(`game-leaderboard-${gameId}-${uniqueSuffix}`)
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "game_scores", filter: `game_id=eq.${gameId}` },

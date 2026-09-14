@@ -6,6 +6,13 @@ import { todaysEntry } from "@/lib/streaks/dailyContent";
 
 const DAY_LABEL_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
 
+/**
+ * Streak widget on the student dashboard's Overview tab. Reworked to use
+ * the theme-agnostic tokens (background / mist / line / ink / slate) so it
+ * reads correctly on both the light and dark dashboard surfaces — the
+ * previous version was built on the dark marketing tokens (panel,
+ * hairline, night-foreground) and would have looked broken here.
+ */
 export default function StreakWidget() {
   const { t, language } = useLanguage();
   const T = (key: string) => t(`components.streaks.StreakWidget.${key}`);
@@ -18,27 +25,27 @@ export default function StreakWidget() {
   const entry = todaysEntry();
 
   return (
-    <section className="flex flex-col gap-block rounded-card border border-hairline bg-panel p-block">
+    <section className="card-lift flex flex-col gap-block rounded-card border border-line bg-background p-block">
       <div className="flex flex-wrap items-center justify-between gap-stack">
         <div className="flex items-center gap-tight">
-          <span className="gradient-head flex h-12 w-12 items-center justify-center rounded-pill">
-            <Flame size={22} className="text-ember-foreground" aria-hidden="true" />
+          <span className="gradient-brand flex h-12 w-12 items-center justify-center rounded-pill">
+            <Flame size={22} className="text-white" aria-hidden="true" />
           </span>
           <div className="flex flex-col">
-            <span className="font-heading text-3xl leading-none">{current}</span>
-            <span className="text-xs uppercase tracking-widest text-lavender">
+            <span className="font-heading text-3xl leading-none text-ink">{current}</span>
+            <span className="text-xs uppercase tracking-widest text-slate">
               {current === 1 ? T("dayStreakSingular") : T("dayStreakPlural")}
             </span>
           </div>
         </div>
         {streak.longest > 0 ? (
-          <span className="text-xs text-lilac">
-            {T("longest")}: {streak.longest}
+          <span className="text-xs text-slate">
+            {T("longest")}: <span className="font-medium text-ink">{streak.longest}</span>
           </span>
         ) : null}
       </div>
 
-      {current === 0 ? <p className="text-sm text-lilac">{T("subtitleZero")}</p> : null}
+      {current === 0 ? <p className="text-sm text-slate">{T("subtitleZero")}</p> : null}
 
       <div className="flex items-center justify-between gap-1">
         {week.map(day => {
@@ -47,7 +54,9 @@ export default function StreakWidget() {
             <div key={day.date} className="flex flex-1 flex-col items-center gap-1">
               <span
                 className={`flex h-8 w-8 items-center justify-center rounded-pill border text-xs transition-colors duration-base ${
-                  day.active ? "border-transparent bg-ember text-ember-foreground" : "border-hairline text-slate"
+                  day.active
+                    ? "border-transparent bg-ember text-ember-foreground"
+                    : "border-line text-slate"
                 }`}
               >
                 {day.active ? <Check size={14} aria-hidden="true" /> : ""}
@@ -59,16 +68,16 @@ export default function StreakWidget() {
       </div>
 
       {nextMilestone ? (
-        <p className="text-xs text-lavender">
+        <p className="text-xs text-slate">
           {nextMilestone - current} {T("daysToNext")} {nextMilestone} {T("dayBadge")}
         </p>
       ) : null}
 
-      <div className="flex flex-col gap-tight rounded-panel border border-hairline bg-night/40 p-stack">
-        <span className="text-xs uppercase tracking-widest text-lavender">{T("todayLabel")}</span>
-        <p className="text-sm text-night-foreground">{language === "sw" ? entry.sw : entry.en}</p>
+      <div className="flex flex-col gap-tight rounded-panel border border-line bg-mist p-stack">
+        <span className="text-xs uppercase tracking-widest text-slate">{T("todayLabel")}</span>
+        <p className="text-sm text-ink">{language === "sw" ? entry.sw : entry.en}</p>
         <div className="flex items-center justify-between gap-stack">
-          <span className="text-xs text-lilac">{language === "sw" ? entry.sourceSw : entry.sourceEn}</span>
+          <span className="text-xs text-slate">{language === "sw" ? entry.sourceSw : entry.sourceEn}</span>
           {loggedToday ? (
             <span className="flex items-center gap-1 text-xs text-success">
               <Check size={14} aria-hidden="true" />

@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { ChevronDown, GripVertical, Loader2, Plus, Sparkles, Trash2, UploadCloud, Video, ClipboardList, ArrowRight } from "lucide-react";
+import { ChevronDown, GripVertical, Loader2, Plus, Sparkles, Trash2, UploadCloud, Video, ClipboardList, ArrowRight, BarChart3 } from "lucide-react";
 import LessonContentCard from "@/components/lesson/LessonContentCard";
 import LessonVideo from "@/components/lesson/LessonVideo";
 import LessonAttachmentsEditor from "@/components/lesson/LessonAttachmentsEditor";
 import QuizBuilder from "@/components/quiz/QuizBuilder";
+import QuizResultsPanel from "@/components/teacher/QuizResultsPanel";
 import { generateId } from "@/lib/uuid";
 import RichTextEditor from "@/components/lesson/RichTextEditor";
 import ResizableSplit from "@/components/ui/ResizableSplit";
@@ -50,6 +51,8 @@ export default function LessonManagerPanel({ course }: { course: Course }) {
   const [editDraftRestored, setEditDraftRestored] = useState(false);
   const [quizByLesson, setQuizByLesson] = useState<Record<string, Quiz | null>>({});
   const [quizBuilderLessonId, setQuizBuilderLessonId] = useState<string | null>(null);
+  const [quizResultsLessonId, setQuizResultsLessonId] = useState<string | null>(null);
+  const [enrolledCount, setEnrolledCount] = useState<number | undefined>(undefined);
 
   const newDraftKey = `new:${course.id}`;
 
@@ -415,7 +418,7 @@ export default function LessonManagerPanel({ course }: { course: Course }) {
   return (
     <div className="flex flex-col gap-tight border-t border-line pt-stack">
       {lessons.length === 0 && !creating ? (
-        <p className="text-sm text-lavender">{t("components.teacher.LessonManagerPanel.empty")}</p>
+        <p className="text-sm text-slate">{t("components.teacher.LessonManagerPanel.empty")}</p>
       ) : (
         <div className="flex flex-col gap-1">
           {visible.map((lesson, i) => {
@@ -608,30 +611,51 @@ export default function LessonManagerPanel({ course }: { course: Course }) {
                           {quizByLesson[lesson.id] === undefined ? (
                             <div className="h-16 w-full animate-pulse rounded-panel bg-line/40" />
                           ) : (
-                            <button
-                              type="button"
-                              onClick={() => setQuizBuilderLessonId(lesson.id)}
-                              className="group flex w-full items-center gap-stack rounded-panel border border-dashed border-accent/40 bg-accent/5 px-stack py-tight text-left transition-colors duration-base hover:border-accent hover:bg-accent/10"
-                            >
-                              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-accent/15 text-accent">
-                                <Sparkles size={18} aria-hidden="true" />
-                              </span>
-                              <span className="min-w-0 flex-1">
-                                <span className="block text-sm font-medium text-ink">
-                                  {quizByLesson[lesson.id]
-                                    ? quizByLesson[lesson.id]!.title
-                                    : t("components.teacher.LessonManagerPanel.quizAdd")}
+                            <div className="flex items-stretch gap-tight">
+                              <button
+                                type="button"
+                                onClick={() => setQuizBuilderLessonId(lesson.id)}
+                                className="group flex min-w-0 flex-1 items-center gap-stack rounded-panel border border-dashed border-accent/40 bg-accent/5 px-stack py-tight text-left transition-colors duration-base hover:border-accent hover:bg-accent/10"
+                              >
+                                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-accent/15 text-accent">
+                                  <Sparkles size={18} aria-hidden="true" />
                                 </span>
-                                <span className="block text-xs text-slate">
-                                  {quizByLesson[lesson.id]
-                                    ? `${quizByLesson[lesson.id]!.quiz_questions?.length ?? 0} ${t(
-                                        "components.teacher.LessonManagerPanel.quizQuestions"
-                                      )} · ${quizByLesson[lesson.id]!.status}`
-                                    : t("components.teacher.LessonManagerPanel.quizAddHint")}
+                                <span className="min-w-0 flex-1">
+                                  <span className="block truncate text-sm font-medium text-ink">
+                                    {quizByLesson[lesson.id]
+                                      ? quizByLesson[lesson.id]!.title
+                                      : t("components.teacher.LessonManagerPanel.quizAdd")}
+                                  </span>
+                                  <span className="block truncate text-xs text-slate">
+                                    {quizByLesson[lesson.id]
+                                      ? `${quizByLesson[lesson.id]!.quiz_questions?.length ?? 0} ${t(
+                                          "components.teacher.LessonManagerPanel.quizQuestions"
+                                        )} · ${quizByLesson[lesson.id]!.status}`
+                                      : t("components.teacher.LessonManagerPanel.quizAddHint")}
+                                  </span>
                                 </span>
-                              </span>
-                              <ArrowRight size={16} className="shrink-0 text-accent opacity-0 transition-opacity duration-base group-hover:opacity-100" aria-hidden="true" />
-                            </button>
+                                <ArrowRight size={16} className="hidden shrink-0 text-accent opacity-0 transition-opacity duration-base group-hover:opacity-100 sm:block" aria-hidden="true" />
+                              </button>
+                              {quizByLesson[lesson.id] ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setQuizResultsLessonId(lesson.id);
+                                    setEnrolledCount(undefined);
+                                    enrollmentQueries
+                                      .getByCourse(course.id)
+                                      .then(list => setEnrolledCount(list.length))
+                                      .catch(() => setEnrolledCount(undefined));
+                                  }}
+                                  className="flex shrink-0 flex-col items-center justify-center gap-0.5 rounded-panel border border-line px-stack py-tight text-slate transition-colors duration-base hover:border-accent hover:text-ink"
+                                >
+                                  <BarChart3 size={16} aria-hidden="true" />
+                                  <span className="text-[10px] uppercase tracking-widest">
+                                    {t("components.teacher.LessonManagerPanel.quizResults")}
+                                  </span>
+                                </button>
+                              ) : null}
+                            </div>
                           )}
                         </div>
                       ) : null}
@@ -777,7 +801,7 @@ export default function LessonManagerPanel({ course }: { course: Course }) {
             setDraftLessonId(generateId());
             setCreating(true);
           }}
-          className="flex w-fit items-center gap-1 rounded-control border border-dashed border-hairline px-stack py-tight text-xs text-lavender transition-colors duration-base hover:border-accent hover:text-night-foreground"
+          className="flex w-fit items-center gap-1 rounded-control border border-dashed border-line px-stack py-tight text-xs text-slate transition-colors duration-base hover:border-accent hover:text-ink"
         >
           <Plus size={14} /> {t("components.teacher.LessonManagerPanel.addLesson")}
         </button>
@@ -830,6 +854,15 @@ export default function LessonManagerPanel({ course }: { course: Course }) {
             setQuizBuilderLessonId(null);
             quizQueries.getStatusByCourse(course.id).then(setQuizStatusByLesson).catch(() => {});
           }}
+        />
+      ) : null}
+
+      {quizResultsLessonId && quizByLesson[quizResultsLessonId] ? (
+        <QuizResultsPanel
+          quiz={quizByLesson[quizResultsLessonId]!}
+          lessonTitle={lessons.find(l => l.id === quizResultsLessonId)?.title ?? ""}
+          enrolledCount={enrolledCount}
+          onClose={() => setQuizResultsLessonId(null)}
         />
       ) : null}
     </div>
