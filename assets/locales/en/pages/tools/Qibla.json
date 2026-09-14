@@ -1,0 +1,22 @@
+{
+  "pages.tools.Qibla.seo.title": "Qibla Direction Finder | Darasaone",
+  "pages.tools.Qibla.seo.description": "Find the exact direction to the Kaaba in Makkah from your current location.",
+  "pages.tools.Qibla.eyebrow": "Qibla",
+  "pages.tools.Qibla.title": "Qibla Finder",
+  "pages.tools.Qibla.paragraph": "Find the direction of the Kaaba from wherever you are.",
+  "pages.tools.Qibla.needLocation": "We need your location to calculate the Qibla direction.",
+  "pages.tools.Qibla.useMyLocation": "Use my location",
+  "pages.tools.Qibla.locating": "Locating…",
+  "pages.tools.Qibla.locationDenied": "Location wasn't available. Please allow location access and try again.",
+  "pages.tools.Qibla.loadError": "We couldn't calculate the Qibla direction. Please check your connection and try again.",
+  "pages.tools.Qibla.retry": "Try again",
+  "pages.tools.Qibla.north": "N",
+  "pages.tools.Qibla.east": "E",
+  "pages.tools.Qibla.south": "S",
+  "pages.tools.Qibla.west": "W",
+  "pages.tools.Qibla.fromNorth": "from true north",
+  "pages.tools.Qibla.enableCompass": "Enable live compass",
+  "pages.tools.Qibla.compassActive": "Compass active — turn to face the arrow.",
+  "pages.tools.Qibla.compassDenied": "Compass access was denied. You can still use the number above with any compass.",
+  "pages.tools.Qibla.staticHint": "This shows the bearing from true north. Enable the live compass, or use it alongside a compass app."
+}

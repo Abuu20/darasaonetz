@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /account
+Disallow: /teacher
+Disallow: /reset-password
+
+Sitemap: https://darasaone-tz.vercel.app/sitemap.xml

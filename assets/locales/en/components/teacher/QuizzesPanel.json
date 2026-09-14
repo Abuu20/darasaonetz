@@ -1,0 +1,17 @@
+{
+  "components.teacher.QuizzesPanel.heading": "Quizzes",
+  "components.teacher.QuizzesPanel.subheading": "Every quiz across your courses, in one place",
+  "components.teacher.QuizzesPanel.close": "Close",
+  "components.teacher.QuizzesPanel.filterAll": "All",
+  "components.teacher.QuizzesPanel.filterPublished": "Published",
+  "components.teacher.QuizzesPanel.filterDraft": "Draft",
+  "components.teacher.QuizzesPanel.filterNoQuiz": "No quiz yet",
+  "components.teacher.QuizzesPanel.searchPlaceholder": "Search by lesson or course",
+  "components.teacher.QuizzesPanel.empty": "No lessons match this filter yet.",
+  "components.teacher.QuizzesPanel.questions": "questions",
+  "components.teacher.QuizzesPanel.draftBadge": "draft",
+  "components.teacher.QuizzesPanel.noQuizBadge": "No quiz yet",
+  "components.teacher.QuizzesPanel.addQuiz": "Add quiz",
+  "components.teacher.QuizzesPanel.editQuiz": "Edit quiz",
+  "components.teacher.QuizzesPanel.results": "Results"
+}

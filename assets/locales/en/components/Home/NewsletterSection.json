@@ -1,0 +1,11 @@
+{
+  "components.Home.NewsletterSection.headA": "Seek",
+  "components.Home.NewsletterSection.headB": "knowledge",
+  "components.Home.NewsletterSection.headC": "with us every week.",
+  "components.Home.NewsletterSection.blurb": "Get new Darasaone courses, live quiz dates and teacher announcements in English and Swahili.",
+  "components.Home.NewsletterSection.label": "Email address",
+  "components.Home.NewsletterSection.placeholder": "you@email.com",
+  "components.Home.NewsletterSection.submit": "Subscribe",
+  "components.Home.NewsletterSection.success": "You are on the list. Watch your inbox for the next course announcement.",
+  "components.Home.NewsletterSection.error": "We could not save your email just now. Please try again."
+}

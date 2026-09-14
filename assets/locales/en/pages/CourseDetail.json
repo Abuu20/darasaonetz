@@ -1,0 +1,23 @@
+{
+  "pages.CourseDetail.back": "Back to courses",
+  "pages.CourseDetail.notFound": "This course could not be found.",
+  "pages.CourseDetail.lessonsLabel": "lessons",
+  "pages.CourseDetail.enrolled": "You are enrolled",
+  "pages.CourseDetail.ownerPreview": "Your course",
+  "pages.CourseDetail.enrollCta": "Enroll to unlock",
+  "pages.CourseDetail.enrolling": "Enrolling",
+  "pages.CourseDetail.lessonsHeading": "Watch the lessons",
+  "pages.CourseDetail.lessonLabel": "Lesson",
+  "pages.CourseDetail.locked": "Enroll in this course to watch its lessons.",
+  "pages.CourseDetail.continueLearning": "Continue learning",
+  "pages.CourseDetail.startLearning": "Start learning",
+  "pages.CourseDetail.materialsHeading": "Books & materials",
+  "pages.CourseDetail.materialsLocked": "Enroll in this course to download its books and materials.",
+  "pages.CourseDetail.noLessons": "This course has no lessons yet — check back soon.",
+  "pages.CourseDetail.markComplete": "Mark as complete",
+  "pages.CourseDetail.completed": "Completed",
+  "pages.CourseDetail.showAll": "Show all lessons",
+  "pages.CourseDetail.showLess": "Show fewer lessons",
+  "pages.CourseDetail.more": "more",
+  "pages.CourseDetail.aboutTeacher": "About the teacher"
+}

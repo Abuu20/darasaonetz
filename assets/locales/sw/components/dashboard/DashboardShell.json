@@ -1,0 +1,7 @@
+{
+  "components.dashboard.DashboardShell.openSidebar": "Fungua menyu",
+  "components.dashboard.DashboardShell.closeSidebar": "Funga menyu",
+  "components.dashboard.DashboardShell.backToSite": "Rudi kwenye tovuti",
+  "components.dashboard.DashboardShell.profileMenu": "Menyu ya wasifu",
+  "components.dashboard.DashboardShell.signOut": "Toka"
+}

@@ -1,0 +1,10 @@
+{
+  "components.tools.QuranSidebar.navLabel": "Sura",
+  "components.tools.QuranSidebar.browseSurahs": "Vinjari sura",
+  "components.tools.QuranSidebar.hideSurahs": "Ficha orodha ya sura",
+  "components.tools.QuranSidebar.close": "Funga",
+  "components.tools.QuranSidebar.filterLabel": "Chuja sura kwa jina au nambari",
+  "components.tools.QuranSidebar.filterPlaceholder": "Tafuta sura…",
+  "components.tools.QuranSidebar.empty": "Hakuna sura inayolingana na utafutaji huo.",
+  "components.tools.QuranSidebar.ayahsLabel": "aya"
+}

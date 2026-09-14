@@ -1,0 +1,18 @@
+{
+  "components.teacher.StudentsPanel.close": "Close",
+  "components.teacher.StudentsPanel.heading": "Enrolled students",
+  "components.teacher.StudentsPanel.searchPlaceholder": "Search by name or email",
+  "components.teacher.StudentsPanel.avgProgress": "Avg. progress",
+  "components.teacher.StudentsPanel.empty": "No students enrolled yet.",
+  "components.teacher.StudentsPanel.noMatches": "No students match that search.",
+  "components.teacher.StudentsPanel.unknownStudent": "Unknown student",
+  "components.teacher.StudentsPanel.enrolledOn": "Enrolled",
+  "components.teacher.StudentsPanel.sortAtRiskFirst": "At-risk first",
+  "components.teacher.StudentsPanel.sortProgressDesc": "Most progress",
+  "components.teacher.StudentsPanel.sortRecent": "Recently enrolled",
+  "components.teacher.StudentsPanel.sortName": "Name (A-Z)",
+  "components.teacher.StudentsPanel.atRiskWarning": "{count} student(s) haven't started, 14+ days after enrolling.",
+  "components.teacher.StudentsPanel.quizResultsHeading": "Quiz results",
+  "components.teacher.StudentsPanel.loadingQuizzes": "Loading quiz results…",
+  "components.teacher.StudentsPanel.noQuizAttempts": "No quiz attempts yet."
+}

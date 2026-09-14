@@ -1,0 +1,7 @@
+{
+  "components.dashboard.DashboardShell.openSidebar": "Open menu",
+  "components.dashboard.DashboardShell.closeSidebar": "Close menu",
+  "components.dashboard.DashboardShell.backToSite": "Back to site",
+  "components.dashboard.DashboardShell.profileMenu": "Profile menu",
+  "components.dashboard.DashboardShell.signOut": "Sign out"
+}

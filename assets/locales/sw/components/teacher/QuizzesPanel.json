@@ -1,0 +1,17 @@
+{
+  "components.teacher.QuizzesPanel.heading": "Maswali",
+  "components.teacher.QuizzesPanel.subheading": "Maswali yote ya kozi zako, mahali pamoja",
+  "components.teacher.QuizzesPanel.close": "Funga",
+  "components.teacher.QuizzesPanel.filterAll": "Yote",
+  "components.teacher.QuizzesPanel.filterPublished": "Yaliyochapishwa",
+  "components.teacher.QuizzesPanel.filterDraft": "Rasimu",
+  "components.teacher.QuizzesPanel.filterNoQuiz": "Bado hakuna swali",
+  "components.teacher.QuizzesPanel.searchPlaceholder": "Tafuta kwa somo au kozi",
+  "components.teacher.QuizzesPanel.empty": "Hakuna masomo yanayolingana na kichujio hiki.",
+  "components.teacher.QuizzesPanel.questions": "maswali",
+  "components.teacher.QuizzesPanel.draftBadge": "rasimu",
+  "components.teacher.QuizzesPanel.noQuizBadge": "Bado hakuna swali",
+  "components.teacher.QuizzesPanel.addQuiz": "Ongeza swali",
+  "components.teacher.QuizzesPanel.editQuiz": "Hariri swali",
+  "components.teacher.QuizzesPanel.results": "Matokeo"
+}

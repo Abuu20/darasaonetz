@@ -1,0 +1,9 @@
+{
+  "pages.TopPlayers.seo.title": "Global Leaderboard — Top Players",
+  "pages.TopPlayers.seo.description": "See who's earned the most points across every Darasaone game.",
+  "pages.TopPlayers.eyebrow": "Global Leaderboard",
+  "pages.TopPlayers.title": "Top players across every game.",
+  "pages.TopPlayers.paragraph": "Points earned from every game add up here — keep playing to climb the ranks.",
+  "pages.TopPlayers.empty": "No points earned yet — be the first on the board!",
+  "pages.TopPlayers.anonymousPlayer": "Player"
+}

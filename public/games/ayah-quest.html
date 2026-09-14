@@ -1,0 +1,2762 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>DarasaOne: Ayah Quest</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Fredoka:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-teal: #0D7377;
+            --primary-gold: #F4A261;
+            --soft-cream: #FAF3E0;
+            --warm-beige: #EABF9F;
+            --emerald: #2A9D8F;
+            --deep-purple: #6A4C93;
+            --text-dark: #1A1A1A;
+            --transition-fast: 150ms;
+            --transition-normal: 300ms;
+            --transition-slow: 500ms;
+            --ease-out: cubic-bezier(0.0, 0, 0.2, 1);
+            --ease-bounce: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+            --space-xs: 8px;
+            --space-sm: 16px;
+            --space-md: 24px;
+            --space-lg: 32px;
+            --space-xl: 48px;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            touch-action: none;
+            -ms-touch-action: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #game-world {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(160deg, #0a4f52 0%, #0D7377 30%, #2A9D8F 60%, #1a6b6e 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            user-select: none;
+            -webkit-user-select: none;
+            isolation: isolate;
+        }
+
+        /* The generated Islamic pattern is kept calm behind the learning surface. */
+        #game-world.art-background {
+            background-color: #FAF3E0;
+            background-repeat: repeat;
+            background-size: 640px 640px;
+            background-position: center top;
+        }
+
+        #game-world.art-background::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background: linear-gradient(160deg, rgba(250,243,224,0.18), rgba(13,115,119,0.22));
+            pointer-events: none;
+        }
+
+        .art-background .header-bar,
+        .art-background .verse-container,
+        .art-background .tiles-area,
+        .art-background .mistakes-counter {
+            position: relative;
+            z-index: 1;
+        }
+
+        .art-background .game-title {
+            color: #F4A261;
+            text-shadow: 0 2px 5px rgba(13,115,119,0.75), 0 0 18px rgba(250,243,224,0.45);
+        }
+
+        .art-background .verse-ref {
+            color: #FAF3E0;
+            text-shadow: 0 1px 4px rgba(13,115,119,0.8);
+        }
+
+        .art-background .verse-display {
+            background: linear-gradient(145deg, rgba(7,76,79,0.90), rgba(13,115,119,0.82));
+            border-color: rgba(244,162,97,0.55);
+            box-shadow: 0 10px 34px rgba(6,57,60,0.34), inset 0 1px 0 rgba(250,243,224,0.18);
+        }
+
+        .art-background .mistakes-counter {
+            color: #FAF3E0;
+            text-shadow: 0 1px 4px rgba(13,115,119,0.7);
+        }
+
+        .header-bar {
+            width: 100%;
+            padding: 16px 24px;
+            box-sizing: border-box;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 8px;
+            z-index: 10;
+        }
+
+        .game-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--primary-gold);
+            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            letter-spacing: 1px;
+            direction: ltr;
+        }
+
+        .verse-ref {
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            color: rgba(255,255,255,0.85);
+            direction: ltr;
+        }
+
+        .verse-container {
+            flex: 1;
+            width: 100%;
+            max-width: 680px;
+            padding: 16px 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .verse-display {
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(8px);
+            border-radius: 24px;
+            padding: 32px 24px;
+            width: 100%;
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            direction: rtl;
+            line-height: 2.2;
+            border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            min-height: 200px;
+        }
+
+        /* Arabic is rendered with a Quran-friendly Naskh font. A completed ayah is
+           reflowed into one text run so the browser can apply joining and ligatures
+           exactly as it does in continuous Mushaf text. */
+        .verse-display.quran-display {
+            font-family: 'Noto Naskh Arabic', 'Amiri', 'Times New Roman', serif;
+            font-variant-ligatures: contextual common-ligatures;
+            font-feature-settings: "calt" 1, "rlig" 1, "liga" 1;
+            line-height: 2.7;
+        }
+
+        .verse-char {
+            font-size: 36px;
+            color: #fff;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            display: inline;
+        }
+
+        .verse-display.quran-display .verse-char,
+        .verse-display.quran-display .slot-letter,
+        .success-verse,
+        .joined-ayah {
+            font-family: 'Noto Naskh Arabic', 'Amiri', 'Times New Roman', serif;
+            font-variant-ligatures: contextual common-ligatures;
+            font-feature-settings: "calt" 1, "rlig" 1, "liga" 1;
+        }
+
+        .verse-display.fully-joined {
+            display: block;
+            padding: 40px 32px;
+        }
+
+        .joined-ayah {
+            display: block;
+            width: 100%;
+            color: #fff;
+            font-size: clamp(38px, 6vw, 54px);
+            line-height: 2.1;
+            text-align: center;
+            direction: rtl;
+            unicode-bidi: plaintext;
+            white-space: normal;
+            text-shadow: 0 1px 5px rgba(0,0,0,0.24);
+        }
+
+        .verse-space { 
+            width: 12px;
+            display: inline-block;
+        }
+
+        .slot {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 56px;
+            height: 56px;
+            border: 2px dashed rgba(244,162,97,0.7);
+            border-radius: 12px;
+            background: rgba(244,162,97,0.1);
+            transition: all var(--transition-normal) var(--ease-out);
+            position: relative;
+            vertical-align: middle;
+            margin: 0 2px;
+        }
+
+        .slot.hover-active {
+            border-color: var(--primary-gold);
+            background: rgba(244,162,97,0.25);
+            transform: scale(1.08);
+            box-shadow: 0 0 16px rgba(244,162,97,0.4);
+        }
+
+        .slot.filled {
+            border-style: solid;
+            border-color: rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.15);
+        }
+
+        .slot.correct {
+            border-color: var(--primary-gold);
+            background: rgba(244,162,97,0.2);
+            box-shadow: 0 0 20px rgba(244,162,97,0.5), 0 0 40px rgba(244,162,97,0.2);
+            animation: correctGlow 0.6s var(--ease-out);
+        }
+
+        .slot .slot-letter {
+            font-size: 32px;
+            color: #fff;
+            pointer-events: none;
+        }
+
+        @keyframes correctGlow {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shakeSlot {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-8px); }
+            40% { transform: translateX(8px); }
+            60% { transform: translateX(-6px); }
+            80% { transform: translateX(4px); }
+        }
+
+        .slot.incorrect {
+            animation: shakeSlot 0.4s ease;
+            border-color: #e74c3c;
+            background: rgba(231,76,60,0.15);
+        }
+
+        .tiles-area {
+            width: 100%;
+            padding: 24px;
+            box-sizing: border-box;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            min-height: 200px;
+            padding-bottom: 40px;
+        }
+
+        .letter-tile {
+            width: 96px;
+            height: 96px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-gold) 0%, #e8924a 100%);
+            border-radius: 16px;
+            font-size: 40px;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            cursor: grab;
+            touch-action: none;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.3);
+            transition: transform var(--transition-fast) var(--ease-out), opacity var(--transition-fast), box-shadow var(--transition-fast);
+            position: relative;
+            z-index: 5;
+        }
+
+        .letter-tile:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
+        }
+
+        .letter-tile:active, .letter-tile.dragging {
+            cursor: grabbing;
+            transform: scale(1.1);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+            z-index: 100;
+        }
+
+        .letter-tile.placed {
+            opacity: 0.3;
+            pointer-events: none;
+            transform: scale(0.9);
+        }
+
+        .letter-tile.drag-ghost {
+            position: fixed;
+            z-index: 1000;
+            pointer-events: none;
+            transform: scale(1.15);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+            opacity: 0.95;
+        }
+
+        /* Real calligraphic tile art replaces the old color-only tile treatment. */
+        .letter-tile.art-backed {
+            background-color: #FAF3E0;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+            border: 1px solid rgba(244,162,97,0.85);
+            color: transparent;
+            text-shadow: none;
+            box-shadow: 0 5px 16px rgba(7,76,79,0.32), 0 0 0 1px rgba(250,243,224,0.24) inset;
+        }
+
+        .slot .slot-letter.art-backed {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+            color: transparent;
+            text-shadow: none;
+        }
+
+        .art-background .tiles-area {
+            filter: drop-shadow(0 5px 12px rgba(7,76,79,0.16));
+        }
+
+        .success-overlay {
+            background: linear-gradient(145deg, rgba(7,76,79,0.94), rgba(13,115,119,0.92));
+            position: absolute;
+            inset: 0;
+            background: rgba(13,115,119,0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-slow) var(--ease-out);
+        }
+
+        .success-overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .success-text {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 48px;
+            color: var(--primary-gold);
+            text-shadow: 0 2px 12px rgba(0,0,0,0.3);
+            margin-bottom: 16px;
+        }
+
+        .success-verse {
+            font-size: 32px;
+            color: #fff;
+            text-align: center;
+            padding: 0 32px;
+            direction: rtl;
+            line-height: 1.8;
+            margin-bottom: 32px;
+        }
+
+        .next-btn {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 24px;
+            min-width: 220px;
+            min-height: 96px;
+            padding: 16px 48px;
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary-gold) 0%, #e8924a 100%);
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+            transition: transform var(--transition-fast) var(--ease-out);
+            pointer-events: auto;
+        }
+
+        .next-btn:hover { transform: translateY(-2px); }
+        .next-btn:active { transform: scale(0.97); }
+
+        .completion-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            direction: ltr;
+        }
+
+        .achievement-overlay-btn {
+            background: linear-gradient(135deg, #2A9D8F 0%, #0D7377 100%);
+            border: 1px solid rgba(250,243,224,0.45);
+        }
+
+        .stars-display {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .star {
+            font-size: 48px;
+            opacity: 0.3;
+            transition: all var(--transition-normal) var(--ease-bounce);
+        }
+        .star.earned {
+            opacity: 1;
+            text-shadow: 0 0 16px rgba(244,162,97,0.6);
+        }
+
+        .mistakes-counter {
+            font-family: 'Inter', sans-serif;
+            font-size: 18px;
+            color: rgba(255,255,255,0.7);
+            position: absolute;
+            top: 100px;
+            right: 24px;
+            direction: ltr;
+        }
+
+        .audio-controls {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 8px;
+            direction: ltr;
+        }
+
+        .audio-toggle {
+            min-width: 112px;
+            min-height: 96px;
+            padding: 12px 16px;
+            border-radius: 18px;
+            border: 1px solid rgba(244,162,97,0.55);
+            background: rgba(7,76,79,0.72);
+            color: #FAF3E0;
+            font-family: 'Inter', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 5px 16px rgba(0,0,0,0.2);
+            transition: transform var(--transition-fast) var(--ease-out), background var(--transition-fast) var(--ease-out);
+        }
+
+        .audio-toggle:hover { transform: translateY(-2px); background: rgba(7,76,79,0.88); }
+        .audio-toggle:active { transform: scale(0.97); }
+        .audio-toggle.muted { color: rgba(250,243,224,0.68); border-color: rgba(250,243,224,0.28); }
+
+        .slot.hint-pulse {
+            animation: hintPulse 0.7s var(--ease-out);
+        }
+
+        @keyframes hintPulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 rgba(244,162,97,0); }
+            45% { transform: scale(1.12); box-shadow: 0 0 24px rgba(244,162,97,0.65); }
+        }
+
+        .achievement-btn {
+            position: absolute;
+            top: 164px;
+            left: 24px;
+            z-index: 10;
+            min-width: 188px;
+            min-height: 88px;
+            padding: 10px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(244,162,97,0.58);
+            background: rgba(7,76,79,0.76);
+            color: #FAF3E0;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 5px 16px rgba(0,0,0,0.22);
+            transition: transform var(--transition-fast) var(--ease-out), background var(--transition-fast) var(--ease-out);
+            direction: ltr;
+        }
+
+        .achievement-btn:hover { transform: translateY(-2px); background: rgba(7,76,79,0.9); }
+        .achievement-btn:active { transform: scale(0.97); }
+
+        .progress-btn {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            min-height: 56px;
+            color: rgba(255,255,255,0.85);
+            position: absolute;
+            top: 100px;
+            left: 24px;
+            direction: ltr;
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: rgba(244,162,97,0.2);
+            border: 1px solid rgba(244,162,97,0.4);
+            cursor: pointer;
+            transition: all var(--transition-fast) var(--ease-out);
+        }
+
+        .progress-btn:hover {
+            background: rgba(244,162,97,0.3);
+            transform: translateY(-2px);
+        }
+
+        .progress-modal {
+            position: absolute;
+            inset: 0;
+            background: rgba(7,76,79,0.94);
+            backdrop-filter: blur(8px);
+            z-index: 60;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 32px 24px;
+            overflow-y: auto;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-normal) var(--ease-out);
+        }
+
+        .progress-modal.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Shareable achievement card screen */
+        .achievement-modal {
+            position: absolute;
+            inset: 0;
+            z-index: 80;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            box-sizing: border-box;
+            overflow-y: auto;
+            background: rgba(4,39,41,0.96);
+            backdrop-filter: blur(12px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-slow) var(--ease-out);
+        }
+
+        .achievement-modal.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .achievement-stage {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .achievement-card {
+            --card-ink: #FAF3E0;
+            --card-muted: rgba(250,243,224,0.76);
+            --card-panel: rgba(7,76,79,0.76);
+            --card-accent: #F4A261;
+            position: relative;
+            width: min(100%, 620px);
+            aspect-ratio: 720 / 1000;
+            min-height: 0;
+            overflow: hidden;
+            border-radius: 28px;
+            box-sizing: border-box;
+            padding: 62px 48px 44px;
+            text-align: center;
+            color: var(--card-ink);
+            background: linear-gradient(145deg, #0a4f52, #0D7377 58%, #e8c28d);
+            border: 2px solid rgba(244,162,97,0.8);
+            box-shadow: 0 24px 70px rgba(0,0,0,0.42), 0 0 0 8px rgba(244,162,97,0.08);
+            transform: translateY(28px) scale(0.96);
+            transition: transform var(--transition-slow) var(--ease-bounce);
+            isolation: isolate;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .achievement-modal.visible .achievement-card {
+            transform: translateY(0) scale(1);
+        }
+
+        .achievement-card::before,
+        .achievement-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .achievement-card::before {
+            z-index: -1;
+            opacity: 0.2;
+            background-image: repeating-conic-gradient(from 45deg, rgba(244,162,97,0.7) 0deg 7deg, transparent 7deg 15deg);
+            background-size: 96px 96px;
+            mix-blend-mode: screen;
+        }
+
+        .achievement-card::after {
+            z-index: -1;
+            background: var(--card-tint, rgba(7,76,79,0.08));
+            mix-blend-mode: multiply;
+        }
+
+        .achievement-card.pattern-lattice::before {
+            opacity: 0.18;
+            background-image: linear-gradient(45deg, rgba(244,162,97,0.8) 1px, transparent 1px), linear-gradient(-45deg, rgba(250,243,224,0.45) 1px, transparent 1px);
+            background-size: 48px 48px;
+        }
+
+        .achievement-card.pattern-arabesque::before {
+            opacity: 0.2;
+            background-image: radial-gradient(circle at 50% 0%, transparent 0 17px, rgba(244,162,97,0.62) 18px 20px, transparent 21px 34px);
+            background-size: 68px 68px;
+        }
+
+        .achievement-card.scheme-midnight-gold {
+            --card-ink: #FFF7E8;
+            --card-muted: rgba(255,247,232,0.76);
+            --card-panel: rgba(20,31,52,0.8);
+            --card-accent: #F4A261;
+            --card-tint: rgba(18,27,49,0.32);
+        }
+
+        .achievement-card.scheme-cream-teal {
+            --card-ink: #0B4F52;
+            --card-muted: rgba(11,79,82,0.72);
+            --card-panel: rgba(250,243,224,0.84);
+            --card-accent: #0D7377;
+            --card-tint: rgba(250,243,224,0.3);
+        }
+
+        .achievement-card.scheme-teal-gold {
+            --card-tint: rgba(7,76,79,0.08);
+        }
+
+        .achievement-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .achievement-kicker {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--card-accent);
+            direction: ltr;
+        }
+
+        .achievement-title {
+            margin: 12px 0 4px;
+            font-family: 'Fredoka', sans-serif;
+            font-size: clamp(38px, 7vw, 58px);
+            line-height: 1.05;
+            color: var(--card-ink);
+            text-shadow: 0 2px 12px rgba(0,0,0,0.22);
+        }
+
+        .branding-top .achievement-title { margin-top: 76px; }
+
+        .achievement-subtitle {
+            margin: 0 0 22px;
+            color: var(--card-muted);
+            font-size: 18px;
+            direction: ltr;
+        }
+
+        .achievement-seal {
+            width: 74px;
+            height: 74px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            border: 2px solid var(--card-accent);
+            color: var(--card-accent);
+            font-size: 34px;
+            background: rgba(7,76,79,0.28);
+            box-shadow: 0 0 0 7px rgba(244,162,97,0.12), 0 0 28px rgba(244,162,97,0.24);
+        }
+
+        .achievement-stats {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            padding: 16px;
+            border: 1px solid rgba(244,162,97,0.45);
+            border-radius: 20px;
+            background: var(--card-panel);
+            backdrop-filter: blur(5px);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
+        }
+
+        .achievement-stat {
+            min-height: 92px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.09);
+        }
+
+        .achievement-stat-value {
+            font-family: 'Fredoka', sans-serif;
+            font-size: clamp(28px, 5vw, 42px);
+            line-height: 1;
+            color: var(--card-accent);
+            direction: ltr;
+        }
+
+        .achievement-stat-label {
+            margin-top: 8px;
+            color: var(--card-muted);
+            font-size: 13px;
+            font-weight: 600;
+            direction: ltr;
+        }
+
+        .achievement-progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 4px 8px;
+            color: var(--card-muted);
+            font-size: 13px;
+            direction: ltr;
+        }
+
+        .achievement-progress-track {
+            height: 12px;
+            overflow: hidden;
+            border-radius: 99px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(244,162,97,0.38);
+        }
+
+        .achievement-progress-fill {
+            height: 100%;
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--card-accent), #ffe0a8);
+            box-shadow: 0 0 16px rgba(244,162,97,0.55);
+            transition: width 900ms var(--ease-out);
+        }
+
+        .achievement-quote {
+            margin: 20px auto 0;
+            max-width: 460px;
+            color: var(--card-muted);
+            font-size: 15px;
+            line-height: 1.45;
+            direction: ltr;
+        }
+
+        .achievement-branding {
+            position: absolute !important;
+            left: 50%;
+            bottom: 25px;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 82%;
+        }
+
+        .achievement-branding img {
+            display: block;
+            width: min(250px, 100%);
+            height: auto;
+            max-height: 64px;
+            object-fit: contain;
+            padding: 7px 14px;
+            border-radius: 12px;
+            background: rgba(250,243,224,0.88);
+        }
+
+        .achievement-branding img[hidden] {
+            display: none;
+        }
+
+        .achievement-logo-fallback {
+            padding: 10px 18px;
+            border-radius: 12px;
+            background: rgba(250,243,224,0.88);
+            color: #0D7377;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 25px;
+            font-weight: 700;
+            direction: ltr;
+        }
+
+        .branding-top .achievement-branding {
+            top: 22px;
+            bottom: auto;
+        }
+
+        .branding-center .achievement-branding {
+            top: 50%;
+            bottom: auto;
+            transform: translate(-50%, -50%);
+            opacity: 0.92;
+        }
+
+        .achievement-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            direction: ltr;
+        }
+
+        .achievement-action-btn {
+            min-width: 220px;
+            min-height: 96px;
+            padding: 14px 26px;
+            border: 1px solid rgba(244,162,97,0.65);
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary-gold), #e8924a);
+            color: #fff;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.28);
+            transition: transform var(--transition-fast) var(--ease-out), filter var(--transition-fast) var(--ease-out);
+        }
+
+        .achievement-action-btn.secondary {
+            background: rgba(250,243,224,0.12);
+            color: #FAF3E0;
+        }
+
+        .achievement-action-btn:hover { transform: translateY(-3px); filter: brightness(1.08); }
+        .achievement-action-btn:active { transform: scale(0.97); }
+
+        .achievement-share-hint {
+            color: rgba(250,243,224,0.68);
+            font-size: 14px;
+            direction: ltr;
+            text-align: center;
+        }
+
+        .progress-header {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 32px;
+            color: var(--primary-gold);
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .verse-list {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .verse-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.15);
+            transition: all var(--transition-fast) var(--ease-out);
+        }
+
+        .verse-item.completed {
+            background: rgba(244,162,97,0.15);
+            border-color: rgba(244,162,97,0.4);
+        }
+
+        .verse-item.current {
+            background: rgba(42,157,143,0.25);
+            border-color: rgba(42,157,143,0.6);
+            box-shadow: 0 0 20px rgba(42,157,143,0.3);
+        }
+
+        .verse-item.locked {
+            opacity: 0.52;
+            filter: grayscale(0.35);
+            cursor: not-allowed !important;
+        }
+
+        .verse-item.locked .verse-item-ref {
+            color: rgba(255,255,255,0.48);
+        }
+
+        .verse-item-info {
+
+            flex: 1;
+            direction: rtl;
+        }
+
+        .verse-item-ref {
+            font-size: 14px;
+            color: rgba(255,255,255,0.7);
+            direction: ltr;
+        }
+
+        .verse-item-stars {
+            display: flex;
+            gap: 4px;
+            font-size: 16px;
+        }
+
+        .close-modal-btn {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 18px;
+            padding: 12px 32px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, var(--primary-gold) 0%, #e8924a 100%);
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            transition: transform var(--transition-fast) var(--ease-out);
+        }
+
+        .close-modal-btn:hover { transform: translateY(-2px); }
+        .close-modal-btn:active { transform: scale(0.97); }
+
+        .edit-indicator {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: var(--deep-purple);
+            color: #fff;
+            font-size: 14px;
+            padding: 4px 12px;
+            border-radius: 8px;
+            z-index: 100;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Floating lights, success sparkles, and gentle screen feedback */
+        .particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: rgba(244,162,97,0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: floatUp linear infinite;
+        }
+
+        .success-sparkle {
+            position: absolute;
+            left: 50%;
+            top: 42%;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 45;
+            background: #F4A261;
+            box-shadow: 0 0 12px 4px rgba(244,162,97,0.72);
+            animation: sparkleBurst 850ms var(--ease-out) forwards;
+        }
+
+        .success-sparkle::before,
+        .success-sparkle::after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 4px;
+            height: 24px;
+            border-radius: 4px;
+            background: #FAF3E0;
+            transform: translate(-50%, -50%);
+        }
+
+        .success-sparkle::after { transform: translate(-50%, -50%) rotate(90deg); }
+
+        .screen-shake { animation: screenShake 420ms ease; }
+
+        @keyframes sparkleBurst {
+            0% { opacity: 0; transform: translate(-50%, -50%) scale(0.25) rotate(0deg); }
+            18% { opacity: 1; }
+            100% { opacity: 0; transform: translate(-50%, -50%) translate(var(--dx), var(--dy)) scale(0.7) rotate(180deg); }
+        }
+
+        @keyframes screenShake {
+            0%, 100% { transform: translate3d(0,0,0); }
+            20% { transform: translate3d(-7px, 2px, 0); }
+            40% { transform: translate3d(6px, -2px, 0); }
+            60% { transform: translate3d(-4px, 1px, 0); }
+            80% { transform: translate3d(3px, 0, 0); }
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(1); opacity: 0.3; }
+            50% { opacity: 0.6; }
+            100% { transform: translateY(-300px) scale(0.3); opacity: 0; }
+        }
+
+        /* Mushaf-inspired ayah presentation: warm paper, ink, traditional borders, and a continuous reading rhythm. */
+        .art-background .verse-display,
+        .verse-display.quran-display {
+            position: relative;
+            display: block;
+            width: min(100%, 656px);
+            min-height: 238px;
+            box-sizing: border-box;
+            padding: 42px 34px 48px;
+            overflow: hidden;
+            border-radius: 6px;
+            border: 3px double #9a6b32;
+            background: #f8f0dc;
+            color: #2b2118;
+            box-shadow: 0 8px 0 rgba(119,78,36,0.12), 0 16px 30px rgba(54,37,19,0.28), inset 0 0 0 9px rgba(154,107,50,0.08), inset 0 0 36px rgba(119,78,36,0.1);
+            text-align: center;
+            line-height: 2.35;
+            backdrop-filter: none;
+        }
+
+        .verse-display.quran-display::before,
+        .verse-display.quran-display::after {
+            content: '۞';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #9a6b32;
+            font-family: 'Amiri Quran', 'Amiri', serif;
+            font-size: 22px;
+            line-height: 1;
+            opacity: 0.78;
+            pointer-events: none;
+        }
+        .verse-display.quran-display::before { top: 11px; }
+        .verse-display.quran-display::after { bottom: 13px; }
+
+        .verse-display.quran-display .verse-char,
+        .verse-display.quran-display .slot-letter,
+        .joined-ayah {
+            font-family: 'Amiri Quran', 'Amiri', 'Noto Naskh Arabic', serif;
+            font-weight: 400;
+            font-size: clamp(39px, 5.8vw, 55px);
+            color: #2b2118;
+            text-shadow: none;
+            font-variant-ligatures: contextual common-ligatures;
+            font-feature-settings: "calt" 1, "rlig" 1, "liga" 1, "kern" 1;
+        }
+
+        .verse-display.quran-display .verse-char { display: inline; }
+        .verse-display.quran-display .verse-space { display: inline; width: auto; margin: 0 0.12em; }
+        .verse-display.quran-display .slot {
+            width: 0.92em !important;
+            height: 1.02em !important;
+            margin: 0 0.05em;
+            vertical-align: -0.12em;
+            border: 0;
+            border-bottom: 3px solid #9a6b32;
+            border-radius: 0;
+            background: rgba(154,107,50,0.08);
+            box-shadow: none;
+        }
+        .verse-display.quran-display .slot.filled,
+        .verse-display.quran-display .slot.correct {
+            border-color: #9a6b32;
+            background: rgba(154,107,50,0.08);
+            box-shadow: none;
+        }
+        .verse-display.quran-display .slot .slot-letter {
+            font-size: inherit;
+            line-height: 1;
+        }
+        .verse-display.quran-display .slot .slot-letter.art-backed {
+            display: inline;
+            width: auto;
+            height: auto;
+            border-radius: 0;
+            background-image: none !important;
+            color: #2b2118;
+            text-shadow: none;
+        }
+        .verse-display.quran-display .ayah-end {
+            display: inline-block;
+            margin-inline-start: 0.16em;
+            color: #9a6b32;
+            font-family: 'Amiri Quran', 'Amiri', serif;
+            font-size: 0.78em;
+            vertical-align: 0.06em;
+        }
+        .art-background .verse-display.quran-display {
+            border-color: #9a6b32;
+            background: #f8f0dc;
+        }
+        .art-background .verse-display.quran-display .verse-char,
+        .art-background .verse-display.quran-display .slot-letter,
+        .art-background .verse-display.quran-display .joined-ayah {
+            color: #2b2118;
+        }
+        .verse-display.fully-joined {
+            min-height: 238px;
+            padding: 50px 34px 52px;
+        }
+        .joined-ayah {
+            display: block;
+            width: 100%;
+            font-size: clamp(40px, 6.4vw, 60px);
+            line-height: 2.05;
+            text-align: center;
+            direction: rtl;
+            unicode-bidi: plaintext;
+            white-space: normal;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .particle, .slot, .letter-tile {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
+        /* Madinah Mushaf-inspired reading surface, based on the supplied reference image. */
+        #game-world.art-background {
+            background: #e9e6dc !important;
+            background-image: none !important;
+        }
+
+        #game-world.art-background::before {
+            background: radial-gradient(circle at 50% 18%, rgba(255,255,255,0.9), rgba(233,230,220,0.35) 58%, rgba(180,166,140,0.16));
+        }
+
+        .art-background .header-bar {
+            padding-top: 22px;
+        }
+
+        .art-background .game-title {
+            color: #116b68;
+            text-shadow: none;
+        }
+
+        .art-background .verse-ref {
+            color: #5b5144;
+            text-shadow: none;
+            font-weight: 600;
+        }
+
+        .art-background .verse-display,
+        .art-background .verse-display.quran-display {
+            width: min(100%, 680px);
+            min-height: 260px;
+            padding: 48px 34px 54px;
+            border: 1px solid #c9bda6;
+            border-radius: 2px;
+            background: #fffef9;
+            box-shadow: 0 2px 0 rgba(103,82,50,0.16), 0 14px 28px rgba(70,57,37,0.2), inset 0 0 0 8px rgba(154,107,50,0.035);
+            text-align: center;
+        }
+
+        .art-background .verse-display.quran-display::before,
+        .art-background .verse-display.quran-display::after {
+            color: #9b7844;
+            opacity: 0.55;
+        }
+
+        .art-background .verse-display.quran-display .verse-char,
+        .art-background .verse-display.quran-display .slot-letter,
+        .art-background .verse-display.quran-display .joined-ayah {
+            color: #171513;
+            text-shadow: none;
+            font-family: 'Amiri Quran', 'Amiri', 'Noto Naskh Arabic', serif;
+            font-weight: 400;
+            font-feature-settings: 'calt' 1, 'rlig' 1, 'liga' 1, 'kern' 1;
+        }
+
+        .art-background .verse-display.quran-display .verse-char,
+        .art-background .verse-display.quran-display .slot-letter {
+            font-size: clamp(40px, 6vw, 58px);
+        }
+
+        .art-background .verse-display.quran-display .slot {
+            width: auto !important;
+            min-width: 0;
+            height: 1.06em !important;
+            padding: 0 0.12em;
+            margin: 0 0.04em;
+            border: 0;
+            border-bottom: 2px solid #9b7844;
+            border-radius: 0;
+            background: rgba(155,120,68,0.06);
+            box-shadow: none;
+            vertical-align: -0.12em;
+        }
+
+        .art-background .verse-display.quran-display .slot.filled,
+        .art-background .verse-display.quran-display .slot.correct {
+            border-color: #9b7844;
+            background: rgba(155,120,68,0.04);
+            box-shadow: none;
+        }
+
+        .art-background .verse-display.quran-display .slot .slot-letter {
+            font-size: inherit;
+            line-height: 1;
+        }
+
+        .joined-ayah {
+            display: block;
+            width: 100%;
+            color: #171513;
+            font-family: 'Amiri Quran', 'Amiri', 'Noto Naskh Arabic', serif;
+            font-size: clamp(42px, 6.6vw, 64px);
+            line-height: 2.05;
+            text-align: center;
+            direction: rtl;
+            unicode-bidi: plaintext;
+            white-space: normal;
+        }
+
+        .ayah-marker {
+            position: relative;
+            display: inline-flex;
+            width: 1.28em;
+            height: 1.28em;
+            margin-inline: 0.16em 0.08em;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            vertical-align: 0.08em;
+            border: 1.5px solid #9b7844;
+            border-radius: 50%;
+            color: #6d512b;
+            font-family: 'Amiri Quran', 'Amiri', serif;
+            font-size: 0.52em;
+            line-height: 1;
+        }
+
+        .ayah-marker::before {
+            content: '';
+            position: absolute;
+            inset: 0.13em;
+            border: 1px solid rgba(155,120,68,0.72);
+            border-radius: 50%;
+        }
+
+        .art-background .tiles-area {
+            filter: none;
+        }
+
+        .art-background .mistakes-counter {
+            color: #5b5144;
+            text-shadow: none;
+        }
+
+        @media (max-width: 560px) {
+            .art-background .verse-display,
+            .art-background .verse-display.quran-display {
+                padding-inline: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-world"></div>
+
+
+    <script>
+    // --- Standalone harness (replaces Astrocade's hosted runtime) ---
+    // Asset Map (Read-Only)
+// Edit assets in the Media tab.
+// Use these IDs alongside lib to reference assets in your code:
+//
+// Example: lib.getAsset["player_sprite"]
+
+const assets = {
+  "letter_tile_alif": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/letter_tile_alif_1161be61-e012-4e09-ba98-e673c5115eba.webp",
+    "type": "image",
+    "aspect_ratio": [
+      1024,
+      1024
+    ]
+  },
+  "letter_tile_ba": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/letter_tile_ba_1de86499-5aed-41dc-becd-2ecc5c77acdc.webp",
+    "type": "image",
+    "aspect_ratio": [
+      1024,
+      1024
+    ]
+  },
+  "letter_tile_ta": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/letter_tile_ta_27740ceb-b356-4550-af24-67fa371e3401.webp",
+    "type": "image",
+    "aspect_ratio": [
+      1024,
+      1024
+    ]
+  },
+  "letter_tile_tha": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/letter_tile_tha_91f4ebd8-0f6f-4347-98c0-90646736b259.webp",
+    "type": "image",
+    "aspect_ratio": [
+      1024,
+      1024
+    ]
+  },
+  "letter_tile_jeem": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/letter_tile_jeem_c7917abd-9c14-49a9-aab7-241db7f2d114.webp",
+    "type": "image",
+    "aspect_ratio": [
+      1024,
+      1024
+    ]
+  },
+  "letter_tile_hha": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/letter_tile_hha_19d3bf19-ae56-47d3-887c-3ed13d31a06d.webp",
+    "type": "image",
+    "aspect_ratio": [
+      1024,
+      1024
+    ]
+  },
+  "letter_tile_kha": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/letter_tile_kha_bc3de830-e5e8-4a86-8c59-c57c487b069f.webp",
+    "type": "image",
+    "aspect_ratio": [
+      1024,
+      1024
+    ]
+  },
+  "letter_tile_dal": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/letter_tile_dal_69f4c791-28b3-4c0c-ad05-1ee4f0c1a3ce.webp",
+    "type": "image",
+    "aspect_ratio": [
+      1024,
+      1024
+    ]
+  },
+  "letter_tile_thal": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/letter_tile_thal_82c31588-74bf-45a6-90ea-3d11b2732eb4.webp",
+    "type": "image",
+    "aspect_ratio": [
+      1024,
+      1024
+    ]
+  },
+  "letter_tile_ra": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/letter_tile_ra_bdf106b7-9b7e-4c66-a3f1-c21b52cea555.webp",
+    "type": "image",
+    "aspect_ratio": [
+      1024,
+      1024
+    ]
+  },
+  "background_pattern": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/background_pattern_b5eabfcd-bdbc-42b6-ae84-bd9d726aca5c.webp",
+    "type": "image",
+    "aspect_ratio": [
+      1024,
+      1024
+    ]
+  },
+  "success_chime": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/sounds/effect/success_chime_dd801e8c-2eef-4b60-840c-7cf70f529d95.mp3",
+    "type": "audio"
+  },
+  "error_sound": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/sounds/effect/error_sound_4f06d94f-f242-467c-a570-fbbd489dd407.mp3",
+    "type": "audio"
+  },
+  "completion_fanfare": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/sounds/effect/completion_fanfare_c504e043-5508-4017-9e32-f438f3b6f2f0.mp3",
+    "type": "audio"
+  },
+  "achievement_card_background": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/achievement_card_background_4d66392f-8c1e-47df-b5d1-db451ab26632.webp",
+    "type": "image",
+    "aspect_ratio": [
+      848,
+      1264
+    ]
+  },
+  "darasaone_logo": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/darasaone_logo_3aef9cfc-b2fe-42cf-a54b-86a80f4293cb.webp",
+    "type": "image",
+    "aspect_ratio": [
+      1282,
+      381
+    ]
+  },
+  "image.png": {
+    "url": "https://d16qq0o35va7kz.cloudfront.net/images/Google_109080903118853623380/1788516844752_01M1NYJH6G20R83QS9R7R8WC4K.image.png",
+    "type": "image",
+    "aspect_ratio": [
+      768,
+      532
+    ]
+  }
+};
+
+
+    window.gameConfig = {"verse": {"text": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ", "reference": "Surah Al-Fatiha (1:1)", "missingIndices": [4, 9, 11, 19], "missingIndicesStr": "4,9,11,19", "slotSize": 56, "difficulty": "Beginner"}, "settings": {"bgColor1": "#0a4f52", "bgColor2": "#2A9D8F"}, "verses": [{"id": "al_fatiha_1", "text": "بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ", "reference": "Surah Al-Fatiha (1:1)", "difficulty": "Beginner", "missingIndices": [4, 9, 11, 19], "missingIndicesStr": "4,9,11,19"}, {"id": "al_fatiha_2", "text": "ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ", "reference": "Surah Al-Fatiha (1:2)", "difficulty": "Beginner", "missingIndices": [2, 6, 10, 13], "missingIndicesStr": "2,6,10,13"}, {"id": "al_fatiha_3", "text": "ٱلرَّحْمَٰنِ ٱلرَّحِيمِ", "reference": "Surah Al-Fatiha (1:3)", "difficulty": "Intermediate", "missingIndices": [2, 7, 9, 11], "missingIndicesStr": "2,7,9,11"}, {"id": "al_fatiha_4", "text": "مَٰلِكِ يَوْمِ ٱلدِّينِ", "reference": "Surah Al-Fatiha (1:4)", "difficulty": "Intermediate", "missingIndices": [1, 5, 9, 12], "missingIndicesStr": "1,5,9,12"}, {"id": "al_fatiha_5", "text": "إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ", "reference": "Surah Al-Fatiha (1:5)", "difficulty": "Intermediate", "missingIndices": [1, 5, 10, 15, 17, 19], "missingIndicesStr": "1,5,10,15,17,19"}, {"id": "al_fatiha_6", "text": "ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ", "reference": "Surah Al-Fatiha (1:6)", "difficulty": "Advanced", "missingIndices": [0, 6, 9, 13, 17, 19], "missingIndicesStr": "0,6,9,13,17,19"}, {"id": "al_fatiha_7", "text": "صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ", "reference": "Surah Al-Fatiha (1:7)", "difficulty": "Advanced", "missingIndices": [2, 5, 11, 13, 19, 21], "missingIndicesStr": "2,5,11,13,19,21"}, {"id": "al_fatiha_8", "text": "غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ", "reference": "Surah Al-Fatiha (1:7)", "difficulty": "Advanced", "missingIndices": [0, 4, 8, 12, 15, 22, 24, 27], "missingIndicesStr": "0,4,8,12,15,22,24,27"}], "versesJson": "[{\"id\":\"al_fatiha_1\",\"text\":\"بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\",\"reference\":\"Surah Al-Fatiha (1:1)\",\"difficulty\":\"Beginner\",\"missingIndices\":[4,9,11,19],\"missingIndicesStr\":\"4,9,11,19\"},{\"id\":\"al_fatiha_2\",\"text\":\"ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَٰلَمِينَ\",\"reference\":\"Surah Al-Fatiha (1:2)\",\"difficulty\":\"Beginner\",\"missingIndices\":[2,6,10,13],\"missingIndicesStr\":\"2,6,10,13\"},{\"id\":\"al_fatiha_3\",\"text\":\"ٱلرَّحْمَٰنِ ٱلرَّحِيمِ\",\"reference\":\"Surah Al-Fatiha (1:3)\",\"difficulty\":\"Intermediate\",\"missingIndices\":[2,7,9,11],\"missingIndicesStr\":\"2,7,9,11\"},{\"id\":\"al_fatiha_4\",\"text\":\"مَٰلِكِ يَوْمِ ٱلدِّينِ\",\"reference\":\"Surah Al-Fatiha (1:4)\",\"difficulty\":\"Intermediate\",\"missingIndices\":[1,5,9,12],\"missingIndicesStr\":\"1,5,9,12\"},{\"id\":\"al_fatiha_5\",\"text\":\"إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ\",\"reference\":\"Surah Al-Fatiha (1:5)\",\"difficulty\":\"Intermediate\",\"missingIndices\":[1,5,10,15,17,19],\"missingIndicesStr\":\"1,5,10,15,17,19\"},{\"id\":\"al_fatiha_6\",\"text\":\"ٱهْدِنَا ٱلصِّرَٰطَ ٱلْمُسْتَقِيمَ\",\"reference\":\"Surah Al-Fatiha (1:6)\",\"difficulty\":\"Advanced\",\"missingIndices\":[0,6,9,13,17,19],\"missingIndicesStr\":\"0,6,9,13,17,19\"},{\"id\":\"al_fatiha_7\",\"text\":\"صِرَٰطَ ٱلَّذِينَ أَنْعَمْتَ عَلَيْهِمْ\",\"reference\":\"Surah Al-Fatiha (1:7)\",\"difficulty\":\"Advanced\",\"missingIndices\":[2,5,11,13,19,21],\"missingIndicesStr\":\"2,5,11,13,19,21\"},{\"id\":\"al_fatiha_8\",\"text\":\"غَيْرِ ٱلْمَغْضُوبِ عَلَيْهِمْ وَلَا ٱلضَّآلِّينَ\",\"reference\":\"Surah Al-Fatiha (1:7)\",\"difficulty\":\"Advanced\",\"missingIndices\":[0,4,8,12,15,22,24,27],\"missingIndicesStr\":\"0,4,8,12,15,22,24,27\"}]", "audio": {"masterVolume": 0.8, "hintVolume": 0.75, "feedbackVolume": 0.85, "recitationVolume": 0.9, "recitationEnabled": true}, "achievement": {"cardColorScheme": "cream-teal", "patternStyle": "ornate", "particleIntensity": 1.1, "brandingPosition": "bottom"}, "quran": {"script": "uthmani", "joinLetters": true}};
+
+    var lib = {
+        getAsset: function(id) { return assets[id] || null; },
+        log: function(message) { console.log('[AyahQuest]', message); },
+        // No in-game settings editor in production play mode.
+        showGameParameters: function() {},
+        // No progress persistence yet -- every visit starts fresh.
+        // Swap these for Supabase reads/writes when we wire up saving.
+        getUserGameState: async function() { return { success: true, state: null }; },
+        saveUserGameState: async function() { return { success: true }; }
+    };
+    </script>
+    <script>
+    /*
+     * DarasaOne: Ayah Quest
+     * An educational Quranic puzzle game where players drag missing letters
+     * into empty slots within an ayah to complete the verse.
+     */
+    async function run(mode) {
+        const gameWorld = document.getElementById('game-world');
+        gameWorld.innerHTML = '';
+        const config = window.gameConfig;
+        const quranConfig = config.quran || {};
+        const quranSettings = {
+            // Use the Hafs/Uthmani presentation by default; the creator can switch
+            // to a plain Arabic presentation without changing the verse text.
+            script: quranConfig.script === 'standard' ? 'standard' : 'uthmani',
+            joinLetters: quranConfig.joinLetters !== false
+        };
+
+        // Arabic combining marks stay attached to their base letter. Missing
+        // positions therefore count visible grapheme clusters, not UTF-16 units.
+        function splitTextUnits(text) {
+            if (typeof Intl !== 'undefined' && Intl.Segmenter) {
+                return Array.from(new Intl.Segmenter('ar', { granularity: 'grapheme' }).segment(text), part => part.segment);
+            }
+            return Array.from(text).reduce((units, character) => {
+                if (/^[\\u0610-\\u061A\\u064B-\\u065F\\u0670\\u06D6-\\u06ED\\u08D3-\\u08FF]$/u.test(character) && units.length) {
+                    units[units.length - 1] += character;
+                } else {
+                    units.push(character);
+                }
+                return units;
+            }, []);
+        }
+
+        // --- Real Islamic art assets (loaded once at initialization) ---
+        const letterAssetMap = {
+            'ا': 'letter_tile_alif',
+            'ب': 'letter_tile_ba',
+            'ت': 'letter_tile_ta',
+            'ث': 'letter_tile_tha',
+            'ج': 'letter_tile_jeem',
+            'ح': 'letter_tile_hha',
+            'خ': 'letter_tile_kha',
+            'د': 'letter_tile_dal',
+            'ذ': 'letter_tile_thal',
+            'ر': 'letter_tile_ra'
+        };
+        const artAssetIds = ['background_pattern', 'achievement_card_background', 'darasaone_logo', ...Object.values(letterAssetMap)];
+        const assetCache = {};
+        artAssetIds.forEach((id) => {
+            const info = lib.getAsset(id);
+            if (info && info.url) {
+                const image = new Image();
+                image.src = info.url;
+                assetCache[id] = { info, image };
+            }
+        });
+
+        function applyLetterArtwork(element, char) {
+            // Quranic marks belong to the grapheme. Never replace a marked grapheme
+            // with a base-letter image, otherwise kasra, shadda, sukun, and tanween
+            // would disappear from the draggable tile.
+            const hasQuranMarks = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u08D3-\u08FF]/u.test(char);
+            const baseChar = char.replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u08D3-\u08FF]/gu, '');
+            const assetId = hasQuranMarks ? null : letterAssetMap[baseChar];
+            const cached = assetId ? assetCache[assetId] : null;
+            element.setAttribute('aria-label', `Arabic letter ${char}`);
+            if (cached && cached.info && cached.info.url) {
+                element.classList.add('art-backed');
+                element.style.backgroundImage = `url("${cached.info.url}")`;
+                element.textContent = '';
+            } else {
+                // Keep marked graphemes and letters without artwork typographically legible.
+                element.classList.remove('art-backed');
+                element.style.backgroundImage = '';
+                element.textContent = char;
+            }
+        }
+
+        // --- Web Audio feedback, generated letter hints, and recitation ---
+        const audioConfig = config.audio || {};
+        const audioSettings = {
+            masterVolume: Number.isFinite(Number(audioConfig.masterVolume)) ? Math.max(0, Math.min(1, Number(audioConfig.masterVolume))) : 0.8,
+            hintVolume: Number.isFinite(Number(audioConfig.hintVolume)) ? Math.max(0, Math.min(1, Number(audioConfig.hintVolume))) : 0.75,
+            feedbackVolume: Number.isFinite(Number(audioConfig.feedbackVolume)) ? Math.max(0, Math.min(1, Number(audioConfig.feedbackVolume))) : 0.85,
+            recitationVolume: Number.isFinite(Number(audioConfig.recitationVolume)) ? Math.max(0, Math.min(1, Number(audioConfig.recitationVolume))) : 0.9,
+            recitationEnabled: audioConfig.recitationEnabled !== false
+        };
+        const achievementConfig = config.achievement || {};
+        const validCardSchemes = ['teal-gold', 'midnight-gold', 'cream-teal'];
+        const validPatternStyles = ['ornate', 'lattice', 'arabesque'];
+        const validBrandingPositions = ['bottom', 'top', 'center'];
+        const achievementSettings = {
+            cardColorScheme: validCardSchemes.includes(achievementConfig.cardColorScheme) ? achievementConfig.cardColorScheme : 'teal-gold',
+            patternStyle: validPatternStyles.includes(achievementConfig.patternStyle) ? achievementConfig.patternStyle : 'ornate',
+            particleIntensity: Number.isFinite(Number(achievementConfig.particleIntensity)) ? Math.max(0, Math.min(2, Number(achievementConfig.particleIntensity))) : 1,
+            brandingPosition: validBrandingPositions.includes(achievementConfig.brandingPosition) ? achievementConfig.brandingPosition : 'bottom'
+        };
+        let audioCtx;
+        let audioMuted = false;
+        let audioBuffers = {};
+        let recitationTimer = null;
+
+        function getAudioCtx() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContextClass) return null;
+                audioCtx = new AudioContextClass();
+            }
+            return audioCtx;
+        }
+
+        async function preloadAudioAssets() {
+            const ids = ['success_chime', 'error_sound', 'completion_fanfare'];
+            await Promise.all(ids.map(async (id) => {
+                try {
+                    const info = lib.getAsset(id);
+                    if (!info || !info.url) return;
+                    const response = await fetch(info.url);
+                    if (!response.ok) return;
+                    const bytes = await response.arrayBuffer();
+                    const ctx = getAudioCtx();
+                    if (ctx) audioBuffers[id] = await ctx.decodeAudioData(bytes);
+                } catch (error) {
+                    lib.log(`Audio asset ${id} unavailable; using gentle generated fallback.`);
+                }
+            }));
+        }
+        // Cache approved static audio once at initialization, never during rendering.
+        const audioPreloadPromise = preloadAudioAssets();
+        // Asset decoding is intentionally started at initialization; gameplay remains responsive if it fails.
+
+        function outputVolume(categoryVolume, amount = 1) {
+            return Math.max(0, Math.min(1, audioSettings.masterVolume * categoryVolume * amount));
+        }
+
+        function playBuffer(id, categoryVolume) {
+            if (audioMuted) return false;
+            try {
+                const ctx = getAudioCtx();
+                const buffer = audioBuffers[id];
+                if (!ctx || !buffer) return false;
+                if (ctx.state === 'suspended') ctx.resume();
+                const source = ctx.createBufferSource();
+                const gain = ctx.createGain();
+                gain.gain.setValueAtTime(outputVolume(categoryVolume), ctx.currentTime);
+                source.buffer = buffer;
+                source.connect(gain);
+                gain.connect(ctx.destination);
+                source.start(0);
+                return true;
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function playTone(freq, duration, type = 'sine', vol = 0.15) {
+            if (audioMuted) return;
+            try {
+                const ctx = getAudioCtx();
+                if (!ctx) return;
+                if (ctx.state === 'suspended') ctx.resume();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                const safeVol = Math.max(0.0001, outputVolume(vol, 1));
+                gain.gain.setValueAtTime(safeVol, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + duration);
+            } catch (error) {}
+        }
+
+        function playCorrectSound() {
+            if (!playBuffer('success_chime', audioSettings.feedbackVolume)) {
+                playTone(523, 0.14, 'sine', audioSettings.feedbackVolume * 0.14);
+                setTimeout(() => playTone(659, 0.16, 'sine', audioSettings.feedbackVolume * 0.14), 100);
+                setTimeout(() => playTone(784, 0.2, 'sine', audioSettings.feedbackVolume * 0.14), 200);
+            }
+        }
+
+        function playIncorrectSound() {
+            if (!playBuffer('error_sound', audioSettings.feedbackVolume)) {
+                playTone(220, 0.2, 'sine', audioSettings.feedbackVolume * 0.08);
+                setTimeout(() => playTone(196, 0.25, 'sine', audioSettings.feedbackVolume * 0.08), 150);
+            }
+        }
+
+        function playDropSound() {
+            playTone(440, 0.08, 'sine', audioSettings.feedbackVolume * 0.05);
+        }
+
+        // Each letter has a distinct gentle two-note pronunciation hint until dedicated voice assets exist.
+        const hintFrequencyMap = {
+            'ا': 440, 'ب': 494, 'ت': 523, 'ث': 554, 'ج': 587,
+            'ح': 622, 'خ': 659, 'د': 698, 'ذ': 740, 'ر': 784,
+            'ز': 831, 'س': 880, 'ش': 932, 'ص': 988, 'ض': 1047,
+            'ط': 1109, 'ظ': 1175, 'ع': 1245, 'غ': 1319, 'ف': 1397,
+            'ق': 1480, 'ك': 1568, 'ل': 1661, 'م': 1760, 'ن': 1865,
+            'ه': 1976, 'و': 2093, 'ي': 2217
+        };
+
+        function playLetterHint(char) {
+            const base = hintFrequencyMap[char] || (360 + (char.charCodeAt(0) % 12) * 34);
+            playTone(base, 0.24, 'sine', audioSettings.hintVolume * 0.12);
+            setTimeout(() => playTone(base * 1.25, 0.28, 'triangle', audioSettings.hintVolume * 0.09), 135);
+        }
+
+        function stopRecitation() {
+            if (recitationTimer) {
+                clearTimeout(recitationTimer);
+                recitationTimer = null;
+            }
+            if (window.speechSynthesis && typeof window.speechSynthesis.cancel === 'function') {
+                window.speechSynthesis.cancel();
+            }
+        }
+
+        function playGeneratedRecitation(text) {
+            // A calm generated placeholder recitation when no Arabic speech voice is available.
+            const words = text.split(/\s+/).filter(Boolean);
+            words.forEach((word, index) => {
+                const base = 250 + ((word.charCodeAt(0) || 1) % 9) * 34;
+                setTimeout(() => playTone(base, 0.32, 'sine', audioSettings.recitationVolume * 0.06), index * 420);
+                setTimeout(() => playTone(base * 1.18, 0.28, 'triangle', audioSettings.recitationVolume * 0.04), index * 420 + 150);
+            });
+        }
+
+        function playVerseRecitation(text) {
+            if (audioMuted || !audioSettings.recitationEnabled) return;
+            if (window.speechSynthesis && typeof window.SpeechSynthesisUtterance !== 'undefined') {
+                stopRecitation();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'ar-SA';
+                utterance.rate = 0.72;
+                utterance.pitch = 1;
+                utterance.volume = outputVolume(audioSettings.recitationVolume);
+                window.speechSynthesis.speak(utterance);
+            } else {
+                playGeneratedRecitation(text);
+            }
+        }
+
+        function playCompletionSequence() {
+            if (audioMuted) return;
+            const fanfareLoaded = playBuffer('completion_fanfare', audioSettings.feedbackVolume);
+            const fanfareDuration = fanfareLoaded ? 3500 : 900;
+            if (audioSettings.recitationEnabled) {
+                recitationTimer = setTimeout(() => {
+                    recitationTimer = null;
+                    playVerseRecitation(verseText);
+                }, fanfareDuration);
+            }
+        }
+
+        // --- Player progression state (NOT in gameConfig - this is player-specific) ---
+        let playerProgress = {
+            currentVerseIndex: 0,
+            currentLevel: 'Beginner',
+            completedVerseIds: [],
+            starRatings: {}, // verseId -> stars (1-3)
+            totalVersesCompleted: 0,
+            // Achievement statistics
+            totalCorrectPlacements: 0,
+            totalIncorrectPlacements: 0,
+            currentStreak: 0,
+            bestStreak: 0,
+            lastCompletedAt: null
+        };
+
+        // --- Load saved player progress ---
+        async function loadPlayerProgress() {
+            if (mode === 'edit') return; // Don't load in edit mode
+
+            try {
+                const response = await lib.getUserGameState();
+                const savedState = response && response.state ? response.state : response;
+                if (savedState && typeof savedState === 'object') {
+                    const savedIndex = Number(savedState.currentVerseIndex);
+                    const savedTotal = Number(savedState.totalVersesCompleted);
+                    const savedCorrect = Number(savedState.totalCorrectPlacements);
+                    const savedIncorrect = Number(savedState.totalIncorrectPlacements);
+                    const savedCurrentStreak = Number(savedState.currentStreak);
+                    const savedBestStreak = Number(savedState.bestStreak);
+                    
+                    playerProgress = {
+                        currentVerseIndex: Number.isFinite(savedIndex) ? Math.max(0, Math.floor(savedIndex)) : 0,
+                        currentLevel: savedState.currentLevel || 'Beginner',
+                        completedVerseIds: Array.isArray(savedState.completedVerseIds) ? [...new Set(savedState.completedVerseIds)] : [],
+                        starRatings: savedState.starRatings && typeof savedState.starRatings === 'object' ? savedState.starRatings : {},
+                        totalVersesCompleted: Number.isFinite(savedTotal) ? Math.max(0, Math.floor(savedTotal)) : 0,
+                        // Achievement statistics with safe defaults for existing players
+                        totalCorrectPlacements: Number.isFinite(savedCorrect) ? Math.max(0, Math.floor(savedCorrect)) : 0,
+                        totalIncorrectPlacements: Number.isFinite(savedIncorrect) ? Math.max(0, Math.floor(savedIncorrect)) : 0,
+                        currentStreak: Number.isFinite(savedCurrentStreak) ? Math.max(0, Math.floor(savedCurrentStreak)) : 0,
+                        bestStreak: Number.isFinite(savedBestStreak) ? Math.max(0, Math.floor(savedBestStreak)) : 0,
+                        lastCompletedAt: savedState.lastCompletedAt || null
+                    };
+                    lib.log('✅ Player progress loaded successfully');
+                } else {
+                    lib.log('ℹ️ No saved progress found, starting fresh');
+                }
+            } catch (error) {
+                lib.log(`⚠️ Failed to load progress: ${error.message}`);
+                // Game continues with default progress
+            }
+        }
+
+        // --- Save player progress ---
+        async function savePlayerProgress() {
+            if (mode === 'edit') return; // Don't save in edit mode
+
+            try {
+                const saveData = {
+                    currentVerseIndex: playerProgress.currentVerseIndex,
+                    completedVerseIds: playerProgress.completedVerseIds,
+                    starRatings: playerProgress.starRatings,
+                    totalVersesCompleted: playerProgress.totalVersesCompleted,
+                    currentLevel: playerProgress.currentLevel,
+                    // Achievement statistics
+                    totalCorrectPlacements: playerProgress.totalCorrectPlacements,
+                    totalIncorrectPlacements: playerProgress.totalIncorrectPlacements,
+                    currentStreak: playerProgress.currentStreak,
+                    bestStreak: playerProgress.bestStreak,
+                    lastCompletedAt: playerProgress.lastCompletedAt,
+                    lastPlayed: new Date().toISOString()
+                };
+                await lib.saveUserGameState(saveData);
+                lib.log('💾 Progress saved successfully');
+            } catch (error) {
+                lib.log(`⚠️ Failed to save progress: ${error.message}`);
+                // Game continues even if save fails
+            }
+        }
+
+        // --- Get verses array from config ---
+        const configuredVerses = Array.isArray(config.verses) && config.verses.length > 0 ? config.verses : [config.verse];
+        const versesArray = configuredVerses.filter((verse) => {
+            return verse && typeof verse.text === 'string' && Array.isArray(verse.missingIndices);
+        });
+        
+        // Ensure we have valid verse data
+        if (!versesArray.length || !versesArray[0].text) {
+            lib.log('Error: No valid verses found in configuration');
+            return;
+        }
+        
+        // --- Parse current verse and build game state ---
+        let currentVerseData = versesArray[playerProgress.currentVerseIndex] || versesArray[0];
+        let verseText = currentVerseData.text;
+        let missingIndices = currentVerseData.missingIndices.slice().sort((a, b) => a - b);
+        const slotSize = config.verse?.slotSize || 56;
+        let verseRef = currentVerseData.reference || '';
+
+        // Build character array from verse (excluding spaces for indexing letters)
+        let chars = splitTextUnits(verseText);
+        // Identify which character indices are missing
+        // missingIndices refers to character positions in the full string (including spaces)
+        let missingSet = new Set(missingIndices);
+
+        // Runtime state
+        let mistakes = 0;
+        let slots = []; // {index, correctChar, filledChar, filledTileId, element, correct}
+        let tiles = []; // {id, char, placed, element}
+        let dragState = null;
+        let gameComplete = false;
+
+        // --- Show game parameters ---
+        lib.showGameParameters({
+            name: 'Ayah Quest Settings',
+            params: {
+                'Verse Text': { key: 'verse.text', type: 'string' },
+                'Verse Reference': { key: 'verse.reference', type: 'string' },
+                'Quran Script': { key: 'quran.script', type: 'dropdown', options: [
+                    { label: 'Hafs / Uthmani Mushaf', value: 'uthmani' },
+                    { label: 'Plain Arabic', value: 'standard' }
+                ] },
+                'Mushaf Letter Joining': { key: 'quran.joinLetters', type: 'checkbox' },
+                'Missing Positions (graphemes)': { key: 'verse.missingIndicesStr', type: 'string',
+                    onChange: (val) => {
+                        try {
+                            const arr = val.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n));
+                            window.gameConfig.verse.missingIndices = arr;
+                            window.gameConfig.verse.missingIndicesStr = val;
+                        } catch(e) {}
+                    }
+                },
+                'Verse Bank JSON': { key: 'versesJson', type: 'string',
+                    onChange: (val) => {
+                        try {
+                            const parsed = JSON.parse(val);
+                            if (!Array.isArray(parsed) || !parsed.length) return;
+                            const validVerses = parsed.filter(v => v && typeof v.text === 'string' && Array.isArray(v.missingIndices));
+                            if (!validVerses.length) return;
+                            window.gameConfig.verses = validVerses;
+                            window.gameConfig.verse = validVerses[0];
+                            window.gameConfig.versesJson = JSON.stringify(validVerses);
+                        } catch(e) {
+                            lib.log('Verse Bank JSON must be a valid array of verse objects.');
+                        }
+                    }
+                },
+                'Slot Size': { key: 'verse.slotSize', type: 'slider', min: 40, max: 80, step: 4 },
+                'Background': { key: 'settings.bgColor1', type: 'color' },
+                'Background 2': { key: 'settings.bgColor2', type: 'color' },
+                'Master Volume': { key: 'audio.masterVolume', type: 'slider', min: 0, max: 1, step: 0.05 },
+                'Hint Volume': { key: 'audio.hintVolume', type: 'slider', min: 0, max: 1, step: 0.05 },
+                    'Feedback Volume': { key: 'audio.feedbackVolume', type: 'slider', min: 0, max: 1, step: 0.05 },
+                'Recitation Volume': { key: 'audio.recitationVolume', type: 'slider', min: 0, max: 1, step: 0.05 },
+                'Enable Verse Recitation': { key: 'audio.recitationEnabled', type: 'checkbox' },
+                'Achievement Card Colors': { key: 'achievement.cardColorScheme', type: 'dropdown', options: [
+                    { label: 'Teal & Gold', value: 'teal-gold' },
+                    { label: 'Midnight & Gold', value: 'midnight-gold' },
+                    { label: 'Cream & Teal', value: 'cream-teal' }
+                ] },
+                'Achievement Pattern': { key: 'achievement.patternStyle', type: 'dropdown', options: [
+                    { label: 'Ornate Geometry', value: 'ornate' },
+                    { label: 'Lattice', value: 'lattice' },
+                    { label: 'Arabesque', value: 'arabesque' }
+                ] },
+                'Particle Intensity': { key: 'achievement.particleIntensity', type: 'slider', min: 0, max: 2, step: 0.1 },
+                'Branding Position': { key: 'achievement.brandingPosition', type: 'dropdown', options: [
+                    { label: 'Bottom', value: 'bottom' },
+                    { label: 'Top', value: 'top' },
+                    { label: 'Center', value: 'center' }
+                ] }
+            }
+        });
+
+        // --- Load player progress first (async) ---
+        await loadPlayerProgress();
+
+        // Normalize saved progress against the current editable verse bank.
+        const knownVerseIds = new Set(versesArray.map((verse, idx) => verse.id || `verse_${idx}`));
+        playerProgress.completedVerseIds = [...new Set(playerProgress.completedVerseIds)]
+            .filter(id => knownVerseIds.has(id));
+        playerProgress.totalVersesCompleted = playerProgress.completedVerseIds.length;
+        playerProgress.currentVerseIndex = Math.max(0, Math.min(versesArray.length - 1, playerProgress.currentVerseIndex));
+        currentVerseData = versesArray[playerProgress.currentVerseIndex] || versesArray[0];
+        playerProgress.currentLevel = currentVerseData.difficulty || 'Beginner';
+        verseText = currentVerseData.text;
+        missingIndices = currentVerseData.missingIndices.slice().sort((a, b) => a - b);
+        verseRef = currentVerseData.reference || '';
+        chars = splitTextUnits(verseText);
+        missingSet = new Set(missingIndices);
+
+        // --- Build DOM ---
+        // Use the generated seamless Islamic geometric pattern as the world surface.
+        const bg1 = config.settings?.bgColor1 || '#0a4f52';
+        const bg2 = config.settings?.bgColor2 || '#2A9D8F';
+        const pattern = assetCache.background_pattern;
+        if (pattern && pattern.info && pattern.info.url) {
+            gameWorld.classList.add('art-background');
+            gameWorld.style.backgroundImage = `url("${pattern.info.url}")`;
+        } else {
+            gameWorld.style.background = `linear-gradient(160deg, ${bg1} 0%, ${bg2} 100%)`;
+            lib.log('Warning: background_pattern asset not found; using the original gradient fallback.');
+        }
+
+        // Subtle floating lights add a calm, living atmosphere without distracting from the ayah.
+        for (let i = 0; i < Math.round(18 * achievementSettings.particleIntensity); i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            p.style.left = Math.random() * 700 + 'px';
+            p.style.top = (380 + Math.random() * 820) + 'px';
+            p.style.animationDuration = (5 + Math.random() * 7) + 's';
+            p.style.animationDelay = Math.random() * 6 + 's';
+            p.style.width = (4 + Math.random() * 6) + 'px';
+            p.style.height = p.style.width;
+            p.style.background = Math.random() > 0.35 ? 'rgba(244,162,97,0.38)' : 'rgba(250,243,224,0.42)';
+            gameWorld.appendChild(p);
+        }
+
+        function spawnSuccessParticles() {
+            const sparkleCount = Math.round(14 * achievementSettings.particleIntensity);
+            for (let i = 0; i < sparkleCount; i++) {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'success-sparkle';
+                const angle = (Math.PI * 2 * i) / Math.max(1, sparkleCount) + Math.random() * 0.45;
+                const distance = 90 + Math.random() * 210;
+                sparkle.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+                sparkle.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
+                sparkle.style.animationDelay = `${Math.random() * 160}ms`;
+                gameWorld.appendChild(sparkle);
+                setTimeout(() => sparkle.remove(), 1100);
+            }
+        }
+
+        // Header with progression info
+        const header = document.createElement('div');
+        header.className = 'header-bar';
+        
+        const progressInfo = mode === 'play' ? 
+            `<div style="font-size:14px; color:rgba(255,255,255,0.65); direction:ltr; margin-top:4px;">
+                Verse ${playerProgress.currentVerseIndex + 1} of ${versesArray.length} • 
+                ${playerProgress.totalVersesCompleted} completed • 
+                ${currentVerseData.difficulty || 'beginner'}
+            </div>` : '';
+        
+        header.innerHTML = `
+            <div class="game-title">DarasaOne: Ayah Quest</div>
+            <div class="verse-ref">${verseRef}</div>
+            ${progressInfo}
+        `;
+        const audioControls = document.createElement('div');
+        audioControls.className = 'audio-controls';
+        const audioToggle = document.createElement('button');
+        audioToggle.className = 'audio-toggle';
+        audioToggle.type = 'button';
+        audioToggle.setAttribute('aria-label', 'Mute or unmute game audio');
+        function updateAudioToggle() {
+            audioToggle.textContent = audioMuted ? '🔇 Muted' : '🔊 Sound on';
+            audioToggle.classList.toggle('muted', audioMuted);
+        }
+        audioToggle.addEventListener('click', () => {
+            audioMuted = !audioMuted;
+            if (audioMuted) stopRecitation();
+            updateAudioToggle();
+            if (!audioMuted) {
+                const ctx = getAudioCtx();
+                if (ctx && ctx.state === 'suspended') ctx.resume();
+                playTone(660, 0.12, 'sine', audioSettings.feedbackVolume * 0.08);
+            }
+        });
+        updateAudioToggle();
+        audioControls.appendChild(audioToggle);
+        header.appendChild(audioControls);
+        gameWorld.appendChild(header);
+
+        // Mistakes counter
+        const mistakesEl = document.createElement('div');
+        mistakesEl.className = 'mistakes-counter';
+        mistakesEl.textContent = '⚠ 0';
+        if (mode === 'play') gameWorld.appendChild(mistakesEl);
+
+        // Progress button
+        const progressBtn = document.createElement('div');
+        progressBtn.className = 'progress-btn';
+        progressBtn.textContent = '📖 Progress';
+        if (mode === 'play') {
+            gameWorld.appendChild(progressBtn);
+            progressBtn.addEventListener('click', showProgressModal);
+        }
+
+        const achievementBtn = document.createElement('button');
+        achievementBtn.className = 'achievement-btn';
+        achievementBtn.type = 'button';
+        achievementBtn.textContent = '🏅 View Achievement';
+        achievementBtn.setAttribute('aria-label', 'View your achievement card');
+        function updateAchievementButton() {
+            achievementBtn.hidden = mode !== 'play' || playerProgress.totalVersesCompleted < 1;
+        }
+        if (mode === 'play') {
+            gameWorld.appendChild(achievementBtn);
+            achievementBtn.addEventListener('click', showAchievementCard);
+        }
+        updateAchievementButton();
+
+        // Verse display
+        const verseContainer = document.createElement('div');
+        verseContainer.className = 'verse-container';
+        const verseDisplay = document.createElement('div');
+        verseDisplay.className = 'verse-display';
+        verseContainer.appendChild(verseDisplay);
+        gameWorld.appendChild(verseContainer);
+
+        function getArabicAyahNumber() {
+            const explicitNumber = currentVerseData.ayahNumber || currentVerseData.number;
+            const match = String(verseRef).match(/:(\d+)\)?\s*$/);
+            const number = explicitNumber || (match ? match[1] : '');
+            const digits = '٠١٢٣٤٥٦٧٨٩';
+            return String(number).split('').map((digit) => /\d/.test(digit) ? digits[Number(digit)] : digit).join('');
+        }
+
+        // Keep the complete Uthmani grapheme, including its harakah, in a slot.
+        // Artwork is intentionally bypassed for marked letters so no tanween,
+        // fatha, damma, kasra, shaddah, sukun, or Quranic annotation is lost.
+        function getBaseArabicLetter(grapheme) {
+            return grapheme.replace(/[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u08D3-\u08FF]/gu, '');
+        }
+
+        function createAyahMarker() {
+            const marker = document.createElement('span');
+            marker.className = 'ayah-marker';
+            marker.textContent = getArabicAyahNumber() || '۝';
+            marker.setAttribute('aria-label', `End of ayah ${getArabicAyahNumber()}`);
+            return marker;
+        }
+
+        // Build verse with slots
+        function buildVerse() {
+            verseDisplay.innerHTML = '';
+            slots = [];
+            verseDisplay.classList.toggle('quran-display', quranSettings.joinLetters);
+            verseDisplay.classList.toggle('standard-script', quranSettings.script === 'standard');
+            verseDisplay.classList.remove('fully-joined');
+
+            for (let i = 0; i < chars.length; i++) {
+                if (/^\\s+$/.test(chars[i])) {
+                    const sp = document.createElement('span');
+                    sp.className = 'verse-space';
+                    sp.textContent = ' ';
+                    verseDisplay.appendChild(sp);
+                } else if (missingSet.has(i)) {
+                    const slot = document.createElement('div');
+                    slot.className = 'slot';
+                    slot.style.width = slotSize + 'px';
+                    slot.style.height = slotSize + 'px';
+                    slot.dataset.slotIndex = slots.length;
+
+                    const slotData = {
+                        index: i,
+                        correctChar: chars[i],
+                        filledChar: null,
+                        filledTileId: null,
+                        element: slot,
+                        correct: false
+                    };
+                    slots.push(slotData);
+                    slot.setAttribute('aria-label', `Tap to hear the letter hint for ${chars[i]}`);
+                    slot.addEventListener('click', () => {
+                        if (mode !== 'play' || slotData.correct) return;
+                        slot.classList.remove('hint-pulse');
+                        void slot.offsetWidth;
+                        slot.classList.add('hint-pulse');
+                        playLetterHint(slotData.correctChar);
+                    });
+                    verseDisplay.appendChild(slot);
+                } else {
+                    const ch = document.createElement('span');
+                    ch.className = 'verse-char';
+                    ch.textContent = chars[i];
+                        verseDisplay.appendChild(ch);
+                }
+            }
+            verseDisplay.appendChild(createAyahMarker());
+        }
+
+        function showFullyJoinedAyah() {
+            if (!quranSettings.joinLetters) return;
+            verseDisplay.innerHTML = '';
+            verseDisplay.classList.add('quran-display', 'fully-joined');
+            const joinedAyah = document.createElement('span');
+            joinedAyah.className = 'joined-ayah';
+            joinedAyah.appendChild(document.createTextNode(verseText));
+            joinedAyah.appendChild(createAyahMarker());
+            verseDisplay.appendChild(joinedAyah);
+        }
+
+        buildVerse();
+
+        // Letter tiles area
+        const tilesArea = document.createElement('div');
+        tilesArea.className = 'tiles-area';
+        gameWorld.appendChild(tilesArea);
+
+        // Collect missing letters and add some distractors
+        function buildTiles() {
+            tilesArea.innerHTML = '';
+            tiles = [];
+
+            const correctLetters = missingIndices.map(i => chars[i]);
+            // Add 2 distractor Arabic letters
+            const distractors = ['ع', 'ص', 'ق', 'ث', 'ذ', 'ض', 'ظ', 'غ'];
+            const extraCount = Math.min(2, Math.max(0, 6 - correctLetters.length));
+            const shuffledDistractors = distractors.sort(() => Math.random() - 0.5);
+            const allLetters = [...correctLetters];
+            for (let i = 0; i < extraCount; i++) {
+                if (!allLetters.includes(shuffledDistractors[i])) {
+                    allLetters.push(shuffledDistractors[i]);
+                }
+            }
+
+            // Shuffle
+            const shuffled = allLetters.sort(() => Math.random() - 0.5);
+
+            shuffled.forEach((ch, idx) => {
+                const tile = document.createElement('div');
+                tile.className = 'letter-tile';
+                tile.dataset.tileId = idx;
+                applyLetterArtwork(tile, ch);
+
+                const tileData = {
+                    id: idx,
+                    char: ch,
+                    placed: false,
+                    element: tile
+                };
+                tiles.push(tileData);
+                tilesArea.appendChild(tile);
+            });
+        }
+
+        buildTiles();
+
+        // Success overlay
+        const successOverlay = document.createElement('div');
+        successOverlay.className = 'success-overlay';
+        gameWorld.appendChild(successOverlay);
+
+        // Progress and achievement screens
+        const progressModal = document.createElement('div');
+        progressModal.className = 'progress-modal';
+        gameWorld.appendChild(progressModal);
+
+        const achievementModal = document.createElement('div');
+        achievementModal.className = 'achievement-modal';
+        gameWorld.appendChild(achievementModal);
+        let achievementReturnToCompletion = false;
+
+        function getAccuracyPercentage() {
+            const totalAttempts = playerProgress.totalCorrectPlacements + playerProgress.totalIncorrectPlacements;
+            return totalAttempts > 0 ? Math.round((playerProgress.totalCorrectPlacements / totalAttempts) * 100) : 100;
+        }
+
+        function getAchievementLevel() {
+            const completed = playerProgress.totalVersesCompleted;
+            if (completed >= versesArray.length && versesArray.length > 0) return 'Master';
+            if (completed >= 6) return 'Advanced';
+            if (completed >= 3) return 'Intermediate';
+            return 'Beginner';
+        }
+
+        function hideAchievementCard() {
+            achievementModal.classList.remove('visible');
+            const returnToCompletion = achievementReturnToCompletion;
+            achievementReturnToCompletion = false;
+            setTimeout(() => {
+                if (!achievementModal.classList.contains('visible')) {
+                    achievementModal.innerHTML = '';
+                    if (returnToCompletion) successOverlay.classList.add('visible');
+                }
+            }, 560);
+        }
+
+        function showAchievementCard(returnToCompletion = false) {
+            if (mode !== 'play' || playerProgress.totalVersesCompleted < 1) return;
+            achievementReturnToCompletion = returnToCompletion;
+            const accuracy = getAccuracyPercentage();
+            const completionPercentage = Math.round((playerProgress.totalVersesCompleted / versesArray.length) * 100);
+            const level = getAchievementLevel();
+            const cardBackground = assetCache.achievement_card_background;
+            const logoAsset = assetCache.darasaone_logo;
+            const safeScheme = achievementSettings.cardColorScheme;
+            const safePattern = achievementSettings.patternStyle;
+            const safeBranding = achievementSettings.brandingPosition;
+
+            achievementModal.innerHTML = `
+                <div class="achievement-stage">
+                    <article class="achievement-card scheme-${safeScheme} pattern-${safePattern} branding-${safeBranding}" aria-label="DarasaOne achievement card">
+                        <div class="achievement-kicker">DARASAONE • AYAH QUEST</div>
+                        <div class="achievement-seal">✦</div>
+                        <h1 class="achievement-title">Your Journey</h1>
+                        <p class="achievement-subtitle">A beautiful step through the Qur'an</p>
+                        <div class="achievement-stats">
+                            <div class="achievement-stat">
+                                <div class="achievement-stat-value">${playerProgress.totalVersesCompleted}/${versesArray.length}</div>
+                                <div class="achievement-stat-label">Verses Mastered</div>
+                            </div>
+                            <div class="achievement-stat">
+                                <div class="achievement-stat-value">${accuracy}%</div>
+                                <div class="achievement-stat-label">Accuracy</div>
+                            </div>
+                            <div class="achievement-stat">
+                                <div class="achievement-stat-value">${playerProgress.currentStreak}</div>
+                                <div class="achievement-stat-label">Current Streak</div>
+                            </div>
+                            <div class="achievement-stat">
+                                <div class="achievement-stat-value">${level}</div>
+                                <div class="achievement-stat-label">Learning Level</div>
+                            </div>
+                        </div>
+                        <div class="achievement-progress-label"><span>Journey progress</span><strong>${completionPercentage}%</strong></div>
+                        <div class="achievement-progress-track" aria-label="${completionPercentage}% of verses mastered">
+                            <div class="achievement-progress-fill" style="width:${Math.max(0, Math.min(100, completionPercentage))}%"></div>
+                        </div>
+                        <p class="achievement-quote">Every ayah mastered is a light carried forward.</p>
+                        <div class="achievement-branding">
+                            <img class="achievement-logo" alt="DarasaOne" hidden>
+                            <span class="achievement-logo-fallback">DarasaOne</span>
+                        </div>
+                    </article>
+                    <div class="achievement-actions">
+                        <button type="button" class="achievement-action-btn" id="close-achievement-btn">Continue Learning</button>
+                    </div>
+                    <div class="achievement-share-hint">Screenshot this card to share your learning journey.</div>
+                </div>
+            `;
+
+            const card = achievementModal.querySelector('.achievement-card');
+            if (cardBackground && cardBackground.info && cardBackground.info.url) {
+                card.style.backgroundImage = `url("${cardBackground.info.url}")`;
+            }
+            const logoImage = achievementModal.querySelector('.achievement-logo');
+            const logoFallback = achievementModal.querySelector('.achievement-logo-fallback');
+            if (logoAsset && logoAsset.info && logoAsset.info.url) {
+                logoImage.src = logoAsset.info.url;
+                logoImage.hidden = false;
+                logoFallback.hidden = true;
+            }
+
+            achievementModal.classList.add('visible');
+            achievementModal.querySelector('#close-achievement-btn').addEventListener('click', hideAchievementCard);
+        }
+
+        function showProgressModal() {
+            const completionPercentage = Math.round((playerProgress.totalVersesCompleted / versesArray.length) * 100);
+            const accuracy = getAccuracyPercentage();
+            
+            progressModal.innerHTML = `
+                <div class="progress-header">Your Learning Journey</div>
+                <div style="font-size:20px; color:rgba(255,255,255,0.8); margin-bottom:8px; direction:ltr;">
+                    ${playerProgress.totalVersesCompleted} of ${versesArray.length} verses completed
+                </div>
+                <div style="font-size:16px; color:var(--primary-gold); margin-bottom:24px; direction:ltr;">
+                    ${completionPercentage}% mastered
+                </div>
+                <div style="display:flex; gap:24px; margin-bottom:32px; flex-wrap:wrap; justify-content:center;">
+                    <div style="text-align:center; min-width:120px;">
+                        <div style="font-size:32px; color:var(--primary-gold); font-weight:700;">${accuracy}%</div>
+                        <div style="font-size:14px; color:rgba(255,255,255,0.6);">Accuracy</div>
+                    </div>
+                    <div style="text-align:center; min-width:120px;">
+                        <div style="font-size:32px; color:var(--primary-gold); font-weight:700;">${playerProgress.currentStreak}</div>
+                        <div style="font-size:14px; color:rgba(255,255,255,0.6);">Current Streak</div>
+                    </div>
+                    <div style="text-align:center; min-width:120px;">
+                        <div style="font-size:32px; color:var(--primary-gold); font-weight:700;">${playerProgress.bestStreak}</div>
+                        <div style="font-size:14px; color:rgba(255,255,255,0.6);">Best Streak</div>
+                    </div>
+                </div>
+                <div class="verse-list">
+                    ${versesArray.map((v, idx) => {
+                        const verseId = v.id || `verse_${idx}`;
+                        const isCompleted = playerProgress.completedVerseIds.includes(verseId);
+                        const isCurrent = idx === playerProgress.currentVerseIndex;
+                        const isUnlocked = idx <= playerProgress.currentVerseIndex || isCompleted;
+                        const stars = playerProgress.starRatings[verseId] || 0;
+                        const starsDisplay = isCompleted ? 
+                            [1,2,3].map(i => i <= stars ? '⭐' : '☆').join('') : '—';
+                        
+                        return `
+                            <div class="verse-item ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isUnlocked ? '' : 'locked'}" data-verse-idx="${idx}" style="cursor: ${isUnlocked ? 'pointer' : 'not-allowed'};" aria-disabled="${!isUnlocked}">
+                                <div class="verse-item-info">
+                                    <div style="font-size:16px; color:#fff; margin-bottom:4px;">${isUnlocked ? v.text.substring(0, 40) + (v.text.length > 40 ? '...' : '') : '🔒 Complete the previous verse'}</div>
+                                    <div class="verse-item-ref">${v.reference || ''} • ${v.difficulty || 'Beginner'}</div>
+                                </div>
+                                <div class="verse-item-stars">${starsDisplay}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <div style="display:flex; gap:12px; margin-top:16px; flex-wrap:wrap; justify-content:center;">
+                    ${playerProgress.totalVersesCompleted > 0 ? '<button class="close-modal-btn" id="view-achievement-from-progress">🏅 View Achievement</button>' : ''}
+                    <button class="close-modal-btn" id="close-progress-btn">Continue Learning</button>
+                    ${playerProgress.totalVersesCompleted > 0 ? 
+                        '<button class="close-modal-btn" id="reset-progress-btn" style="background: rgba(255,255,255,0.15);">Start Fresh</button>' 
+                        : ''}
+                </div>
+            `;
+            
+            progressModal.classList.add('visible');
+            
+            document.getElementById('close-progress-btn').addEventListener('click', () => {
+                progressModal.classList.remove('visible');
+            });
+
+            const viewAchievementFromProgress = document.getElementById('view-achievement-from-progress');
+            if (viewAchievementFromProgress) {
+                viewAchievementFromProgress.addEventListener('click', () => {
+                    progressModal.classList.remove('visible');
+                    showAchievementCard();
+                });
+            }
+
+            const resetBtn = document.getElementById('reset-progress-btn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    // Create confirmation overlay
+                    const confirmOverlay = document.createElement('div');
+                    confirmOverlay.style.cssText = `
+                        position: fixed;
+                        inset: 0;
+                        background: rgba(0,0,0,0.8);
+                        z-index: 100;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        padding: 24px;
+                    `;
+                    confirmOverlay.innerHTML = `
+                        <div style="background: linear-gradient(145deg, rgba(7,76,79,0.98), rgba(13,115,119,0.95)); 
+                                    padding: 32px; border-radius: 20px; text-align: center; max-width: 400px;
+                                    border: 2px solid rgba(244,162,97,0.4);">
+                            <div style="font-size: 24px; color: var(--primary-gold); margin-bottom: 16px; font-family: 'Fredoka', sans-serif;">
+                                Reset Progress?
+                            </div>
+                            <div style="font-size: 16px; color: rgba(255,255,255,0.8); margin-bottom: 24px; line-height: 1.5;">
+                                This will erase all your completed verses, star ratings, and achievement statistics. This cannot be undone.
+                            </div>
+                            <div style="display: flex; gap: 12px; justify-content: center;">
+                                <button class="close-modal-btn" id="confirm-reset" style="background: #e74c3c;">Yes, Reset</button>
+                                <button class="close-modal-btn" id="cancel-reset">Cancel</button>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(confirmOverlay);
+
+                    document.getElementById('confirm-reset').addEventListener('click', async () => {
+                        playerProgress = {
+                            currentVerseIndex: 0,
+                            currentLevel: 'Beginner',
+                            completedVerseIds: [],
+                            starRatings: {},
+                            totalVersesCompleted: 0,
+                            totalCorrectPlacements: 0,
+                            totalIncorrectPlacements: 0,
+                            currentStreak: 0,
+                            bestStreak: 0,
+                            lastCompletedAt: null
+                        };
+                        await savePlayerProgress();
+                        confirmOverlay.remove();
+                        progressModal.classList.remove('visible');
+                        loadNextVerse();
+                    });
+
+                    document.getElementById('cancel-reset').addEventListener('click', () => {
+                        confirmOverlay.remove();
+                    });
+                });
+            }
+
+            // Allow clicking on verse items to jump to them
+            progressModal.querySelectorAll('.verse-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const idx = parseInt(item.dataset.verseIdx);
+                    const targetVerse = versesArray[idx];
+                    const targetId = targetVerse && (targetVerse.id || `verse_${idx}`);
+                    const isUnlocked = idx <= playerProgress.currentVerseIndex || playerProgress.completedVerseIds.includes(targetId);
+                    if (!isUnlocked) return;
+                    playerProgress.currentVerseIndex = idx;
+                    playerProgress.currentLevel = targetVerse.difficulty || 'Beginner';
+                    savePlayerProgress();
+                    progressModal.classList.remove('visible');
+                    loadNextVerse();
+                });
+            });
+        }
+
+        // --- Drag and Drop ---
+        let ghostEl = null;
+
+        function getSlotAtPoint(x, y) {
+            for (const s of slots) {
+                const rect = s.element.getBoundingClientRect();
+                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+                    return s;
+                }
+            }
+            return null;
+        }
+
+        function startDrag(tileData, startX, startY) {
+            if (mode === 'edit' || gameComplete) return;
+            if (tileData.placed) return;
+
+            dragState = { tileData, startX, startY };
+            tileData.element.classList.add('dragging');
+
+            // Create ghost
+            ghostEl = document.createElement('div');
+            ghostEl.className = 'letter-tile drag-ghost';
+            applyLetterArtwork(ghostEl, tileData.char);
+            ghostEl.style.left = (startX - 48) + 'px';
+            ghostEl.style.top = (startY - 48) + 'px';
+            document.body.appendChild(ghostEl);
+
+            tileData.element.style.opacity = '0.4';
+        }
+
+        function moveDrag(x, y) {
+            if (!dragState || !ghostEl) return;
+
+            ghostEl.style.left = (x - 48) + 'px';
+            ghostEl.style.top = (y - 48) + 'px';
+
+            // Highlight slot under cursor
+            slots.forEach(s => {
+                if (!s.correct) s.element.classList.remove('hover-active');
+            });
+            const hoverSlot = getSlotAtPoint(x, y);
+            if (hoverSlot && !hoverSlot.correct) {
+                hoverSlot.element.classList.add('hover-active');
+            }
+        }
+
+        function endDrag(x, y) {
+            if (!dragState) return;
+
+            const { tileData } = dragState;
+            tileData.element.classList.remove('dragging');
+            tileData.element.style.opacity = '';
+
+            // Clean up ghost
+            if (ghostEl) {
+                ghostEl.remove();
+                ghostEl = null;
+            }
+
+            // Remove hover states
+            slots.forEach(s => s.element.classList.remove('hover-active'));
+
+            const targetSlot = getSlotAtPoint(x, y);
+
+            if (targetSlot && !targetSlot.correct) {
+                playDropSound();
+
+                // Remove any previously placed tile in this slot
+                if (targetSlot.filledTileId !== null) {
+                    const prevTile = tiles.find(t => t.id === targetSlot.filledTileId);
+                    if (prevTile) {
+                        prevTile.placed = false;
+                        prevTile.element.classList.remove('placed');
+                    }
+                }
+
+                if (tileData.char === targetSlot.correctChar) {
+                    // Correct!
+                    targetSlot.correct = true;
+                    targetSlot.filledChar = tileData.char;
+                    targetSlot.filledTileId = tileData.id;
+                    tileData.placed = true;
+                    tileData.element.classList.add('placed');
+
+                    targetSlot.element.classList.remove('filled', 'incorrect');
+                    targetSlot.element.classList.add('correct');
+                    targetSlot.element.innerHTML = '';
+                    const slotLetter = document.createElement('span');
+                    slotLetter.className = 'slot-letter';
+                    // Keep the ayah surface typographic like a Mushaf; illustrated tiles stay in the tray only.
+                    if (quranSettings.joinLetters || /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED\u08D3-\u08FF]/u.test(tileData.char)) {
+                        slotLetter.textContent = tileData.char;
+                        slotLetter.setAttribute('aria-label', `Arabic letter ${tileData.char}`);
+                    } else {
+                        applyLetterArtwork(slotLetter, tileData.char);
+                    }
+                    targetSlot.element.appendChild(slotLetter);
+
+                    // Track correct placement statistic
+                    playerProgress.totalCorrectPlacements++;
+
+                    playCorrectSound();
+                    checkCompletion();
+                } else {
+                    // Incorrect
+                    mistakes++;
+                    mistakesEl.textContent = `⚠ ${mistakes}`;
+
+                    // Track incorrect placement statistic
+                    playerProgress.totalIncorrectPlacements++;
+
+                    targetSlot.element.classList.add('incorrect');
+                    gameWorld.classList.remove('screen-shake');
+                    void gameWorld.offsetWidth;
+                    gameWorld.classList.add('screen-shake');
+                    setTimeout(() => {
+                        targetSlot.element.classList.remove('incorrect');
+                        gameWorld.classList.remove('screen-shake');
+                    }, 500);
+
+                    playIncorrectSound();
+                }
+            }
+
+            dragState = null;
+        }
+
+        // Touch events
+        gameWorld.addEventListener('touchstart', (e) => {
+            if (mode === 'edit' || gameComplete) return;
+            const touch = e.touches[0];
+            const target = e.target.closest('.letter-tile');
+            if (!target) return;
+
+            const tileData = tiles.find(t => t.id === parseInt(target.dataset.tileId));
+            if (tileData && !tileData.placed) {
+                e.preventDefault();
+                startDrag(tileData, touch.clientX, touch.clientY);
+            }
+        }, { passive: false });
+
+        gameWorld.addEventListener('touchmove', (e) => {
+            if (!dragState) return;
+            e.preventDefault();
+            const touch = e.touches[0];
+            moveDrag(touch.clientX, touch.clientY);
+        }, { passive: false });
+
+        gameWorld.addEventListener('touchend', (e) => {
+            if (!dragState) return;
+            const touch = e.changedTouches[0];
+            endDrag(touch.clientX, touch.clientY);
+        });
+
+        // Mouse events
+        gameWorld.addEventListener('mousedown', (e) => {
+            if (mode === 'edit' || gameComplete) return;
+            const target = e.target.closest('.letter-tile');
+            if (!target) return;
+
+            const tileData = tiles.find(t => t.id === parseInt(target.dataset.tileId));
+            if (tileData && !tileData.placed) {
+                startDrag(tileData, e.clientX, e.clientY);
+            }
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!dragState) return;
+            moveDrag(e.clientX, e.clientY);
+        });
+
+        window.addEventListener('mouseup', (e) => {
+            if (!dragState) return;
+            endDrag(e.clientX, e.clientY);
+        });
+
+        // --- Check completion ---
+        function checkCompletion() {
+            if (slots.every(s => s.correct)) {
+                gameComplete = true;
+                // Reflow the completed text as one Arabic run so contextual joining,
+                // ligatures, and Quranic diacritics remain visually connected.
+                showFullyJoinedAyah();
+                // Completion fanfare is followed by the complete ayah recitation.
+
+                const stars = mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1;
+                const verseId = currentVerseData.id || `verse_${playerProgress.currentVerseIndex}`;
+
+                // Update player progress
+                if (!playerProgress.completedVerseIds.includes(verseId)) {
+                    playerProgress.completedVerseIds.push(verseId);
+                    playerProgress.totalVersesCompleted++;
+                }
+                
+                // Update star rating (keep the best)
+                const previousStars = playerProgress.starRatings[verseId] || 0;
+                if (stars > previousStars) {
+                    playerProgress.starRatings[verseId] = stars;
+                }
+
+                // Update streak statistics
+                if (stars === 3) {
+                    // Perfect completion continues the streak
+                    playerProgress.currentStreak++;
+                    if (playerProgress.currentStreak > playerProgress.bestStreak) {
+                        playerProgress.bestStreak = playerProgress.currentStreak;
+                    }
+                } else {
+                    // Non-perfect completion resets the streak
+                    playerProgress.currentStreak = 0;
+                }
+
+                // Record completion timestamp
+                playerProgress.lastCompletedAt = new Date().toISOString();
+
+                // Save progress immediately after completion
+                savePlayerProgress();
+                updateAchievementButton();
+                spawnSuccessParticles();
+
+                // Tell the host page a verse was completed so it can record
+                // points/score in Supabase and refresh the live leaderboard.
+                // Checked by identity on the receiving end (event.source), not
+                // origin, so this keeps working whether the game is served
+                // same-origin (public/) or later moved to a CDN/R2 URL.
+                try {
+                    if (window.parent && window.parent !== window) {
+                        window.parent.postMessage({
+                            source: 'darasaone-game',
+                            gameSlug: 'ayah-quest',
+                            // Standard contract for every Darasaone game:
+                            // { source: 'darasaone-game', gameSlug, type: 'game-complete', pointsEarned, ...meta }.
+                            // The host only ever reads `pointsEarned`; everything
+                            // else here is Ayah-Quest-specific metadata for
+                            // future features (per-verse stats, etc).
+                            type: 'game-complete',
+                            verseId,
+                            stars,
+                            pointsEarned: stars * 10,
+                            totalVersesCompleted: playerProgress.totalVersesCompleted,
+                            bestStreak: playerProgress.bestStreak
+                        }, '*');
+                    }
+                } catch (error) {
+                    lib.log(`Could not notify host page of verse completion: ${error.message}`);
+                }
+
+                setTimeout(() => {
+                    const isLastVerse = playerProgress.currentVerseIndex >= versesArray.length - 1;
+                    const nextBtnText = isLastVerse ? 'Play Again' : 'Next Verse →';
+                    
+                    successOverlay.innerHTML = `
+                        <div class="stars-display">
+                            ${[1,2,3].map(i => `<span class="star ${i <= stars ? 'earned' : ''}">⭐</span>`).join('')}
+                        </div>
+                        <div class="success-text">ما شاء الله!</div>
+                        <div class="success-verse">${verseText}</div>
+                        <div style="font-size:18px; color:rgba(255,255,255,0.7); margin-bottom:24px; direction:ltr;">${verseRef}</div>
+                        <div style="font-size:16px; color:rgba(255,255,255,0.55); margin-bottom:16px; direction:ltr;">
+                            ${playerProgress.totalVersesCompleted} verses mastered
+                        </div>
+                        <div class="completion-actions">
+                            <button class="next-btn achievement-overlay-btn" id="view-achievement-btn">🏅 View Achievement</button>
+                            <button class="next-btn" id="next-verse-btn">${nextBtnText}</button>
+                        </div>
+                    `;
+                    successOverlay.classList.add('visible');
+
+                    // Animate stars
+                    const starEls = successOverlay.querySelectorAll('.star.earned');
+                    starEls.forEach((el, i) => {
+                        el.style.transitionDelay = (i * 200) + 'ms';
+                        el.style.transform = 'scale(1.2)';
+                        setTimeout(() => { el.style.transform = 'scale(1)'; }, 300 + i * 200);
+                    });
+
+                    const viewAchievementBtn = document.getElementById('view-achievement-btn');
+                    if (viewAchievementBtn) {
+                        viewAchievementBtn.addEventListener('click', () => {
+                            successOverlay.classList.remove('visible');
+                            showAchievementCard(true);
+                        });
+                    }
+
+                    document.getElementById('next-verse-btn').addEventListener('click', () => {
+                        successOverlay.classList.remove('visible');
+                        
+                        if (isLastVerse) {
+                            // Reset to first verse
+                            playerProgress.currentVerseIndex = 0;
+                        } else {
+                            // Move to next verse
+                            playerProgress.currentVerseIndex++;
+                        }
+                        
+                        // Save after advancing
+                        savePlayerProgress();
+                        
+                        // Load next verse
+                        loadNextVerse();
+                    });
+                }, 600);
+            }
+        }
+
+        function loadNextVerse() {
+            stopRecitation();
+            gameComplete = false;
+            mistakes = 0;
+            mistakesEl.textContent = '⚠ 0';
+            
+            // Update verse data from progression
+            currentVerseData = versesArray[playerProgress.currentVerseIndex] || versesArray[0];
+            playerProgress.currentLevel = currentVerseData.difficulty || 'Beginner';
+            verseText = currentVerseData.text;
+            missingIndices = currentVerseData.missingIndices.slice().sort((a, b) => a - b);
+            verseRef = currentVerseData.reference || '';
+            chars = splitTextUnits(verseText);
+            missingSet = new Set(missingIndices);
+            
+            // Update header
+            const progressInfo = `<div style="font-size:14px; color:rgba(255,255,255,0.65); direction:ltr; margin-top:4px;">
+                Verse ${playerProgress.currentVerseIndex + 1} of ${versesArray.length} • 
+                ${playerProgress.totalVersesCompleted} completed • 
+                ${currentVerseData.difficulty || 'beginner'}
+            </div>`;
+            
+            header.innerHTML = `
+                <div class="game-title">DarasaOne: Ayah Quest</div>
+                <div class="verse-ref">${verseRef}</div>
+                ${mode === 'play' ? progressInfo : ''}
+            `;
+            // Reattach the persistent audio control after changing verse header content.
+            header.appendChild(audioControls);
+            
+            buildVerse();
+            buildTiles();
+        }
+
+        function resetGame() {
+            stopRecitation();
+            gameComplete = false;
+            mistakes = 0;
+            mistakesEl.textContent = '⚠ 0';
+            buildVerse();
+            buildTiles();
+        }
+
+        // --- Edit mode ---
+        if (mode === 'edit') {
+            const indicator = document.createElement('div');
+            indicator.className = 'edit-indicator';
+            indicator.textContent = '✏️ Edit Mode';
+            gameWorld.appendChild(indicator);
+        }
+    }
+
+
+    run('play');
+    </script>
+</body>
+</html>

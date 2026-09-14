@@ -1,0 +1,2026 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Deen Dash</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+          --transition-fast: 150ms;
+          --transition-normal: 300ms;
+          --ease-out: cubic-bezier(0.0, 0, 0.2, 1);
+          --ease-bounce: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+          --space-xs: 8px;
+          --space-sm: 16px;
+          --space-md: 24px;
+          --space-lg: 32px;
+          --space-xl: 48px;
+
+          --gold: #D4A843;
+          --teal: #1A8A7D;
+          --deep-blue: #1B3A5C;
+          --warm-white: #FFF8EC;
+          --sunset-orange: #E8854A;
+          --sky-top: #F5C76B;
+          --sky-bottom: #2A6B7C;
+          --ground: #C4915A;
+          --ground-dark: #A07040;
+          --obstacle-color: #8B5E3C;
+          --runner-color: #1A8A7D;
+      }
+
+      body, html {
+          margin: 0;
+          padding: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          touch-action: none;
+          -ms-touch-action: none;
+          background: #1B3A5C;
+      }
+
+      #game-world {
+          position: relative;
+          width: 100%;
+          height: 100%;
+      }
+
+      canvas {
+          display: block;
+          width: 100%;
+          height: 100%;
+      }
+
+      /* Game Over Overlay */
+      .game-over-overlay {
+          position: absolute;
+          top: 0; left: 0;
+          width: 100%; height: 100%;
+          background: rgba(27, 58, 92, 0.85);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          z-index: 10;
+          opacity: 0;
+          transition: opacity var(--transition-normal) var(--ease-out);
+          pointer-events: none;
+      }
+
+      .game-over-overlay.visible {
+          opacity: 1;
+          pointer-events: auto;
+      }
+
+      .game-over-overlay > * {
+          opacity: 0;
+          transform: translateY(16px);
+          transition: opacity var(--transition-normal) var(--ease-out), transform var(--transition-normal) var(--ease-out);
+      }
+
+      .game-over-overlay.visible > * {
+          opacity: 1;
+          transform: translateY(0);
+      }
+
+      .game-over-title {
+          font-family: 'Fredoka', sans-serif;
+          font-weight: 700;
+          font-size: 52px;
+          color: var(--gold);
+          text-shadow: 0 3px 8px rgba(0,0,0,0.4);
+          margin-bottom: var(--space-sm);
+      }
+
+      .game-over-score {
+          font-family: 'Fredoka', sans-serif;
+          font-weight: 600;
+          font-size: 32px;
+          color: var(--warm-white);
+          margin-bottom: 18px;
+          text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      }
+
+      .score-breakdown {
+          width: min(420px, calc(100% - 48px));
+          box-sizing: border-box;
+          padding: 16px 20px;
+          margin-bottom: var(--space-md);
+          border: 2px solid rgba(245,214,128,0.45);
+          border-radius: 16px;
+          background: rgba(255,248,236,0.1);
+          color: var(--warm-white);
+          font-family: 'Inter', sans-serif;
+          font-size: 18px;
+      }
+
+      .score-breakdown-row {
+          display: flex;
+          justify-content: space-between;
+          gap: 20px;
+          padding: 7px 0;
+      }
+
+      .score-breakdown-row strong {
+          color: #F5D680;
+          font-family: 'Fredoka', sans-serif;
+          font-size: 21px;
+      }
+
+      .restart-btn {
+          font-family: 'Fredoka', sans-serif;
+          font-weight: 600;
+          font-size: 28px;
+          color: var(--deep-blue);
+          background: linear-gradient(180deg, #F5D680, #D4A843);
+          border: none;
+          border-radius: 16px;
+          padding: 20px 64px;
+          min-width: 240px;
+          min-height: 96px;
+          cursor: pointer;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
+          transition: transform var(--transition-fast) var(--ease-out), box-shadow var(--transition-fast);
+      }
+
+      .restart-btn:hover {
+          transform: scale(1.05);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.3);
+      }
+
+      .restart-btn:active {
+          transform: scale(0.97);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      }
+
+      /* HUD */
+      .hud {
+          position: absolute;
+          top: var(--space-sm);
+          left: var(--space-sm);
+          right: var(--space-sm);
+          display: flex;
+          justify-content: space-between;
+          pointer-events: none;
+          z-index: 5;
+      }
+
+      .hud-score,
+      .hud-multiplier {
+          font-family: 'Fredoka', sans-serif;
+          font-weight: 700;
+          font-size: 36px;
+          color: var(--warm-white);
+          text-shadow: 0 2px 6px rgba(0,0,0,0.5), 0 0 12px rgba(0,0,0,0.2);
+      }
+
+      .hud-multiplier {
+          color: #F5D680;
+          text-align: right;
+      }
+
+      /* Trivia question overlay */
+      .trivia-overlay {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 32px;
+          box-sizing: border-box;
+          background: rgba(27, 58, 92, 0.72);
+          z-index: 8;
+          opacity: 0;
+          visibility: hidden;
+          pointer-events: none;
+          transition: opacity var(--transition-normal) var(--ease-out), visibility var(--transition-normal);
+      }
+
+      .trivia-overlay.visible {
+          opacity: 1;
+          visibility: visible;
+          pointer-events: auto;
+      }
+
+      .trivia-card {
+          width: min(620px, 100%);
+          box-sizing: border-box;
+          padding: 30px;
+          border: 3px solid rgba(245, 214, 128, 0.8);
+          border-radius: 28px;
+          background: linear-gradient(155deg, rgba(27, 58, 92, 0.98), rgba(26, 138, 125, 0.96));
+          box-shadow: 0 14px 40px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.18);
+          text-align: center;
+          transform: translateY(18px) scale(0.96);
+          transition: transform var(--transition-normal) var(--ease-bounce);
+      }
+
+      .trivia-overlay.visible .trivia-card {
+          transform: translateY(0) scale(1);
+      }
+
+      .trivia-kicker {
+          color: #F5D680;
+          font-family: 'Inter', sans-serif;
+          font-size: 20px;
+          font-weight: 600;
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          margin-bottom: 14px;
+      }
+
+      .trivia-timer {
+          height: 16px;
+          border-radius: 10px;
+          overflow: hidden;
+          background: rgba(255,248,236,0.2);
+          margin-bottom: 22px;
+          border: 1px solid rgba(255,248,236,0.25);
+      }
+
+      .trivia-timer-fill {
+          width: 100%;
+          height: 100%;
+          border-radius: inherit;
+          background: linear-gradient(90deg, #F5D680, #D4A843);
+          transition: width 100ms linear;
+      }
+
+      .trivia-timer-text {
+          color: rgba(255,248,236,0.85);
+          font-family: 'Inter', sans-serif;
+          font-size: 18px;
+          margin-top: -14px;
+          margin-bottom: 18px;
+      }
+
+      .trivia-question {
+          min-height: 100px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--warm-white);
+          font-family: 'Fredoka', sans-serif;
+          font-size: 32px;
+          line-height: 1.2;
+          margin: 0 0 24px;
+      }
+
+      .trivia-answers {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px;
+      }
+
+      .answer-btn {
+          min-height: 96px;
+          padding: 14px 12px;
+          border: 2px solid rgba(245,214,128,0.7);
+          border-radius: 16px;
+          background: rgba(255,248,236,0.96);
+          color: var(--deep-blue);
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+          font-size: 21px;
+          line-height: 1.15;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.22);
+          transition: transform var(--transition-fast) var(--ease-out), background var(--transition-fast), box-shadow var(--transition-fast);
+      }
+
+      .answer-btn:hover,
+      .answer-btn:focus-visible {
+          background: #F5D680;
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(0,0,0,0.28);
+          outline: none;
+      }
+
+      .answer-btn:active {
+          transform: scale(0.97);
+      }
+
+      /* Tap hint */
+      .tap-hint {
+          position: absolute;
+          bottom: 200px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+          font-size: 24px;
+          color: rgba(255, 248, 236, 0.8);
+          text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+          pointer-events: none;
+          z-index: 5;
+          animation: tapPulse 1.5s ease-in-out infinite;
+      }
+
+      @keyframes tapPulse {
+          0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+          50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+      }
+
+      /* Start screen */
+      .start-overlay {
+          position: absolute;
+          top: 0; left: 0;
+          width: 100%; height: 100%;
+          background: rgba(27, 58, 92, 0.8);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          z-index: 10;
+      }
+
+      .start-title {
+          font-family: 'Fredoka', sans-serif;
+          font-weight: 700;
+          font-size: 56px;
+          color: var(--gold);
+          text-shadow: 0 3px 10px rgba(0,0,0,0.5);
+          margin-bottom: var(--space-xs);
+      }
+
+      .start-subtitle {
+          font-family: 'Inter', sans-serif;
+          font-size: 22px;
+          color: var(--warm-white);
+          opacity: 0.85;
+          margin-bottom: var(--space-xl);
+          text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+      }
+
+      /* Game Over Buttons */
+      .game-over-buttons {
+          display: flex;
+          gap: var(--space-md);
+          flex-wrap: wrap;
+          justify-content: center;
+      }
+
+      .leaderboard-btn {
+          font-family: 'Fredoka', sans-serif;
+          font-weight: 600;
+          font-size: 28px;
+          color: var(--deep-blue);
+          background: linear-gradient(180deg, #8ED4CC, #1A8A7D);
+          border: none;
+          border-radius: 16px;
+          padding: 20px 64px;
+          min-width: 240px;
+          min-height: 96px;
+          cursor: pointer;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
+          transition: transform var(--transition-fast) var(--ease-out), box-shadow var(--transition-fast);
+      }
+
+      .leaderboard-btn:hover {
+          transform: scale(1.05);
+          box-shadow: 0 6px 20px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.3);
+      }
+
+      .leaderboard-btn:active {
+          transform: scale(0.97);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      }
+
+      /* Leaderboard Overlay */
+      .leaderboard-overlay {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+          box-sizing: border-box;
+          background: rgba(27, 58, 92, 0.85);
+          z-index: 15;
+          opacity: 0;
+          visibility: hidden;
+          pointer-events: none;
+          transition: opacity var(--transition-normal) var(--ease-out), visibility var(--transition-normal);
+      }
+
+      .leaderboard-overlay.visible {
+          opacity: 1;
+          visibility: visible;
+          pointer-events: auto;
+      }
+
+      .leaderboard-panel {
+          width: min(540px, 100%);
+          max-height: 90vh;
+          box-sizing: border-box;
+          padding: 32px 24px;
+          border: 3px solid rgba(245, 214, 128, 0.8);
+          border-radius: 28px;
+          background: linear-gradient(155deg, rgba(27, 58, 92, 0.98), rgba(26, 138, 125, 0.96));
+          box-shadow: 0 14px 40px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.18);
+          overflow-y: auto;
+      }
+
+      .leaderboard-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 24px;
+      }
+
+      .leaderboard-title {
+          font-family: 'Fredoka', sans-serif;
+          font-weight: 700;
+          font-size: 38px;
+          color: var(--gold);
+          text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+          margin: 0;
+      }
+
+      .leaderboard-close {
+          background: rgba(255,248,236,0.2);
+          border: 2px solid rgba(255,248,236,0.4);
+          border-radius: 50%;
+          width: 48px;
+          height: 48px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: background var(--transition-fast), transform var(--transition-fast);
+          font-size: 28px;
+          color: var(--warm-white);
+          font-weight: bold;
+          line-height: 1;
+      }
+
+      .leaderboard-close:hover {
+          background: rgba(255,248,236,0.35);
+          transform: scale(1.1);
+      }
+
+      .leaderboard-close:active {
+          transform: scale(0.95);
+      }
+
+      .leaderboard-list {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+      }
+
+      .leaderboard-entry {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          padding: 14px 18px;
+          margin-bottom: 12px;
+          background: rgba(255,248,236,0.12);
+          border: 2px solid rgba(245,214,128,0.3);
+          border-radius: 16px;
+          transition: background var(--transition-fast), border-color var(--transition-fast);
+      }
+
+      .leaderboard-entry:hover {
+          background: rgba(255,248,236,0.18);
+          border-color: rgba(245,214,128,0.5);
+      }
+
+      .leaderboard-entry.current-user {
+          background: rgba(212,168,67,0.25);
+          border-color: rgba(245,214,128,0.7);
+      }
+
+      .leaderboard-rank {
+          font-family: 'Fredoka', sans-serif;
+          font-weight: 700;
+          font-size: 24px;
+          color: var(--gold);
+          min-width: 40px;
+          text-align: center;
+      }
+
+      .leaderboard-avatar {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          border: 2px solid rgba(245,214,128,0.6);
+          background: rgba(255,248,236,0.15);
+          object-fit: cover;
+      }
+
+      .leaderboard-info {
+          flex: 1;
+          min-width: 0;
+      }
+
+      .leaderboard-username {
+          font-family: 'Fredoka', sans-serif;
+          font-weight: 600;
+          font-size: 20px;
+          color: var(--warm-white);
+          margin: 0 0 2px 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+      }
+
+      .leaderboard-score {
+          font-family: 'Inter', sans-serif;
+          font-weight: 600;
+          font-size: 28px;
+          color: var(--gold);
+          white-space: nowrap;
+      }
+
+      .leaderboard-loading,
+      .leaderboard-empty,
+      .leaderboard-error {
+          text-align: center;
+          padding: 48px 24px;
+          font-family: 'Inter', sans-serif;
+          font-size: 18px;
+          color: rgba(255,248,236,0.8);
+      }
+
+      .leaderboard-loading {
+          animation: pulse 1.5s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
+      }
+
+      .leaderboard-error {
+          color: #E8854A;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-world">
+      <canvas id="game-canvas"></canvas>
+      <div class="hud" id="hud" style="display:none;">
+        <div class="hud-score" id="score-display">0</div>
+        <div class="hud-multiplier" id="multiplier-display">×1</div>
+      </div>
+      <div class="trivia-overlay" id="trivia-overlay" aria-live="polite">
+        <div class="trivia-card">
+          <div class="trivia-kicker">Light Orb Challenge</div>
+          <div class="trivia-timer" aria-hidden="true">
+            <div class="trivia-timer-fill" id="trivia-timer-fill"></div>
+          </div>
+          <div class="trivia-timer-text" id="trivia-timer-text">12s</div>
+          <p class="trivia-question" id="trivia-question">Question</p>
+          <div class="trivia-answers" id="trivia-answers"></div>
+        </div>
+      </div>
+      <div class="tap-hint" id="tap-hint" style="display:none;">Tap or Spacebar to Jump</div>
+      <div class="game-over-overlay" id="game-over">
+        <div class="game-over-title">Game Over</div>
+        <div class="game-over-score" id="final-score">Final Score: 0</div>
+        <div class="score-breakdown" id="score-breakdown" aria-label="Final score breakdown">
+          <div class="score-breakdown-row">
+            <span>Distance</span><strong id="distance-score">0</strong>
+          </div>
+          <div class="score-breakdown-row">
+            <span>Trivia bonus</span><strong id="trivia-score">0</strong>
+          </div>
+          <div class="score-breakdown-row">
+            <span>Multiplier bonus</span><strong id="multiplier-score">0</strong>
+          </div>
+        </div>
+        <div class="game-over-buttons">
+          <button class="restart-btn" id="restart-btn">Play Again</button>
+          <button class="leaderboard-btn" id="leaderboard-btn">Leaderboard</button>
+        </div>
+      </div>
+      <div class="leaderboard-overlay" id="leaderboard-overlay">
+        <div class="leaderboard-panel">
+          <div class="leaderboard-header">
+            <h2 class="leaderboard-title">Top Runners</h2>
+            <button class="leaderboard-close" id="leaderboard-close" aria-label="Close leaderboard">
+              &times;
+            </button>
+          </div>
+          <div id="leaderboard-content">
+            <div class="leaderboard-loading">Loading leaderboard...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <script>
+    // --- Standalone harness (replaces Astrocade's hosted runtime) ---
+    // Asset Map (Read-Only)
+// Edit assets in the Media tab.
+// Use these IDs alongside lib to reference assets in your code:
+//
+// Example: lib.getAsset["player_sprite"]
+
+const assets = {
+  "runner_character": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/runner_character_d1a56eee-2153-40ce-b370-13a2cfef25c5.webp",
+    "type": "image",
+    "aspect_ratio": [
+      889,
+      1225
+    ]
+  },
+  "islamic_obstacle_low": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/islamic_obstacle_low_557e3aab-4fdc-4b10-a4f6-c854c3f890b4.webp",
+    "type": "image",
+    "aspect_ratio": [
+      738,
+      587
+    ]
+  },
+  "islamic_obstacle_tall": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/islamic_obstacle_tall_99fab9a0-eae5-4c4b-8550-52102d9f4315.webp",
+    "type": "image",
+    "aspect_ratio": [
+      660,
+      838
+    ]
+  },
+  "far_background": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/far_background_06ed5193-6618-415a-a3fb-273382a846a8.webp",
+    "type": "image",
+    "aspect_ratio": [
+      1264,
+      848
+    ]
+  },
+  "mid_background": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/mid_background_59b42c93-0288-4802-be3f-f6323e139ac7.webp",
+    "type": "image",
+    "aspect_ratio": [
+      1264,
+      848
+    ]
+  },
+  "islamic_ground_tile": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/islamic_ground_tile_5a19f6ca-71c6-48db-97d3-5bd46edbc200.webp",
+    "type": "image",
+    "aspect_ratio": [
+      1024,
+      1024
+    ]
+  },
+  "light_orb": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/images/light_orb_05b6bc97-fcca-4b77-9b5d-714dce178da5.webp",
+    "type": "image",
+    "aspect_ratio": [
+      653,
+      646
+    ]
+  },
+  "background_music": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/sounds/effect/background_music_ec3526fd-dcca-4267-b962-544c6ac8687a.mp3",
+    "type": "audio"
+  },
+  "jump_sound": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/sounds/effect/jump_sound_fee81318-c37a-43b1-bf99-10d035e2bbef.mp3",
+    "type": "audio"
+  },
+  "orb_collect_sound": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/sounds/effect/orb_collect_sound_6f86fc0a-f14f-41cf-84ed-fd2d3cd0779f.mp3",
+    "type": "audio"
+  },
+  "correct_answer_sound": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/sounds/effect/correct_answer_sound_fdba190e-fd03-440a-a02f-20dad35162f3.mp3",
+    "type": "audio"
+  },
+  "wrong_answer_sound": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/sounds/effect/wrong_answer_sound_6f49e281-4b2f-42e1-af80-1284f0493488.mp3",
+    "type": "audio"
+  },
+  "collision_sound": {
+    "url": "https://d2oir5eh8rty2e.cloudfront.net/assets/sounds/effect/collision_sound_8e0632ce-1eed-42a4-8bb8-b788d1ad767b.mp3",
+    "type": "audio"
+  }
+};
+
+
+
+    window.gameConfig = {"runner": {"speed": 350, "maxSpeed": 700, "speedIncrease": 8, "jumpHeight": 160, "gravity": 1600, "color": "#1A8A7D"}, "obstacles": {"spawnInterval": 2.2, "minGap": 1, "color": "#8B5E3C", "speedSpawnFactor": 0.55, "minSpawnInterval": 0.75}, "orbs": {"spawnInterval": 3.1, "minGap": 1.7, "spawnChance": 0.82, "size": 64, "height": 132}, "scoring": {"distancePointRate": 0.02}, "trivia": {"timeLimit": 12, "points": 100, "multiplierThresholds": [0, 3, 6, 10, 15], "multiplierThresholdsText": "0,3,6,10,15", "questionBank": [{"question": "How many pillars of Islam are there?", "options": ["Three", "Four", "Five", "Six"], "answer": 2}, {"question": "What is the first pillar of Islam?", "options": ["Salah", "Shahadah", "Zakah", "Hajj"], "answer": 1}, {"question": "How many daily prayers are obligatory?", "options": ["Three", "Four", "Five", "Six"], "answer": 2}, {"question": "Which month do Muslims fast in?", "options": ["Muharram", "Rajab", "Ramadan", "Shawwal"], "answer": 2}, {"question": "What is the pilgrimage to Makkah called?", "options": ["Hajj", "Umrah", "Hijrah", "Ziyarah"], "answer": 0}, {"question": "What is the obligatory charity called?", "options": ["Sadaqah", "Zakah", "Fidyah", "Waqf"], "answer": 1}, {"question": "What is the declaration of faith called?", "options": ["Shahadah", "Salah", "Sawm", "Adhan"], "answer": 0}, {"question": "In which direction do Muslims pray?", "options": ["Jerusalem", "Madinah", "The Ka'bah in Makkah", "Mount Uhud"], "answer": 2}, {"question": "What is the Arabic name for the dawn prayer?", "options": ["Fajr", "Dhuhr", "Asr", "Isha"], "answer": 0}, {"question": "What is the Arabic name for the night prayer?", "options": ["Maghrib", "Isha", "Fajr", "Asr"], "answer": 1}, {"question": "Which prayer has four obligatory units (rak'ahs)?", "options": ["Fajr", "Maghrib", "Dhuhr", "Witr"], "answer": 2}, {"question": "What is the call to prayer called?", "options": ["Khutbah", "Adhan", "Takbir", "Tasbih"], "answer": 1}, {"question": "What is the pre-dawn meal during Ramadan called?", "options": ["Iftar", "Suhoor", "Walima", "Aqiqah"], "answer": 1}, {"question": "What meal breaks the fast at sunset?", "options": ["Suhoor", "Iftar", "Niyyah", "Sahur prayer"], "answer": 1}, {"question": "What is the Night of Decree called?", "options": ["Laylat al-Qadr", "Laylat al-Miraj", "Yawm al-Arafah", "Ashura"], "answer": 0}, {"question": "Which month comes after Ramadan?", "options": ["Dhul-Hijjah", "Shawwal", "Safar", "Rabi al-Awwal"], "answer": 1}, {"question": "How many days does Ramadan usually last?", "options": ["10 or 11", "20 or 21", "29 or 30", "40 or 41"], "answer": 2}, {"question": "What is the festival at the end of Ramadan called?", "options": ["Eid al-Adha", "Eid al-Fitr", "Eid al-Mawlid", "Ashura"], "answer": 1}, {"question": "What is the festival during the Hajj season called?", "options": ["Eid al-Fitr", "Eid al-Adha", "Eid al-Isra", "Eid al-Nur"], "answer": 1}, {"question": "What is the sacred cube-shaped building in Makkah called?", "options": ["The Ka'bah", "The Rawdah", "The Minbar", "The Mihrab"], "answer": 0}, {"question": "In which city is the Prophet's Mosque?", "options": ["Makkah", "Madinah", "Jerusalem", "Taif"], "answer": 1}, {"question": "In which city is Al-Masjid al-Haram?", "options": ["Madinah", "Makkah", "Cairo", "Damascus"], "answer": 1}, {"question": "What was the migration from Makkah to Madinah called?", "options": ["Hajj", "Hijrah", "Isra", "Umrah"], "answer": 1}, {"question": "Who was the final prophet in Islam?", "options": ["Musa (Moses)", "Isa (Jesus)", "Ibrahim (Abraham)", "Muhammad ﷺ"], "answer": 3}, {"question": "Which prophet built the Ark?", "options": ["Nuh (Noah)", "Yusuf (Joseph)", "Yunus (Jonah)", "Dawud (David)"], "answer": 0}, {"question": "Which prophet is known for interpreting dreams?", "options": ["Yusuf (Joseph)", "Musa (Moses)", "Sulayman (Solomon)", "Ayyub (Job)"], "answer": 0}, {"question": "Which prophet spoke to Allah according to the Quran?", "options": ["Musa (Moses)", "Yahya (John)", "Ismail (Ishmael)", "Lut (Lot)"], "answer": 0}, {"question": "Which prophet was swallowed by a great fish?", "options": ["Yunus (Jonah)", "Nuh (Noah)", "Hud", "Salih"], "answer": 0}, {"question": "Who was the father of Ismail (Ishmael)?", "options": ["Ibrahim (Abraham)", "Yaqub (Jacob)", "Imran", "Zakariya (Zechariah)"], "answer": 0}, {"question": "Which prophet was known for patience during severe trials?", "options": ["Ayyub (Job)", "Yusuf (Joseph)", "Shu'ayb", "Idris (Enoch)"], "answer": 0}, {"question": "What is the holy book of Islam?", "options": ["The Quran", "The Torah", "The Psalms", "The Gospel"], "answer": 0}, {"question": "In which language was the Quran first revealed?", "options": ["Arabic", "Hebrew", "Aramaic", "Persian"], "answer": 0}, {"question": "How many surahs are in the Quran?", "options": ["104", "114", "124", "144"], "answer": 1}, {"question": "Which is the first surah of the Quran?", "options": ["Al-Baqarah", "Al-Ikhlas", "Al-Fatihah", "An-Nas"], "answer": 2}, {"question": "Which is the longest surah in the Quran?", "options": ["Al-Fatihah", "Al-Baqarah", "Yasin", "Al-Kahf"], "answer": 1}, {"question": "Which surah is often called the heart of the Quran?", "options": ["Yasin", "Al-Mulk", "Al-Falaq", "Al-Asr"], "answer": 0}, {"question": "What does Bismillah begin with?", "options": ["In the name of Allah", "Praise belongs to people", "Peace be upon the city", "By the morning"], "answer": 0}, {"question": "What does the Arabic word 'deen' commonly mean?", "options": ["Religion or way of life", "Mountain", "Journey", "Book"], "answer": 0}, {"question": "What does 'salah' mean?", "options": ["Prayer", "Charity", "Fasting", "Pilgrimage"], "answer": 0}, {"question": "What does 'sawm' mean?", "options": ["Fasting", "Patience", "Charity", "Remembrance"], "answer": 0}, {"question": "What does 'shukr' mean?", "options": ["Gratitude", "Courage", "Travel", "Knowledge"], "answer": 0}, {"question": "What does 'sabr' mean?", "options": ["Patience", "Strength", "Wealth", "Wisdom"], "answer": 0}, {"question": "What is a good deed called in Arabic?", "options": ["Hasanah", "Fitnah", "Riba", "Ghibah"], "answer": 0}, {"question": "What is backbiting called in Arabic?", "options": ["Ghibah", "Sadaqah", "Tawbah", "Shukr"], "answer": 0}, {"question": "What is repentance called in Arabic?", "options": ["Tawbah", "Sawm", "Adhan", "Qiblah"], "answer": 0}, {"question": "What does 'Assalamu alaykum' mean?", "options": ["Peace be upon you", "Good morning", "Welcome home", "Thank you"], "answer": 0}, {"question": "What is the response to 'Assalamu alaykum'?", "options": ["Wa alaykum as-salam", "Bismillah", "Alhamdulillah", "InshaAllah"], "answer": 0}, {"question": "What does 'Alhamdulillah' mean?", "options": ["All praise is for Allah", "Allah is greatest", "If Allah wills", "Glory be to Allah"], "answer": 0}, {"question": "What does 'InshaAllah' mean?", "options": ["If Allah wills", "Allah is greatest", "Peace be upon you", "Praise be to Allah"], "answer": 0}, {"question": "What does 'Allahu Akbar' mean?", "options": ["Allah is the Greatest", "Allah is forgiving", "Allah gives peace", "Allah is near"], "answer": 0}, {"question": "What is the direction of prayer called?", "options": ["Qiblah", "Mihrab", "Minbar", "Rawdah"], "answer": 0}, {"question": "What is the washing before prayer called?", "options": ["Wudu", "Ghusl", "Tayammum", "Ihram"], "answer": 0}, {"question": "What is the state of pilgrimage clothing called?", "options": ["Ihram", "Wudu", "Adhan", "Sujud"], "answer": 0}, {"question": "What is prostration in prayer called?", "options": ["Sujud", "Ruku", "Qiyam", "Tashahhud"], "answer": 0}, {"question": "What is bowing in prayer called?", "options": ["Ruku", "Sujud", "Salam", "Niyyah"], "answer": 0}, {"question": "What is the Friday congregational prayer called?", "options": ["Jumu'ah", "Tarawih", "Witr", "Duha"], "answer": 0}, {"question": "What are the special night prayers commonly prayed in Ramadan called?", "options": ["Tarawih", "Jumu'ah", "Istisqa", "Janazah"], "answer": 0}]}, "audio": {"masterVolume": 0.8, "musicVolume": 0.3, "jumpVolume": 0.55, "orbCollectVolume": 0.7, "correctVolume": 0.75, "wrongVolume": 0.45, "collisionVolume": 0.8}, "polish": {"screenShakeIntensity": 8, "orbPulseSpeed": 1, "particleCount": 18, "particleLifetime": 0.65, "uiTransitionSpeed": 300}};
+
+    // Pending get-leaderboard RPC calls, keyed by request id, resolved when
+    // the host page (GamePlayer.tsx) replies. This is the standard
+    // Darasaone leaderboard-read bridge -- see lib.getTopNEntriesFromLeaderboard
+    // below and the matching handler in GamePlayer.tsx.
+    const _pendingLeaderboardRequests = {};
+    window.addEventListener('message', function(event) {
+        const data = event.data;
+        if (!data || data.source !== 'darasaone-host' || data.type !== 'leaderboard-response') return;
+        const resolver = _pendingLeaderboardRequests[data.requestId];
+        if (resolver) {
+            delete _pendingLeaderboardRequests[data.requestId];
+            resolver(data.entries || []);
+        }
+    });
+
+    var lib = {
+        getAsset: function(id) { return assets[id] || null; },
+        log: function(message) { console.log('[DeenDash]', message); },
+        // No in-game settings editor in production play mode.
+        showGameParameters: function() {},
+
+        // Standard Darasaone scoring contract: tell the host page a run
+        // finished so it can record it in Supabase and refresh the live
+        // leaderboard next to the game. numEntries is accepted for
+        // interface compatibility but unused -- score recording doesn't
+        // need it.
+        addPlayerScoreToLeaderboard: async function(score, numEntries) {
+            try {
+                if (window.parent && window.parent !== window) {
+                    window.parent.postMessage({
+                        source: 'darasaone-game',
+                        gameSlug: 'deen-dash',
+                        type: 'game-complete',
+                        pointsEarned: score
+                    }, '*');
+                }
+            } catch (error) {
+                lib.log('Could not notify host page of score: ' + error.message);
+            }
+            return { success: true };
+        },
+
+        // Bridges the game's own "Top Runners" overlay to the host page's
+        // real Supabase leaderboard for this game, via postMessage
+        // request/response (the iframe has no direct Supabase access).
+        getTopNEntriesFromLeaderboard: async function(numEntries) {
+            if (!(window.parent && window.parent !== window)) return { entries: [] };
+            const requestId = 'lb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+            const entries = await new Promise(function(resolve) {
+                _pendingLeaderboardRequests[requestId] = resolve;
+                window.parent.postMessage({
+                    source: 'darasaone-game',
+                    gameSlug: 'deen-dash',
+                    type: 'get-leaderboard',
+                    requestId: requestId,
+                    numEntries: numEntries || 10
+                }, '*');
+                // Don't hang forever if the host never responds.
+                setTimeout(function() {
+                    if (_pendingLeaderboardRequests[requestId]) {
+                        delete _pendingLeaderboardRequests[requestId];
+                        resolve([]);
+                    }
+                }, 5000);
+            });
+            return { entries: entries };
+        }
+    };
+    </script>
+    <script>
+      /*
+       * DEEN DASH - Step 1: Endless Runner Core
+       * Side-scrolling runner with auto-movement, jump, obstacles, collision, game-over.
+       * Placeholder shapes; Islamic-inspired color palette.
+       */
+      async function run(mode) {
+        const gameWorld = document.getElementById('game-world');
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        const hud = document.getElementById('hud');
+        const scoreDisplay = document.getElementById('score-display');
+        const tapHint = document.getElementById('tap-hint');
+        const gameOverOverlay = document.getElementById('game-over');
+        const finalScoreEl = document.getElementById('final-score');
+        const distanceScoreEl = document.getElementById('distance-score');
+        const triviaScoreEl = document.getElementById('trivia-score');
+        const multiplierScoreEl = document.getElementById('multiplier-score');
+        const restartBtn = document.getElementById('restart-btn');
+        const multiplierDisplay = document.getElementById('multiplier-display');
+        const triviaOverlay = document.getElementById('trivia-overlay');
+        const triviaQuestionEl = document.getElementById('trivia-question');
+        const triviaAnswersEl = document.getElementById('trivia-answers');
+        const triviaTimerFill = document.getElementById('trivia-timer-fill');
+        const triviaTimerText = document.getElementById('trivia-timer-text');
+        const leaderboardBtn = document.getElementById('leaderboard-btn');
+        const leaderboardOverlay = document.getElementById('leaderboard-overlay');
+        const leaderboardClose = document.getElementById('leaderboard-close');
+        const leaderboardContent = document.getElementById('leaderboard-content');
+
+        function resizeCanvas() {
+          canvas.width = gameWorld.clientWidth;
+          canvas.height = gameWorld.clientHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const W = () => canvas.width;
+        const H = () => canvas.height;
+
+        // Config references
+        const cfg = window.gameConfig;
+
+        // Audio is decoded once at startup and played through Web Audio. The first
+        // player gesture resumes the context so browsers' autoplay rules are respected.
+        let audioCtx;
+        const audioBuffers = {};
+        let musicSource = null;
+        let musicGain = null;
+        let masterGain = null;
+
+        function getAudioCtx() {
+          if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          if (!masterGain && audioCtx) {
+            masterGain = audioCtx.createGain();
+            masterGain.connect(audioCtx.destination);
+            applyAudioVolumes();
+          }
+          return audioCtx;
+        }
+
+        function audioVolume(key, fallback) {
+          const value = Number(cfg.audio?.[key]);
+          return Math.max(0, Math.min(1, Number.isFinite(value) ? value : fallback));
+        }
+
+        function applyAudioVolumes() {
+          if (masterGain) masterGain.gain.value = audioVolume('masterVolume', 0.8);
+          if (musicGain) musicGain.gain.value = audioVolume('musicVolume', 0.3);
+        }
+
+        async function preloadAudio(id) {
+          const info = lib.getAsset(id);
+          if (!info || info.type !== 'audio') {
+            lib.log('Warning: Audio asset ' + id + ' not found');
+            return;
+          }
+          try {
+            const response = await fetch(info.url);
+            const data = await response.arrayBuffer();
+            audioBuffers[id] = await getAudioCtx().decodeAudioData(data);
+          } catch (error) {
+            lib.log('Warning: Could not load audio ' + id + ': ' + error.message);
+          }
+        }
+
+        function ensureAudioStarted() {
+          try {
+            const ac = getAudioCtx();
+            if (ac.state === 'suspended') ac.resume();
+            applyAudioVolumes();
+            if (!musicSource && audioBuffers.background_music) {
+              musicSource = ac.createBufferSource();
+              musicSource.buffer = audioBuffers.background_music;
+              musicSource.loop = true;
+              musicGain = ac.createGain();
+              musicGain.gain.value = audioVolume('musicVolume', 0.3);
+              musicSource.connect(musicGain).connect(masterGain);
+              musicSource.onended = () => {
+                musicSource = null;
+              };
+              musicSource.start(0);
+            }
+          } catch (error) {
+            lib.log('Audio could not start: ' + error.message);
+          }
+        }
+
+        function playAudioAsset(id, volumeKey, fallbackVolume) {
+          try {
+            const buffer = audioBuffers[id];
+            if (!buffer) return false;
+            const ac = getAudioCtx();
+            if (ac.state === 'suspended') ac.resume();
+            const source = ac.createBufferSource();
+            const gain = ac.createGain();
+            source.buffer = buffer;
+            gain.gain.value = audioVolume(volumeKey, fallbackVolume);
+            source.connect(gain).connect(masterGain);
+            source.start(0);
+            return true;
+          } catch (error) {
+            return false;
+          }
+        }
+
+        const audioIds = [
+          'background_music',
+          'jump_sound',
+          'orb_collect_sound',
+          'correct_answer_sound',
+          'wrong_answer_sound',
+          'collision_sound',
+        ];
+
+        // Cache all art and audio once at initialization; rendering never calls lib.getAsset().
+        const assetCache = {};
+        function preloadImage(id) {
+          const info = lib.getAsset(id);
+          if (!info || info.type !== 'image') {
+            lib.log('Warning: Asset ' + id + ' not found');
+            return;
+          }
+          const image = new Image();
+          image.src = info.url;
+          assetCache[id] = image;
+        }
+        [
+          'runner_character',
+          'islamic_obstacle_low',
+          'islamic_obstacle_tall',
+          'far_background',
+          'mid_background',
+          'islamic_ground_tile',
+          'light_orb',
+        ].forEach(preloadImage);
+        await Promise.all(audioIds.map(preloadAudio));
+
+        // Show editable params
+        lib.showGameParameters({
+          name: 'Deen Dash',
+          params: {
+            'Runner Speed': { key: 'runner.speed', type: 'slider', min: 200, max: 800, step: 10 },
+            'Max Speed': { key: 'runner.maxSpeed', type: 'slider', min: 300, max: 1200, step: 10 },
+            'Speed Increase': {
+              key: 'runner.speedIncrease',
+              type: 'slider',
+              min: 0,
+              max: 50,
+              step: 1,
+            },
+            'Jump Height': { key: 'runner.jumpHeight', type: 'slider', min: 80, max: 250, step: 5 },
+            Gravity: { key: 'runner.gravity', type: 'slider', min: 800, max: 3000, step: 50 },
+            'Obstacle Spawn Rate': {
+              key: 'obstacles.spawnInterval',
+              type: 'slider',
+              min: 0.8,
+              max: 4,
+              step: 0.1,
+            },
+            'Min Obstacle Gap': {
+              key: 'obstacles.minGap',
+              type: 'slider',
+              min: 0.5,
+              max: 3,
+              step: 0.1,
+            },
+            'Spawn Acceleration': {
+              key: 'obstacles.speedSpawnFactor',
+              type: 'slider',
+              min: 0,
+              max: 0.9,
+              step: 0.05,
+            },
+            'Minimum Spawn Interval': {
+              key: 'obstacles.minSpawnInterval',
+              type: 'slider',
+              min: 0.4,
+              max: 2,
+              step: 0.1,
+            },
+            'Orb Spawn Rate': {
+              key: 'orbs.spawnInterval',
+              type: 'slider',
+              min: 1.5,
+              max: 6,
+              step: 0.1,
+            },
+            'Question Time Limit': {
+              key: 'trivia.timeLimit',
+              type: 'slider',
+              min: 5,
+              max: 20,
+              step: 1,
+            },
+            'Trivia Points': { key: 'trivia.points', type: 'slider', min: 25, max: 250, step: 25 },
+            'Multiplier Thresholds': {
+              key: 'trivia.multiplierThresholdsText',
+              type: 'string',
+              onChange: (value) => {
+                const parsed = String(value)
+                  .split(',')
+                  .map((v) => Number(v.trim()))
+                  .filter((v) => Number.isFinite(v));
+                if (parsed.length >= 5)
+                  window.gameConfig.trivia.multiplierThresholds = parsed.slice(0, 5);
+                window.gameConfig.trivia.multiplierThresholdsText = String(value);
+              },
+            },
+            'Master Volume': {
+              key: 'audio.masterVolume',
+              type: 'slider',
+              min: 0,
+              max: 1,
+              step: 0.05,
+              onChange: () => applyAudioVolumes(),
+            },
+            'Music Volume': {
+              key: 'audio.musicVolume',
+              type: 'slider',
+              min: 0,
+              max: 1,
+              step: 0.05,
+              onChange: () => applyAudioVolumes(),
+            },
+            'Jump Volume': { key: 'audio.jumpVolume', type: 'slider', min: 0, max: 1, step: 0.05 },
+            'Orb Collection Volume': {
+              key: 'audio.orbCollectVolume',
+              type: 'slider',
+              min: 0,
+              max: 1,
+              step: 0.05,
+            },
+            'Correct Answer Volume': {
+              key: 'audio.correctVolume',
+              type: 'slider',
+              min: 0,
+              max: 1,
+              step: 0.05,
+            },
+            'Wrong Answer Volume': {
+              key: 'audio.wrongVolume',
+              type: 'slider',
+              min: 0,
+              max: 1,
+              step: 0.05,
+            },
+            'Collision Volume': {
+              key: 'audio.collisionVolume',
+              type: 'slider',
+              min: 0,
+              max: 1,
+              step: 0.05,
+            },
+            'Screen Shake Intensity': {
+              key: 'polish.screenShakeIntensity',
+              type: 'slider',
+              min: 0,
+              max: 20,
+              step: 1,
+            },
+            'Orb Pulse Speed': {
+              key: 'polish.orbPulseSpeed',
+              type: 'slider',
+              min: 0.4,
+              max: 2.5,
+              step: 0.1,
+            },
+            'Collection Particle Count': {
+              key: 'polish.particleCount',
+              type: 'slider',
+              min: 4,
+              max: 40,
+              step: 1,
+            },
+            'Particle Lifetime': {
+              key: 'polish.particleLifetime',
+              type: 'slider',
+              min: 0.25,
+              max: 1.5,
+              step: 0.05,
+            },
+            'UI Transition Speed': {
+              key: 'polish.uiTransitionSpeed',
+              type: 'slider',
+              min: 100,
+              max: 600,
+              step: 25,
+              onChange: (value) =>
+                document.documentElement.style.setProperty(
+                  '--transition-normal',
+                  Math.max(100, Number(value) || 300) + 'ms'
+                ),
+            },
+            'Runner Color': { key: 'runner.color', type: 'color' },
+            'Obstacle Color': { key: 'obstacles.color', type: 'color' },
+          },
+        });
+
+        // ===== CONSTANTS =====
+        const GROUND_HEIGHT_RATIO = 0.18;
+        const RUNNER_X_RATIO = 0.15;
+        const RUNNER_W = 80;
+        const RUNNER_H = 120;
+
+        // ===== RUNTIME STATE =====
+        let gameState = 'start'; // start, playing, trivia, over
+        let score = 0;
+        let distanceScore = 0;
+        let triviaBaseBonus = 0;
+        let multiplierBonus = 0;
+        let currentSpeed = cfg.runner.speed;
+        let runnerY = 0;
+        let velocityY = 0;
+        let isGrounded = true;
+        let obstacles = [];
+        let orbs = [];
+        let particles = [];
+        let timeSinceLastObstacle = 0;
+        let nextSpawnTime = 0;
+        let timeSinceLastOrb = 0;
+        let nextOrbSpawnTime = 0;
+        let triviaBonus = 0;
+        let correctAnswers = 0;
+        let multiplier = 1;
+        let activeQuestion = null;
+        let triviaTimeRemaining = 0;
+        let groundOffset = 0;
+        let bgOffset1 = 0;
+        let bgOffset2 = 0;
+        let runnerAnimFrame = 0;
+        let runnerAnimTimer = 0;
+        let hintTimer = 0;
+        let hintShown = false;
+        let shakeTimer = 0;
+        let shakeIntensity = 0;
+
+        function groundY() {
+          return H() * (1 - GROUND_HEIGHT_RATIO);
+        }
+
+        function runnerX() {
+          return W() * RUNNER_X_RATIO;
+        }
+
+        function getMultiplier() {
+          const thresholds =
+            Array.isArray(cfg.trivia?.multiplierThresholds) &&
+            cfg.trivia.multiplierThresholds.length >= 5
+              ? cfg.trivia.multiplierThresholds
+              : [0, 3, 6, 10, 15];
+          if (correctAnswers >= Number(thresholds[4])) return 10;
+          if (correctAnswers >= Number(thresholds[3])) return 5;
+          if (correctAnswers >= Number(thresholds[2])) return 3;
+          if (correctAnswers >= Number(thresholds[1])) return 2;
+          return 1;
+        }
+
+        function updateHud() {
+          scoreDisplay.textContent = Math.floor(score);
+          multiplierDisplay.textContent = '×' + multiplier;
+        }
+
+        function resetTriviaOverlay() {
+          triviaOverlay.classList.remove('visible');
+          triviaAnswersEl.innerHTML = '';
+          activeQuestion = null;
+          triviaTimeRemaining = 0;
+          triviaTimerFill.style.width = '100%';
+          triviaTimerText.textContent = Math.ceil(Number(cfg.trivia?.timeLimit) || 12) + 's';
+        }
+
+        function getObstacleSpawnWindow() {
+          const baseInterval = Math.max(0.4, Number(cfg.obstacles?.spawnInterval) || 2.2);
+          const minimumInterval = Math.max(0.4, Number(cfg.obstacles?.minSpawnInterval) || 0.75);
+          const startSpeed = Math.max(1, Number(cfg.runner?.speed) || 350);
+          const maxSpeed = Math.max(startSpeed, Number(cfg.runner?.maxSpeed) || 700);
+          const progress = Math.max(
+            0,
+            Math.min(1, (currentSpeed - startSpeed) / Math.max(1, maxSpeed - startSpeed))
+          );
+          const configuredFactor = Number(cfg.obstacles?.speedSpawnFactor);
+          const speedSpawnFactor = Number.isFinite(configuredFactor)
+            ? Math.max(0, Math.min(0.9, configuredFactor))
+            : 0.55;
+          const interval = Math.max(
+            minimumInterval,
+            baseInterval * (1 - progress * speedSpawnFactor)
+          );
+          const baseGap = Math.max(0.2, Number(cfg.obstacles?.minGap) || 1);
+          const dynamicGap = Math.min(interval * 0.78, baseGap * (1 - progress * 0.35));
+          return { interval, minGap: Math.max(0.2, dynamicGap) };
+        }
+
+        function resetGame() {
+          score = 0;
+          distanceScore = 0;
+          triviaBaseBonus = 0;
+          multiplierBonus = 0;
+          correctAnswers = 0;
+          multiplier = 1;
+          currentSpeed = cfg.runner.speed;
+          runnerY = groundY() - RUNNER_H;
+          velocityY = 0;
+          isGrounded = true;
+          obstacles = [];
+          orbs = [];
+          timeSinceLastObstacle = 10; // spawn quickly at start
+          nextSpawnTime = getObstacleSpawnWindow().interval * 0.5;
+          timeSinceLastOrb = 0;
+          nextOrbSpawnTime = Math.max(0.9, Number(cfg.orbs?.minGap) || 1.7);
+          resetTriviaOverlay();
+          updateHud();
+          groundOffset = 0;
+          bgOffset1 = 0;
+          bgOffset2 = 0;
+          runnerAnimFrame = 0;
+          hintTimer = 0;
+          hintShown = false;
+          shakeTimer = 0;
+        }
+
+        function startGame() {
+          resetGame();
+          gameState = 'playing';
+          hud.style.display = 'flex';
+          tapHint.style.display = 'block';
+          gameOverOverlay.classList.remove('visible');
+        }
+
+        function endGame() {
+          gameState = 'over';
+          tapHint.style.display = 'none';
+          resetTriviaOverlay();
+          const finalScore = Math.floor(distanceScore + triviaBaseBonus + multiplierBonus);
+          score = finalScore;
+          finalScoreEl.textContent = 'Final Score: ' + finalScore.toLocaleString();
+          distanceScoreEl.textContent = Math.floor(distanceScore).toLocaleString();
+          triviaScoreEl.textContent = Math.floor(triviaBaseBonus).toLocaleString();
+          multiplierScoreEl.textContent = Math.floor(multiplierBonus).toLocaleString();
+          gameOverOverlay.classList.add('visible');
+          shakeTimer = 0.3;
+          shakeIntensity = Math.max(0, Number(cfg.polish?.screenShakeIntensity) || 8);
+
+          // Submit score to leaderboard
+          submitScoreToLeaderboard(finalScore);
+        }
+
+        // ===== JUMP =====
+        function tryJump() {
+          if (gameState !== 'playing') return;
+          if (!isGrounded) return;
+          velocityY = -Math.sqrt(2 * cfg.runner.gravity * cfg.runner.jumpHeight);
+          isGrounded = false;
+          playJumpSound();
+        }
+
+        // ===== SOUND EFFECTS =====
+        function playJumpSound() {
+          playAudioAsset('jump_sound', 'jumpVolume', 0.55);
+        }
+
+        function playOrbCollectSound() {
+          playAudioAsset('orb_collect_sound', 'orbCollectVolume', 0.7);
+        }
+
+        function playCorrectAnswerSound() {
+          playAudioAsset('correct_answer_sound', 'correctVolume', 0.75);
+        }
+
+        function playWrongAnswerSound() {
+          playAudioAsset('wrong_answer_sound', 'wrongVolume', 0.45);
+        }
+
+        function playCrashSound() {
+          playAudioAsset('collision_sound', 'collisionVolume', 0.8);
+        }
+
+        // ===== TRIVIA =====
+        function closeTrivia() {
+          triviaOverlay.classList.remove('visible');
+          triviaAnswersEl.innerHTML = '';
+          activeQuestion = null;
+          triviaTimeRemaining = 0;
+        }
+
+        function finishTrivia(correct) {
+          if (!activeQuestion || gameState !== 'trivia') return;
+          if (correct) {
+            playCorrectAnswerSound();
+            correctAnswers += 1;
+            multiplier = getMultiplier();
+            const basePoints = Number(cfg.trivia?.points) || 100;
+            const points = basePoints * multiplier;
+            triviaBaseBonus += basePoints;
+            multiplierBonus += points - basePoints;
+            score += points;
+          } else {
+            playWrongAnswerSound();
+            correctAnswers = 0;
+            multiplier = 1;
+          }
+          updateHud();
+          closeTrivia();
+          gameState = 'playing';
+        }
+
+        function openTriviaQuestion() {
+          const bank = Array.isArray(cfg.trivia?.questionBank) ? cfg.trivia.questionBank : [];
+          if (!bank.length) return;
+          activeQuestion = bank[Math.floor(Math.random() * bank.length)];
+          triviaTimeRemaining = Math.max(1, Number(cfg.trivia?.timeLimit) || 12);
+          gameState = 'trivia';
+          triviaQuestionEl.textContent = activeQuestion.question;
+          triviaAnswersEl.innerHTML = '';
+          activeQuestion.options.forEach((option, index) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'answer-btn';
+            button.textContent = option;
+            button.addEventListener('click', (event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              finishTrivia(index === Number(activeQuestion.answer));
+            });
+            triviaAnswersEl.appendChild(button);
+          });
+          triviaTimerFill.style.width = '100%';
+          triviaTimerText.textContent = Math.ceil(triviaTimeRemaining) + 's';
+          triviaOverlay.classList.add('visible');
+        }
+
+        function updateTriviaTimer(dt) {
+          if (gameState !== 'trivia' || !activeQuestion) return;
+          triviaTimeRemaining -= dt;
+          const limit = Math.max(1, Number(cfg.trivia?.timeLimit) || 12);
+          const fraction = Math.max(0, triviaTimeRemaining / limit);
+          triviaTimerFill.style.width = fraction * 100 + '%';
+          triviaTimerText.textContent = Math.max(0, Math.ceil(triviaTimeRemaining)) + 's';
+          if (triviaTimeRemaining <= 0) finishTrivia(false);
+        }
+
+        // ===== LEADERBOARD =====
+        async function submitScoreToLeaderboard(finalScore) {
+          try {
+            await lib.addPlayerScoreToLeaderboard(finalScore, 10);
+            lib.log('Score submitted to leaderboard successfully');
+          } catch (error) {
+            lib.log('Failed to submit score to leaderboard: ' + error.message);
+            // Game continues to work without leaderboard
+          }
+        }
+
+        async function showLeaderboard() {
+          leaderboardOverlay.classList.add('visible');
+          leaderboardContent.innerHTML =
+            '<div class="leaderboard-loading">Loading leaderboard...</div>';
+
+          try {
+            const response = await lib.getTopNEntriesFromLeaderboard(10);
+            const entries = Array.isArray(response) ? response : response?.entries;
+            const userRank = Array.isArray(response) ? null : response?.userRank;
+            renderLeaderboard(entries, userRank);
+          } catch (error) {
+            lib.log('Failed to fetch leaderboard: ' + error.message);
+            leaderboardContent.innerHTML =
+              '<div class="leaderboard-error">Unable to load leaderboard.<br>Please try again later.</div>';
+          }
+        }
+
+        function renderLeaderboard(entries, userRank) {
+          if (!entries || entries.length === 0) {
+            leaderboardContent.innerHTML =
+              '<div class="leaderboard-empty">No scores yet!<br>Be the first to set a record.</div>';
+            return;
+          }
+
+          const list = document.createElement('ul');
+          list.className = 'leaderboard-list';
+
+          entries.forEach((entry, index) => {
+            const rank = index + 1;
+            const isCurrentUser = userRank != null && rank === Number(userRank);
+
+            const li = document.createElement('li');
+            li.className = 'leaderboard-entry' + (isCurrentUser ? ' current-user' : '');
+
+            const rankEl = document.createElement('div');
+            rankEl.className = 'leaderboard-rank';
+            rankEl.textContent = rank;
+
+            const avatar = document.createElement('img');
+            avatar.className = 'leaderboard-avatar';
+            const avatarUrl = entry.profilePicture || entry.profilePictureUrl || entry.avatarUrl;
+            if (avatarUrl) {
+              avatar.src = avatarUrl;
+              avatar.alt = (entry.username || 'Runner') + ' avatar';
+              avatar.onerror = function () {
+                this.style.display = 'none';
+              };
+            } else {
+              avatar.style.visibility = 'hidden';
+              avatar.alt = '';
+            }
+
+            const info = document.createElement('div');
+            info.className = 'leaderboard-info';
+
+            const username = document.createElement('p');
+            username.className = 'leaderboard-username';
+            username.textContent = entry.username || 'Anonymous';
+
+            info.appendChild(username);
+
+            const scoreEl = document.createElement('div');
+            scoreEl.className = 'leaderboard-score';
+            scoreEl.textContent = Math.floor(Number(entry.score) || 0).toLocaleString();
+
+            li.appendChild(rankEl);
+            li.appendChild(avatar);
+            li.appendChild(info);
+            li.appendChild(scoreEl);
+
+            list.appendChild(li);
+          });
+
+          leaderboardContent.innerHTML = '';
+          leaderboardContent.appendChild(list);
+        }
+
+        function closeLeaderboard() {
+          leaderboardOverlay.classList.remove('visible');
+        }
+
+        // ===== INPUT =====
+        function handleInput(e) {
+          if (e) e.preventDefault();
+          ensureAudioStarted();
+          if (gameState === 'start') {
+            startGame();
+            return;
+          }
+          if (gameState === 'playing') {
+            tryJump();
+          }
+        }
+
+        if (mode === 'play') {
+          canvas.addEventListener('pointerdown', handleInput);
+          document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'ArrowUp') {
+              handleInput(e);
+            }
+          });
+          restartBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            startGame();
+          });
+          restartBtn.addEventListener('pointerdown', (e) => {
+            e.stopPropagation();
+          });
+          leaderboardBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            showLeaderboard();
+          });
+          leaderboardBtn.addEventListener('pointerdown', (e) => {
+            e.stopPropagation();
+          });
+          leaderboardClose.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeLeaderboard();
+          });
+          leaderboardClose.addEventListener('pointerdown', (e) => {
+            e.stopPropagation();
+          });
+        }
+
+        // ===== OBSTACLE AND ORB SPAWNING =====
+        function spawnObstacle() {
+          const gY = groundY();
+          const tall = Math.random() > 0.55;
+          const w = tall ? 86 : 76;
+          const h = tall ? 116 : 50;
+          obstacles.push({
+            x: W() + 50,
+            y: gY - h,
+            w: w,
+            h: h,
+            kind: tall ? 'tall' : 'low',
+            passed: false,
+          });
+        }
+
+        function spawnOrb() {
+          const size = Math.max(42, Number(cfg.orbs?.size) || 64);
+          const gY = groundY();
+          const baseY = gY - Math.max(70, Number(cfg.orbs?.height) || 132);
+          const wave = Math.random() * 70 - 35;
+          orbs.push({
+            x: W() + 70,
+            y: Math.max(70, baseY + wave),
+            w: size,
+            h: size,
+            phase: Math.random() * Math.PI * 2,
+            collected: false,
+          });
+        }
+
+        // ===== COLLISION =====
+        function checkCollision() {
+          const rx = runnerX();
+          const ry = runnerY;
+          // Slightly shrink hitbox for fairness
+          const pad = 8;
+          const rLeft = rx + pad;
+          const rRight = rx + RUNNER_W - pad;
+          const rTop = ry + pad;
+          const rBottom = ry + RUNNER_H - pad / 2;
+
+          for (const obs of obstacles) {
+            if (
+              rRight > obs.x + 4 &&
+              rLeft < obs.x + obs.w - 4 &&
+              rBottom > obs.y + 4 &&
+              rTop < obs.y + obs.h - 4
+            ) {
+              return true;
+            }
+          }
+          return false;
+        }
+
+        function collectOrbIfHit() {
+          const rx = runnerX() + 12;
+          const ry = runnerY + 12;
+          const rw = RUNNER_W - 24;
+          const rh = RUNNER_H - 24;
+          for (const orb of orbs) {
+            if (
+              !orb.collected &&
+              rx < orb.x + orb.w &&
+              rx + rw > orb.x &&
+              ry < orb.y + orb.h &&
+              ry + rh > orb.y
+            ) {
+              orb.collected = true;
+              playOrbCollectSound();
+              spawnOrbParticles(orb.x + orb.w / 2, orb.y + orb.h / 2);
+              openTriviaQuestion();
+              return true;
+            }
+          }
+          return false;
+        }
+
+        // ===== DRAWING =====
+        function drawSky() {
+          const grad = ctx.createLinearGradient(0, 0, 0, H());
+          grad.addColorStop(0, '#F5C76B');
+          grad.addColorStop(0.5, '#E8854A');
+          grad.addColorStop(0.85, '#2A6B7C');
+          grad.addColorStop(1, '#1B3A5C');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, W(), H());
+        }
+
+        function drawStars() {
+          // Tiny decorative dots in sky
+          ctx.fillStyle = 'rgba(255,248,236,0.3)';
+          const seed = 42;
+          for (let i = 0; i < 20; i++) {
+            const px = (seed * (i + 1) * 7) % 720;
+            const py = (seed * (i + 1) * 13) % 400;
+            ctx.beginPath();
+            ctx.arc(px, py, 1.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+
+        function drawTiledLayer(id, y, height, offset) {
+          const image = assetCache[id];
+          if (!image || !image.complete || !image.naturalWidth) return false;
+          const tileWidth = height * (image.naturalWidth / image.naturalHeight);
+          const off = ((offset % tileWidth) + tileWidth) % tileWidth;
+          for (let x = -off - tileWidth; x < W() + tileWidth; x += tileWidth) {
+            ctx.drawImage(image, x, y, tileWidth, height);
+          }
+          return true;
+        }
+
+        function drawSilhouettes() {
+          // Distant domes and minarets are now supplied by the atmospheric art layer.
+          const gY = groundY();
+          if (!drawTiledLayer('far_background', gY - 400, 400, bgOffset1)) {
+            ctx.fillStyle = 'rgba(27, 58, 92, 0.35)';
+            const off = bgOffset1 % 360;
+            for (let i = -1; i < 4; i++) {
+              const bx = i * 360 - off;
+              ctx.beginPath();
+              ctx.arc(bx + 120, gY - 180, 70, Math.PI, 0);
+              ctx.lineTo(bx + 190, gY);
+              ctx.lineTo(bx + 50, gY);
+              ctx.fill();
+              ctx.fillRect(bx + 250, gY - 260, 20, 260);
+              ctx.beginPath();
+              ctx.arc(bx + 260, gY - 260, 14, Math.PI, 0);
+              ctx.fill();
+            }
+          }
+        }
+
+        function drawMidground() {
+          const gY = groundY();
+          if (!drawTiledLayer('mid_background', gY - 500, 500, bgOffset2)) {
+            ctx.fillStyle = 'rgba(26, 138, 125, 0.2)';
+            const off = bgOffset2 % 300;
+            for (let i = -1; i < 5; i++) {
+              const bx = i * 300 - off;
+              ctx.fillRect(bx + 20, gY - 140, 100, 140);
+              ctx.fillRect(bx + 180, gY - 100, 60, 100);
+            }
+          }
+        }
+
+        function drawGround() {
+          const gY = groundY();
+          const h = H() - gY;
+
+          // Sandstone base keeps the ground readable while the repeating zellige tile
+          // provides the detailed Islamic geometric surface.
+          ctx.fillStyle = cfg.obstacles?.groundColor || '#B9784F';
+          ctx.fillRect(0, gY, W(), h);
+          const tile = assetCache.islamic_ground_tile;
+          const tileSize = 256;
+          const tileOff = ((groundOffset % tileSize) + tileSize) % tileSize;
+          if (tile && tile.complete && tile.naturalWidth) {
+            for (let x = -tileOff - tileSize; x < W() + tileSize; x += tileSize) {
+              for (let y = gY; y < H(); y += tileSize) {
+                ctx.drawImage(tile, x, y, tileSize, tileSize);
+              }
+            }
+          } else {
+            ctx.fillStyle = 'rgba(160, 112, 64, 0.35)';
+            for (let x = -tileOff; x < W() + tileSize; x += 48) {
+              ctx.fillRect(x, gY + 12, 24, 8);
+              ctx.fillRect(x + 12, gY + 34, 24, 8);
+            }
+          }
+          ctx.fillStyle = '#D4A843';
+          ctx.fillRect(0, gY, W(), 5);
+          ctx.fillStyle = 'rgba(27, 58, 92, 0.35)';
+          ctx.fillRect(0, gY + 5, W(), 4);
+        }
+
+        function drawRunner() {
+          const rx = runnerX();
+          const ry = runnerY;
+          const image = assetCache.runner_character;
+          ctx.save();
+          if (image && image.complete && image.naturalWidth) {
+            ctx.drawImage(image, rx, ry, RUNNER_W, RUNNER_H);
+          } else {
+            // Graceful fallback while the generated sprite is loading.
+            const color = cfg.runner.color || '#1A8A7D';
+            ctx.fillStyle = color;
+            roundRect(ctx, rx + 12, ry + 24, 48, 52, 8);
+            ctx.fill();
+            ctx.fillStyle = '#D4A070';
+            ctx.beginPath();
+            ctx.arc(rx + 40, ry + 15, 15, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = '#1B3A5C';
+            const swing =
+              isGrounded && gameState === 'playing' ? Math.sin(runnerAnimFrame) * 12 : 0;
+            ctx.fillRect(rx + 18 - swing, ry + 74, 12, 34);
+            ctx.fillRect(rx + 46 + swing, ry + 74, 12, 34);
+          }
+          ctx.restore();
+        }
+
+        function roundRect(c, x, y, w, h, r) {
+          c.beginPath();
+          c.moveTo(x + r, y);
+          c.lineTo(x + w - r, y);
+          c.quadraticCurveTo(x + w, y, x + w, y + r);
+          c.lineTo(x + w, y + h - r);
+          c.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+          c.lineTo(x + r, y + h);
+          c.quadraticCurveTo(x, y + h, x, y + h - r);
+          c.lineTo(x, y + r);
+          c.quadraticCurveTo(x, y, x + r, y);
+          c.closePath();
+        }
+
+        function drawObstacleSprite(obs) {
+          const id = obs.kind === 'tall' ? 'islamic_obstacle_tall' : 'islamic_obstacle_low';
+          const image = assetCache[id];
+          if (image && image.complete && image.naturalWidth) {
+            ctx.drawImage(image, obs.x, obs.y, obs.w, obs.h);
+            return;
+          }
+          ctx.fillStyle = cfg.obstacles.color || '#8B5E3C';
+          roundRect(ctx, obs.x, obs.y, obs.w, obs.h, 5);
+          ctx.fill();
+          ctx.fillStyle = '#D4A843';
+          ctx.fillRect(obs.x + 3, obs.y + 4, obs.w - 6, 5);
+        }
+
+        function drawObstacles() {
+          for (const obs of obstacles) drawObstacleSprite(obs);
+        }
+
+        function drawOrbs(timestamp) {
+          const image = assetCache.light_orb;
+          const pulseSpeed = Math.max(0.2, Number(cfg.polish?.orbPulseSpeed) || 1);
+          for (const orb of orbs) {
+            if (orb.collected) continue;
+            const bob = Math.sin((timestamp / 320) * pulseSpeed + orb.phase) * 5;
+            const scale = 1 + Math.sin((timestamp / 260) * pulseSpeed + orb.phase) * 0.06;
+            const cx = orb.x + orb.w / 2;
+            const cy = orb.y + orb.h / 2 + bob;
+            ctx.save();
+            ctx.globalAlpha = 0.96;
+            if (image && image.complete && image.naturalWidth) {
+              const drawW = orb.w * scale;
+              const drawH = orb.h * scale;
+              ctx.drawImage(image, cx - drawW / 2, cy - drawH / 2, drawW, drawH);
+            } else {
+              const glow = ctx.createRadialGradient(cx, cy, 4, cx, cy, orb.w * 0.85);
+              glow.addColorStop(0, '#FFF8EC');
+              glow.addColorStop(0.35, '#F5D680');
+              glow.addColorStop(1, 'rgba(26,138,125,0)');
+              ctx.fillStyle = glow;
+              ctx.beginPath();
+              ctx.arc(cx, cy, orb.w * 0.85, 0, Math.PI * 2);
+              ctx.fill();
+              ctx.fillStyle = '#FFF8EC';
+              ctx.beginPath();
+              ctx.arc(cx, cy, orb.w * 0.28, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.restore();
+          }
+        }
+
+        // ===== PARTICLE FEEDBACK =====
+        function spawnOrbParticles(x, y) {
+          const count = Math.max(4, Math.floor(Number(cfg.polish?.particleCount) || 18));
+          for (let i = 0; i < count; i++) {
+            const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.35;
+            const speed = 90 + Math.random() * 170;
+            particles.push({
+              x,
+              y,
+              vx: Math.cos(angle) * speed,
+              vy: Math.sin(angle) * speed - 45,
+              life: Math.max(0.2, Number(cfg.polish?.particleLifetime) || 0.65),
+              maxLife: Math.max(0.2, Number(cfg.polish?.particleLifetime) || 0.65),
+              size: 4 + Math.random() * 5,
+            });
+          }
+        }
+
+        function updateParticles(dt) {
+          for (const particle of particles) {
+            particle.life -= dt;
+            particle.x += particle.vx * dt;
+            particle.y += particle.vy * dt;
+            particle.vy += 260 * dt;
+          }
+          particles = particles.filter((particle) => particle.life > 0);
+        }
+
+        function drawParticles() {
+          for (const particle of particles) {
+            const alpha = Math.max(0, particle.life / particle.maxLife);
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.fillStyle = particle.life / particle.maxLife > 0.45 ? '#FFF8EC' : '#F5D680';
+            ctx.shadowColor = '#F5D680';
+            ctx.shadowBlur = 12;
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size * (0.65 + alpha * 0.35), 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+        }
+
+        // ===== EDIT MODE =====
+        function drawEditMode() {
+          drawSky();
+          drawStars();
+          drawSilhouettes();
+          drawMidground();
+          drawGround();
+
+          // Show static runner
+          runnerY = groundY() - RUNNER_H;
+          drawRunner();
+
+          // Show sample orb and obstacles
+          const editOrb = assetCache.light_orb;
+          const editOrbSize = Math.max(42, Number(cfg.orbs?.size) || 64);
+          if (editOrb && editOrb.complete && editOrb.naturalWidth) {
+            ctx.drawImage(editOrb, W() * 0.38, groundY() - 170, editOrbSize, editOrbSize);
+          } else {
+            ctx.fillStyle = '#F5D680';
+            ctx.beginPath();
+            ctx.arc(W() * 0.38 + editOrbSize / 2, groundY() - 138, editOrbSize / 3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+          const gY = groundY();
+          ctx.fillStyle = cfg.obstacles.color || '#8B5E3C';
+          roundRect(ctx, W() * 0.55, gY - 70, 45, 70, 4);
+          ctx.fill();
+          ctx.fillStyle = cfg.obstacles.color || '#8B5E3C';
+          roundRect(ctx, W() * 0.78, gY - 50, 50, 50, 4);
+          ctx.fill();
+
+          // Edit label
+          ctx.fillStyle = 'rgba(0,0,0,0.4)';
+          roundRect(ctx, W() / 2 - 120, 40, 240, 48, 12);
+          ctx.fill();
+          ctx.fillStyle = '#FFF8EC';
+          ctx.font = '600 24px Fredoka';
+          ctx.textAlign = 'center';
+          ctx.fillText('Edit Mode – Adjust Settings', W() / 2, 72);
+        }
+
+        // ===== START SCREEN =====
+        function drawStartScreen() {
+          drawSky();
+          drawStars();
+          drawSilhouettes();
+          drawMidground();
+          drawGround();
+
+          runnerY = groundY() - RUNNER_H;
+          drawRunner();
+
+          // Overlay
+          ctx.fillStyle = 'rgba(27, 58, 92, 0.7)';
+          ctx.fillRect(0, 0, W(), H());
+
+          // Title
+          ctx.fillStyle = '#D4A843';
+          ctx.font = '700 56px Fredoka';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.shadowColor = 'rgba(0,0,0,0.5)';
+          ctx.shadowBlur = 10;
+          ctx.fillText('Deen Dash', W() / 2, H() * 0.35);
+
+          // Subtitle
+          ctx.fillStyle = '#FFF8EC';
+          ctx.font = '400 22px Inter';
+          ctx.shadowBlur = 5;
+          ctx.fillText('Run, Jump & Learn Your Deen', W() / 2, H() * 0.35 + 50);
+
+          // Tap to start
+          ctx.font = '600 28px Fredoka';
+          ctx.fillStyle = '#F5C76B';
+          ctx.shadowBlur = 0;
+          const pulse = 0.8 + Math.sin(Date.now() / 400) * 0.2;
+          ctx.globalAlpha = pulse;
+          ctx.fillText('Tap to Start', W() / 2, H() * 0.62);
+          ctx.globalAlpha = 1;
+
+          ctx.shadowBlur = 0;
+          ctx.shadowColor = 'transparent';
+        }
+
+        // ===== GAME LOOP =====
+        let lastTime = 0;
+
+        function gameLoop(timestamp) {
+          let dt = (timestamp - lastTime) / 1000;
+          lastTime = timestamp;
+          if (dt > 0.11) dt = 0.11;
+          if (dt <= 0) dt = 0.016;
+
+          ctx.clearRect(0, 0, W(), H());
+
+          if (mode === 'edit') {
+            drawEditMode();
+            requestAnimationFrame(gameLoop);
+            return;
+          }
+
+          // Screen shake
+          updateParticles(dt);
+
+          if (shakeTimer > 0) {
+            shakeTimer -= dt;
+            const sx = (Math.random() - 0.5) * shakeIntensity * 2;
+            const sy = (Math.random() - 0.5) * shakeIntensity * 2;
+            ctx.save();
+            ctx.translate(sx, sy);
+            shakeIntensity *= 0.9;
+          }
+
+          if (gameState === 'start') {
+            drawStartScreen();
+            if (shakeTimer > 0) ctx.restore();
+            requestAnimationFrame(gameLoop);
+            return;
+          }
+
+          // === UPDATE ===
+          if (gameState === 'playing') {
+            // Speed increase
+            currentSpeed = Math.min(
+              currentSpeed + cfg.runner.speedIncrease * dt,
+              cfg.runner.maxSpeed
+            );
+
+            // Distance score rises with the current speed, while the speed cap
+            // keeps the progression readable and competitive.
+            distanceScore += currentSpeed * dt * (Number(cfg.scoring?.distancePointRate) || 0.02);
+            score = distanceScore + triviaBaseBonus + multiplierBonus;
+            updateHud();
+
+            // Scroll backgrounds
+            groundOffset += currentSpeed * dt;
+            bgOffset1 += currentSpeed * dt * 0.15;
+            bgOffset2 += currentSpeed * dt * 0.35;
+
+            // Runner animation
+            runnerAnimTimer += dt * (currentSpeed / 300);
+            runnerAnimFrame = runnerAnimTimer * 8;
+
+            // Jump physics
+            if (!isGrounded) {
+              velocityY += cfg.runner.gravity * dt;
+              runnerY += velocityY * dt;
+              if (runnerY >= groundY() - RUNNER_H) {
+                runnerY = groundY() - RUNNER_H;
+                velocityY = 0;
+                isGrounded = true;
+              }
+            } else {
+              runnerY = groundY() - RUNNER_H;
+            }
+
+            // Obstacle spawning
+            timeSinceLastObstacle += dt;
+            if (timeSinceLastObstacle >= nextSpawnTime) {
+              spawnObstacle();
+              timeSinceLastObstacle = 0;
+              const spawnWindow = getObstacleSpawnWindow();
+              nextSpawnTime =
+                spawnWindow.minGap +
+                Math.random() * Math.max(0, spawnWindow.interval - spawnWindow.minGap);
+            }
+
+            // Light orb spawning along the path
+            timeSinceLastOrb += dt;
+            if (timeSinceLastOrb >= nextOrbSpawnTime) {
+              if (Math.random() <= (Number(cfg.orbs?.spawnChance) || 0.82)) spawnOrb();
+              timeSinceLastOrb = 0;
+              const minOrbGap = Math.max(0.5, Number(cfg.orbs?.minGap) || 1.7);
+              const orbInterval = Math.max(minOrbGap, Number(cfg.orbs?.spawnInterval) || 3.1);
+              nextOrbSpawnTime = minOrbGap + Math.random() * Math.max(0, orbInterval - minOrbGap);
+            }
+
+            // Move obstacles and orbs
+            for (const obs of obstacles) obs.x -= currentSpeed * dt;
+            for (const orb of orbs) orb.x -= currentSpeed * dt;
+
+            // Remove off-screen objects
+            obstacles = obstacles.filter((obs) => obs.x + obs.w > -50);
+            orbs = orbs.filter((orb) => !orb.collected && orb.x + orb.w > -50);
+
+            // Orb collection pauses the runner while the trivia card is open.
+            collectOrbIfHit();
+
+            // Collision
+            if (gameState === 'playing' && checkCollision()) {
+              playCrashSound();
+              endGame();
+            }
+          } else if (gameState === 'trivia') {
+            updateTriviaTimer(dt);
+          }
+
+          if (gameState === 'playing') {
+            // Tap hint
+            hintTimer += dt;
+            if (hintTimer > 3 && !hintShown) {
+              tapHint.style.display = 'none';
+              hintShown = true;
+            }
+          }
+
+          // === DRAW ===
+          drawSky();
+          drawStars();
+          drawSilhouettes();
+          drawMidground();
+          drawGround();
+          drawOrbs(timestamp);
+          drawParticles();
+          drawObstacles();
+          drawRunner();
+
+          if (shakeTimer > 0) ctx.restore();
+
+          requestAnimationFrame(gameLoop);
+        }
+
+        // Init
+        resetGame();
+        if (mode === 'edit') {
+          hud.style.display = 'none';
+          tapHint.style.display = 'none';
+        }
+
+        lastTime = performance.now();
+        requestAnimationFrame(gameLoop);
+      }
+    
+    run('play');
+    </script>
+  </body>
+</html>
+
