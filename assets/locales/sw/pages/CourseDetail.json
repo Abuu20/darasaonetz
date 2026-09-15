@@ -19,5 +19,8 @@
   "pages.CourseDetail.showAll": "Onyesha masomo yote",
   "pages.CourseDetail.showLess": "Onyesha machache",
   "pages.CourseDetail.more": "zaidi",
-  "pages.CourseDetail.aboutTeacher": "Kuhusu mwalimu"
+  "pages.CourseDetail.aboutTeacher": "Kuhusu mwalimu",
+  "pages.CourseDetail.instructorBadge": "Mwalimu",
+  "pages.CourseDetail.teacherCourseCount": "Kozi {count}",
+  "pages.CourseDetail.teacherStudentCount": "Wanafunzi {count} waliofundishwa"
 }

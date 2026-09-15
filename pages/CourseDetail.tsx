@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { motion } from "motion/react";
 import {
+  BadgeCheck,
   BookOpen,
   CheckCircle2,
   ChevronLeft,
@@ -31,6 +32,7 @@ export default function CourseDetail() {
   const [enrolling, setEnrolling] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [showAllLessons, setShowAllLessons] = useState(false);
+  const [teacherStats, setTeacherStats] = useState<{ courseCount: number; studentCount: number } | null>(null);
 
   const COLLAPSE_AFTER = 6;
 
@@ -48,6 +50,26 @@ export default function CourseDetail() {
       .catch(() => setCourse(null))
       .finally(() => setLoading(false));
   }, [id]);
+
+  // Real credibility signals for the "About the teacher" card — how many
+  // courses this teacher actually publishes and how many distinct students
+  // are enrolled across them (via enrollmentQueries.getUniqueStudentCount,
+  // which counts real enrollment rows — not the unmaintained
+  // courses.enrolled_students counter, which nothing in this app writes to).
+  useEffect(() => {
+    if (!course?.teacher_id) {
+      setTeacherStats(null);
+      return;
+    }
+    courseQueries
+      .getByTeacher(course.teacher_id)
+      .then(async teacherCourses => {
+        const published = teacherCourses.filter(c => c.status === "published");
+        const studentCount = await enrollmentQueries.getUniqueStudentCount(published.map(c => c.id));
+        setTeacherStats({ courseCount: published.length, studentCount });
+      })
+      .catch(() => setTeacherStats(null));
+  }, [course?.teacher_id]);
 
   useEffect(() => {
     if (!user || !session || !id) {
@@ -288,7 +310,7 @@ export default function CourseDetail() {
 
             <div className="flex flex-col gap-stack rounded-card border border-line bg-mist p-block">
               <h3 className="font-heading text-base text-ink">{t("pages.CourseDetail.aboutTeacher")}</h3>
-              <div className="flex items-start gap-tight">
+              <div className="flex items-start gap-block">
                 <img
                   src={course.profiles?.avatar_url || images["logo"]}
                   alt=""
@@ -296,18 +318,45 @@ export default function CourseDetail() {
                     event.currentTarget.onerror = null;
                     event.currentTarget.src = images["logo"];
                   }}
-                  className="h-12 w-12 shrink-0 rounded-pill object-cover"
+                  className="h-16 w-16 shrink-0 rounded-pill object-cover ring-2 ring-accent/15"
                 />
-                <div className="flex flex-col gap-0.5">
-                  <p className="text-sm font-medium text-ink">{course.profiles?.full_name ?? ""}</p>
-                  {course.profiles?.expertise ? (
-                    <p className="text-xs font-medium text-accent">{course.profiles.expertise}</p>
-                  ) : null}
+                <div className="flex flex-col gap-tight">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <p className="font-heading text-base text-ink">{course.profiles?.full_name ?? ""}</p>
+                    <span className="inline-flex items-center gap-0.5 rounded-pill bg-accent/10 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-accent">
+                      <BadgeCheck size={12} aria-hidden="true" />
+                      {t("pages.CourseDetail.instructorBadge")}
+                    </span>
+                  </div>
+
                   {course.profiles?.qualifications ? (
                     <p className="text-xs text-slate">{course.profiles.qualifications}</p>
                   ) : null}
+
+                  {/* Real numbers, not decoration — how much this teacher actually
+                      teaches on the platform right now. Hidden until it has
+                      something true to say (no courses/students yet). */}
+                  {teacherStats && (teacherStats.courseCount > 0 || teacherStats.studentCount > 0) ? (
+                    <p className="text-xs text-slate">
+                      {[
+                        t("pages.CourseDetail.teacherCourseCount").replace("{count}", String(teacherStats.courseCount)),
+                        t("pages.CourseDetail.teacherStudentCount").replace("{count}", String(teacherStats.studentCount)),
+                      ].join(" · ")}
+                    </p>
+                  ) : null}
+
+                  {course.profiles?.expertise ? (
+                    <p className="text-xs text-slate">
+                      {course.profiles.expertise
+                        .split(",")
+                        .map(item => item.trim())
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </p>
+                  ) : null}
+
                   {course.profiles?.bio ? (
-                    <p className="mt-1 text-xs text-slate">{course.profiles.bio}</p>
+                    <p className="mt-1 text-xs italic leading-relaxed text-slate">{course.profiles.bio}</p>
                   ) : null}
                 </div>
               </div>

@@ -19,5 +19,8 @@
   "pages.CourseDetail.showAll": "Show all lessons",
   "pages.CourseDetail.showLess": "Show fewer lessons",
   "pages.CourseDetail.more": "more",
-  "pages.CourseDetail.aboutTeacher": "About the teacher"
+  "pages.CourseDetail.aboutTeacher": "About the teacher",
+  "pages.CourseDetail.instructorBadge": "Instructor",
+  "pages.CourseDetail.teacherCourseCount": "{count} courses",
+  "pages.CourseDetail.teacherStudentCount": "{count} students taught"
 }

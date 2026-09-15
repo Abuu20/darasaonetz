@@ -75,7 +75,7 @@ export const courseQueries = {
     const { data, error } = await supabase
       .from("courses")
       .select(
-        `*, categories (*), profiles!courses_teacher_id_fkey (id, full_name, email, avatar_url, bio, expertise, qualifications), lessons (*, lesson_completions (student_id, completed_at))`
+        `*, categories (*), profiles!courses_teacher_id_fkey (id, full_name, avatar_url, bio, expertise, qualifications), lessons (*, lesson_completions (student_id, completed_at))`
       )
       .eq("id", courseId)
       .maybeSingle();
@@ -282,6 +282,18 @@ export const enrollmentQueries = {
       .single();
     if (error) throw error;
     return data as Enrollment;
+  },
+
+  // Real headcount for a teacher's "About the teacher" card. courses.enrolled_students
+  // is a leftover counter column nothing in this app ever writes to (enroll()
+  // above only inserts into `enrollments`), so it can't be trusted — this counts
+  // actual enrollment rows instead, deduped by student so a student enrolled in
+  // several of the same teacher's courses is only counted once.
+  getUniqueStudentCount: async (courseIds: string[]): Promise<number> => {
+    if (courseIds.length === 0) return 0;
+    const { data, error } = await supabase.from("enrollments").select("student_id").in("course_id", courseIds);
+    if (error) throw error;
+    return new Set((data ?? []).map((row: any) => row.student_id)).size;
   },
 };
 
