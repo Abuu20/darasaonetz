@@ -46,6 +46,20 @@ export default function IslamicTools() {
       title: t("pages.tools.IslamicTools.ramadan.title"),
       description: t("pages.tools.IslamicTools.ramadan.description"),
     },
+    {
+      to: "https://abuu20.github.io/pathway-to-arabic/",
+      emoji: "/icons/tools/arabic-learning.png",
+      gradientClassName: "gradient-head",
+      title: "Learn Arabic",
+      description: "A self-study pathway to classical and Quranic Arabic, from your first letters to reading unaided.",
+    },
+    {
+      to: "https://abuu20.github.io/hadiths/",
+      emoji: "/icons/tools/quran.png",
+      gradientClassName: "gradient-brand",
+      title: "Hadiths",
+      description: "Search and read hadiths in multiple languages and grades, from all the major collections.",
+    },
   ] as const;
 
   return (
