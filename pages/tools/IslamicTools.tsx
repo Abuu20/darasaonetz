@@ -1,6 +1,7 @@
 import SEOHead from "@/components/seo/SEOHead";
 import { useLanguage } from "@/context/LanguageContext";
 import ToolCard from "@/components/tools/ToolCard";
+import IslamicPatternBg from "@/components/tools/IslamicPatternBg";
 
 export default function IslamicTools() {
   const { t } = useLanguage();
@@ -66,19 +67,48 @@ export default function IslamicTools() {
     <>
       <SEOHead titleKey={t("pages.tools.IslamicTools.seo.title")} descriptionKey={t("pages.tools.IslamicTools.seo.description")} />
       <main className="pt-block">
-        <section className="mx-auto max-w-shell px-gutter pb-block pt-section-spacing-mobile text-center md:px-gutter-lg md:pt-section-spacing">
-          <span data-text-id="pages.tools.IslamicTools.eyebrow" className="text-gradient-head text-sm uppercase tracking-widest">
-            {t("pages.tools.IslamicTools.eyebrow")}
-          </span>
-          <h1 data-text-id="pages.tools.IslamicTools.title" className="mt-2 font-heading text-3xl text-ink md:text-4xl">
-            {t("pages.tools.IslamicTools.title")}
-          </h1>
-          <p data-text-id="pages.tools.IslamicTools.paragraph" className="mx-auto mt-2 max-w-prose text-ink/70">
-            {t("pages.tools.IslamicTools.paragraph")}
-          </p>
+        {/* Hero */}
+        <section className="relative overflow-hidden">
+          <IslamicPatternBg />
+          <div className="relative mx-auto max-w-shell px-gutter pb-block pt-section-spacing-mobile text-center md:px-gutter-lg md:pt-section-spacing">
+            <span
+              data-text-id="pages.tools.IslamicTools.eyebrow"
+              className="inline-flex items-center gap-2 rounded-pill border border-line bg-mist px-4 py-1.5 text-sm uppercase tracking-widest text-gradient-head"
+            >
+              {t("pages.tools.IslamicTools.eyebrow")}
+            </span>
+            <h1
+              data-text-id="pages.tools.IslamicTools.title"
+              className="mt-5 font-heading text-4xl leading-tight text-ink md:text-6xl"
+            >
+              {t("pages.tools.IslamicTools.title")}
+            </h1>
+            <p
+              data-text-id="pages.tools.IslamicTools.paragraph"
+              className="mx-auto mt-4 max-w-prose text-lg text-ink/70"
+            >
+              {t("pages.tools.IslamicTools.paragraph")}
+            </p>
+
+            <div className="mx-auto mt-8 flex max-w-xs flex-col gap-3 sm:max-w-none sm:flex-row sm:justify-center">
+              <a
+                href="#tools-grid"
+                className="card-lift gradient-brand rounded-pill px-7 py-3 text-sm font-medium text-primary-foreground transition-transform duration-base hover:scale-hover active:scale-active"
+              >
+                Browse all tools
+              </a>
+              <a
+                href="/tools"
+                className="rounded-pill border border-line px-7 py-3 text-sm font-medium text-ink transition-colors duration-base hover:bg-mist"
+              >
+                Back to all categories
+              </a>
+            </div>
+          </div>
         </section>
 
-        <section className="bg-background px-gutter pb-section-spacing-mobile md:px-gutter-lg md:pb-section-spacing">
+        {/* Tool grid */}
+        <section id="tools-grid" className="scroll-mt-block bg-background px-gutter pb-section-spacing-mobile md:px-gutter-lg md:pb-section-spacing">
           <div className="mx-auto grid max-w-shell grid-cols-1 gap-stack sm:grid-cols-2 lg:grid-cols-4">
             {tools.map(tool => (
               <ToolCard
