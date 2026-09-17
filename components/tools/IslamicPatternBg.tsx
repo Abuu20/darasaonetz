@@ -18,7 +18,7 @@ export default function IslamicPatternBg({ className = "" }: { className?: strin
   return (
     <svg
       aria-hidden="true"
-      className={`pointer-events-none absolute inset-0 h-full w-full text-primary/[0.06] ${className}`}
+      className={`pointer-events-none absolute inset-0 h-full w-full text-primary/[0.09] ${className}`}
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
@@ -26,21 +26,21 @@ export default function IslamicPatternBg({ className = "" }: { className?: strin
           id="islamic-star-lattice"
           x="0"
           y="0"
-          width="72"
-          height="72"
+          width="96"
+          height="96"
           patternUnits="userSpaceOnUse"
         >
           {/* One 8-point star tile, built from two overlapping squares. */}
-          <g transform="translate(36,36)" fill="none" stroke="currentColor" strokeWidth="1">
-            <rect x="-18" y="-18" width="36" height="36" transform="rotate(0)" />
-            <rect x="-18" y="-18" width="36" height="36" transform="rotate(45)" />
+          <g transform="translate(48,48)" fill="none" stroke="currentColor" strokeWidth="1.25">
+            <rect x="-24" y="-24" width="48" height="48" transform="rotate(0)" />
+            <rect x="-24" y="-24" width="48" height="48" transform="rotate(45)" />
           </g>
           {/* Connecting lattice lines to the tile's neighbors. */}
-          <g stroke="currentColor" strokeWidth="1">
-            <line x1="0" y1="0" x2="36" y2="0" />
-            <line x1="0" y1="0" x2="0" y2="36" />
-            <line x1="72" y1="0" x2="36" y2="0" />
-            <line x1="0" y1="72" x2="0" y2="36" />
+          <g stroke="currentColor" strokeWidth="1.25">
+            <line x1="0" y1="0" x2="48" y2="0" />
+            <line x1="0" y1="0" x2="0" y2="48" />
+            <line x1="96" y1="0" x2="48" y2="0" />
+            <line x1="0" y1="96" x2="0" y2="48" />
           </g>
         </pattern>
       </defs>
